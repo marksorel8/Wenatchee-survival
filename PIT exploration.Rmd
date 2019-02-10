@@ -1,0 +1,495 @@
+---
+title: "Wenatchee spring Chinook PIT survival"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+editor_options: 
+  chunk_output_type: console
+---
+#Background
+My objective is to use PIT-tag data to characterize survival rates of Wenatchee River spring Chinook between emigrating from natal areas to returning to natal areas as adults. 
+
+All fish were marked in the Wenatchee Basin and were identified as the offspring of naturally-spawning spring Chinook based on when and where they were tagged and (lack of) markings.
+
+We will likely assess survival between the following points: emigration from natal reach -> McNary Dam -> Bonneville Dam (juvenile) -> Bonneville Dam (adult) -> McNary Dam (adult) -> R0ck Island Dam (adult) -> Tumwater Dam (adult)
+
+
+Data were downloaded from PTAGIS website using the following three querries:
+
+1)Tagging records for all natural-origin spring Chinook in the Wenatchee Basin.
+
+2)Any detections of the above at "interrogation sites" ( antennas) such as in juvenile-bypass systems and adult fishways at Dams or instream arrays. 
+
+3)Recaptures of the above (#1). 
+
+```{r load_data, cache=T}
+#setwd("~/559/Wenatchee")
+library(here)
+
+tag_file<-read.csv(here("wen wild  tag det.csv"))
+
+interrogation<-read.csv(here("wen wild tag inter hist.csv"))
+
+recaps<-read.csv(here("wen wild tag recaps.csv"))
+
+```
+
+Since I'm not sure how fish are captured at each site, look at number of fish tagged per site and capture method (e.g. screw trap, electrofish, weir, etc.)
+
+```{r data_examine,echo=F}
+#table(tag_file$Mark.Site.Info.Name,tag_file$Capture.Method.Code)
+sort(table(tag_file$Mark.Site.Info.Name))
+sort(table(tag_file$Capture.Method.Code))
+```
+Fish are tagged when actively migrating downstream at screw traps (juvenile), upstream atthe tumwater fish ladder (adult), or when NOT actively migrating with other methods. 
+
+#tagging 
+##screw traps
+
+```{r tag_day_vis}
+#all screw traps
+Screw_trap_tags<-droplevels(subset(tag_file,          Capture.Method.Code=="SCREWT"))
+
+sort(table(Screw_trap_tags$Mark.Site.Name))
+table(Screw_trap_tags$Mark.Year.YYYY)
+
+hist(Screw_trap_tags$Mark.Day.Number)
+
+#Chiwawa River trap
+chiw_trap_tags<-droplevels(subset(tag_file,Mark.Site.Name=="CHIWAT - Chiwawa River Trap, 0.5 km below CHIP acclimation pond"&
+                                   Capture.Method.Code=="SCREWT"))
+
+table(chiw_trap_tags$Mark.Year.YYYY)
+hist(chiw_trap_tags$Mark.Day.Number)
+#Nason Creek Trap
+nas_trap_tags<-droplevels(subset(tag_file,Mark.Site.Name=="NASONC - Nason Creek (tributary to Wenatchee River)" &
+                                   Capture.Method.Code=="SCREWT"))
+
+table(nas_trap_tags$Mark.Year.YYYY)
+hist(nas_trap_tags$Mark.Day.Number)
+#White River trap
+white_trap_tags<-droplevels(subset(tag_file,Mark.Site.Name=="WHITER - White River, Wenatchee River Basin" &
+                                   Capture.Method.Code=="SCREWT"))
+
+table(white_trap_tags$Mark.Year.YYYY)
+hist(white_trap_tags$Mark.Day.Number)
+
+#Upper Wenatchee trap just below Lake Wenatchee
+Upper_Wen_trap_tags<-droplevels(subset(tag_file,(Mark.Site.Name=="WENA2T - Upper Wenatchee smolt trap just below Lake Wenatchee") & Capture.Method.Code=="SCREWT"))
+
+table(Upper_Wen_trap_tags$Mark.Year.YYYY)
+hist(Upper_Wen_trap_tags$Mark.Day.Number)
+
+#Lower Wenatchee trap
+Lower_Wen_trap_tags<-droplevels(subset(tag_file,(Mark.Site.Name=="WENATT - Wenatchee River trap at West Monitor Bridge"|Mark.Site.Name=="WENA4T - Lower Wenatchee trap, 2.8km below Mission Creek") & Capture.Method.Code=="SCREWT"))
+
+table(Lower_Wen_trap_tags$Mark.Year.YYYY)
+hist(Lower_Wen_trap_tags$Mark.Day.Number)
+```
+
+## "remote" (i.e. NOT at screw traps)
+
+```{r juve_remote_tag_time}
+remote_tags<-droplevels(subset(tag_file,Capture.Method.Name!="Adult Passage Ladder"& Capture.Method.Name!="Screw Trap"& Capture.Method.Name!="Spawning Survey"))
+
+sort(table(remote_tags$Mark.Site.Info.Name))
+
+#Little Wenatchee
+little_Wen_remote<-droplevels(subset(remote_tags,Mark.Site.Name=="LWENAT - Little Wenatchee River"))
+
+hist(little_Wen_remote$Mark.Day.Number)
+
+#Nason
+Nas_remote<-droplevels(subset(remote_tags,Mark.Site.Name=="NASONC - Nason Creek (tributary to Wenatchee River)"))
+
+hist(Nas_remote$Mark.Day.Number)
+
+#Chiwawa
+Chiw_remote<-droplevels(subset(remote_tags,Mark.Site.Name=="CHIWAR - Chiwawa River"|Mark.Site.Name=="ROCK3C - Rock Creek, tributary to Chiwawa River"|Mark.Site.Name=="CHIKAC - Chikamin Creek, tributary to Chiwawa River"))
+  
+hist(Chiw_remote$Mark.Day.Number)
+
+#Mainstem Wenatchee
+Main_Wen_remote<-droplevels(subset(remote_tags,Mark.Site.Info.Name=="Wenatchee River"))
+  
+hist(Main_Wen_remote$Mark.Day.Number)
+
+
+```
+
+#juvenile detections 
+
+##just of fish tagged in screw traps in Chiwawa, Nason, White, Lower Wen
+```{r}
+#Chiwawa River trap
+chiw_Int<-droplevels(subset(interrogation,Mark.Site.Name=="CHIWAT - Chiwawa River Trap, 0.5 km below CHIP acclimation pond"&
+                                   Mark.Capture.Method.Code=="SCREWT"))
+
+#Nason Creek Trap
+nas_Int<-droplevels(subset(interrogation,Mark.Site.Name=="NASONC - Nason Creek (tributary to Wenatchee River)" &
+                                   Mark.Capture.Method.Code=="SCREWT"))
+
+
+#White River trap
+white_Int<-droplevels(subset(interrogation,Mark.Site.Name=="WHITER - White River, Wenatchee River Basin" &
+                                   Mark.Capture.Method.Code=="SCREWT"))
+
+#Upper Wenatchee trap just below Lake Wenatchee
+Upper_Int<-droplevels(subset(interrogation,(Mark.Site.Name=="WENA2T - Upper Wenatchee smolt trap just below Lake Wenatchee") & Mark.Capture.Method.Code=="SCREWT"))
+
+#Lower Wenatchee trap
+Lower_Int<-droplevels(subset(interrogation,(Mark.Site.Name=="WENATT - Wenatchee River trap at West Monitor Bridge"|Mark.Site.Name=="WENA4T - Lower Wenatchee trap, 2.8km below Mission Creek") & Mark.Capture.Method.Code=="SCREWT"))
+
+
+#main traps combined
+mainTraps_Int<-rbind(chiw_Int,nas_Int,white_Int,Upper_Int,Lower_Int)
+
+```
+
+##instream arrays in Wenatchee Basin
+
+```{r juv_instream_det}
+#little Wenatchee
+little_Wen_instream<-droplevels(subset(interrogation,Site.Name=="LWN - Little Wenatchee River" & as.numeric(as.Date(First.Date.MMDDYYYY,format="%m/%d/%Y")-
+  as.Date(Mark.Date.MMDDYYYY,format="%m/%d/%Y"))<300 & Mark.Site.Name=="LWENAT - Little Wenatchee River"))
+
+table(little_Wen_instream$First.Year.YYYY)
+hist(little_Wen_instream$First.Day.Num)
+
+#White River
+
+White_instream<-droplevels(subset(interrogation,Site.Name=="WTL - White River, Wenatchee Basin" & as.numeric(as.Date(First.Date.MMDDYYYY,format="%m/%d/%Y")-
+  as.Date(Mark.Date.MMDDYYYY,format="%m/%d/%Y"))<300 ))
+
+table(White_instream$First.Year.YYYY)
+hist(White_instream$First.Day.Num)
+#Upper Nason
+
+Upper_Nas_instream<-droplevels(subset(interrogation,Site.Name=="NAU - Upper Nason Creek" & as.numeric(as.Date(First.Date.MMDDYYYY,format="%m/%d/%Y")-
+  as.Date(Mark.Date.MMDDYYYY,format="%m/%d/%Y"))<300 ))
+
+table(Upper_Nas_instream$First.Year.YYYY)
+hist(Upper_Nas_instream$First.Day.Num)
+#Lower Nason
+
+lower_nas_instream<-droplevels(subset(interrogation,Site.Name=="NAL - Lower Nason Creek" & as.numeric(as.Date(First.Date.MMDDYYYY,format="%m/%d/%Y")-
+  as.Date(Mark.Date.MMDDYYYY,format="%m/%d/%Y"))<300 ))
+
+table(lower_nas_instream$First.Year.YYYY)
+hist(lower_nas_instream$First.Day.Num)
+#Upper Chiwawa
+upper_Chiw_instream<-droplevels(subset(interrogation,Site.Name=="CHU - Upper Chiwawa River" & as.numeric(as.Date(First.Date.MMDDYYYY,format="%m/%d/%Y")-
+  as.Date(Mark.Date.MMDDYYYY,format="%m/%d/%Y"))<300 ))
+
+table(upper_Chiw_instream$First.Year.YYYY)
+hist(upper_Chiw_instream$First.Day.Num)
+#Lower Chiwawa
+
+lower_Chiw_instream<-droplevels(subset(interrogation,Site.Name=="CHL - Lower Chiwawa River" & as.numeric(as.Date(First.Date.MMDDYYYY,format="%m/%d/%Y")-
+  as.Date(Mark.Date.MMDDYYYY,format="%m/%d/%Y"))<300 ))
+
+table(lower_Chiw_instream$First.Year.YYYY)
+hist(lower_Chiw_instream$First.Day.Num)
+#Upper Wenatchee
+
+Upper_Wen_instream<-droplevels(subset(interrogation,Site.Name=="LWN - Little Wenatchee River" & as.numeric(as.Date(First.Date.MMDDYYYY,format="%m/%d/%Y")-
+  as.Date(Mark.Date.MMDDYYYY,format="%m/%d/%Y"))<300 ))
+
+table(Upper_Wen_instream$First.Year.YYYY)
+hist(Upper_Wen_instream$First.Day.Num)
+
+
+#Middle Wenatchee
+
+middle_Wen_instream<-droplevels(subset(interrogation,Site.Name=="MWE - Middle Wenatchee River" & as.numeric(as.Date(First.Date.MMDDYYYY,format="%m/%d/%Y")-
+  as.Date(Mark.Date.MMDDYYYY,format="%m/%d/%Y"))<300 ))
+
+table(middle_Wen_instream$First.Year.YYYY)
+hist(middle_Wen_instream$First.Day.Num)
+
+
+#Lower Wenatchee
+
+lower_Wen_instream<-droplevels(subset(interrogation,Site.Name=="LWE - Lower Wenatchee River" & as.numeric(as.Date(First.Date.MMDDYYYY,format="%m/%d/%Y")-
+  as.Date(Mark.Date.MMDDYYYY,format="%m/%d/%Y"))<300 ))
+
+table(lower_Wen_instream$First.Year.YYYY)
+hist(lower_Wen_instream$First.Day.Num)
+
+```
+
+tables of detection by mark site and year
+```{r}
+#middle Wenatchee
+middle_Wen_inst_ST<-droplevels(subset(mainTraps_Int,Site.Name=="MWE - Middle Wenatchee River" & as.numeric(as.Date(First.Date.MMDDYYYY,format="%m/%d/%Y")-
+  as.Date(Mark.Date.MMDDYYYY,format="%m/%d/%Y"))<300 ))
+
+
+MW_yr_tab<-table(middle_Wen_inst_ST$Mark.Site.Info.Code,middle_Wen_inst_ST$First.Year.YYYY)
+
+rownames(MW_yr_tab)<-c("Chiwawa","nason","white","upper wen")
+
+MW_yr_tab
+
+hist(middle_Wen_inst_ST$First.Day.Num)
+```
+
+
+Detection of juveniles tagged at screw trap at mainstem dams 
+```{r}
+#McNary Juvenile
+McNary_Juv_ST<-droplevels(subset(mainTraps_Int,Site.Code.Value =="MCJ"))
+
+
+McNary_Juv_yr_tab<-table(McNary_Juv_ST$Mark.Site.Info.Code,McNary_Juv_ST$First.Year.YYYY)
+
+McNary_Juv_yr_tab[5,]<-colSums(McNary_Juv_yr_tab[5:6,])
+McNary_Juv_yr_tab<-McNary_Juv_yr_tab[-6,]
+
+rownames(McNary_Juv_yr_tab)<-c("Chiwawa","Nason","White","Upper Wen","Lower Wen")
+
+McNary_Juv_yr_tab
+
+
+hist(McNary_Juv_ST$First.Day.Num)
+
+
+#John Day Dam Juvenile
+JD_Juv_ST<-droplevels(subset(mainTraps_Int,Site.Code.Value =="JDJ"))
+
+
+JD_Juv_yr_tab<-table(JD_Juv_ST$Mark.Site.Info.Code,JD_Juv_ST$First.Year.YYYY)
+
+JD_Juv_yr_tab[5,]<-colSums(JD_Juv_yr_tab[5:6,])
+JD_Juv_yr_tab<-JD_Juv_yr_tab[-6,]
+
+rownames(JD_Juv_yr_tab)<-c("Chiwawa","Nason","White","Upper Wen","Lower Wen")
+
+JD_Juv_yr_tab
+
+hist(JD_Juv_ST$First.Day.Num)
+
+#Bonneville Dam Juvenile
+Bonn_Juv_ST<-droplevels(subset(mainTraps_Int,Site.Code.Value =="B1J" |Site.Code.Value =="B2J"|
+                             Site.Code.Value =="BCC" ))
+
+
+Bonn_Juv_yr_tab<-table(Bonn_Juv_ST$Mark.Site.Info.Code,Bonn_Juv_ST$First.Year.YYYY)
+
+Bonn_Juv_yr_tab[5,]<-colSums(Bonn_Juv_yr_tab[5:6,])
+Bonn_Juv_yr_tab<-Bonn_Juv_yr_tab[-6,]
+
+rownames(Bonn_Juv_yr_tab)<-c("Chiwawa","Nason","White","Upper Wen","Lower Wen")
+
+Bonn_Juv_yr_tab
+
+hist(Bonn_Juv_ST$First.Day.Num)
+
+#Estuary Towed Juvenile
+Est_Juv_ST<-droplevels(subset(mainTraps_Int,Site.Code.Value =="TWX" ))
+
+
+Est_Juv_yr_tab<-table(Est_Juv_ST$Mark.Site.Info.Code,Est_Juv_ST$First.Year.YYYY)
+
+Est_Juv_yr_tab[5,]<-colSums(Est_Juv_yr_tab[5:6,])
+Est_Juv_yr_tab<-Est_Juv_yr_tab[-6,]
+
+rownames(Est_Juv_yr_tab)<-c("Chiwawa","Nason","White","Upper Wen","Lower Wen")
+
+Est_Juv_yr_tab
+
+hist(Est_Juv_ST$First.Day.Num)
+
+
+
+```
+
+
+## mainstem dams
+
+```{r timeing_juv_mainst}
+#McNary Juvenile
+McNary_Juv<-droplevels(subset(interrogation,Site.Code.Value =="MCJ" ))
+
+hist(McNary_Juv$First.Day.Num,breaks=30)
+
+#John Day Dam Juvenile
+John_Day_Juv<-droplevels(subset(interrogation,Site.Code.Value =="JDJ" ))
+
+hist(John_Day_Juv$First.Day.Num,breaks=30)
+
+#Bonneville Dam Juvenile
+Bon_Juv<-droplevels(subset(interrogation,Site.Code.Value =="B1J" |Site.Code.Value =="B2J"|
+                             Site.Code.Value =="BCC" ))
+
+hist(Bon_Juv$First.Day.Num,breaks=30)
+
+#Estuary towed Juvenile
+Est_towed_Juv<-droplevels(subset(interrogation,Site.Code.Value =="TWX" ))
+
+hist(Est_towed_Juv$First.Day.Num,breaks=30)
+```
+
+
+
+# adult detections 
+
+detections of adults, which were tagged as juveniles in screw traps, at mainstem dams
+```{r}
+#Bonneville Aduls
+Bonn_Ad_ST<-droplevels(subset(mainTraps_Int,Site.Code.Value =="BO1" |Site.Code.Value =="BO2"| Site.Code.Value =="BO3"|Site.Code.Value =="BO4"))
+
+
+Bonn_Ad_yr_tab<-table(Bonn_Ad_ST$Mark.Site.Info.Code,Bonn_Ad_ST$First.Year.YYYY)
+
+Bonn_Ad_yr_tab[5,]<-colSums(Bonn_Ad_yr_tab[5:6,])
+Bonn_Ad_yr_tab<-Bonn_Ad_yr_tab[-6,]
+
+rownames(Bonn_Ad_yr_tab)<-c("Chiwawa","Nason","White","Upper Wen","Lower Wen")
+
+Bonn_Ad_yr_tab
+
+
+hist(Bonn_Ad_ST$First.Day.Num)
+
+#Dalles Adults
+Dalles_Ad_ST<-droplevels(subset(mainTraps_Int,Site.Code.Value =="TD1" |Site.Code.Value =="TD2"))
+
+
+Dalles_Ad_yr_tab<-table(Dalles_Ad_ST$Mark.Site.Info.Code,Dalles_Ad_ST$First.Year.YYYY)
+
+
+rownames(Dalles_Ad_yr_tab)<-c("Chiwawa","Nason","White","Upper Wen","Lower Wen")
+
+Dalles_Ad_yr_tab
+
+
+hist(Dalles_Ad_ST$First.Day.Num)
+
+#McNary Adults
+McNary_Ad_ST<-droplevels(subset(mainTraps_Int,Site.Code.Value =="MC1" |Site.Code.Value =="MC2"))
+
+
+McNary_Ad_yr_tab<-table(McNary_Ad_ST$Mark.Site.Info.Code,McNary_Ad_ST$First.Year.YYYY)
+
+McNary_Ad_yr_tab[5,]<-colSums(McNary_Ad_yr_tab[5:6,])
+McNary_Ad_yr_tab<-McNary_Ad_yr_tab[-6,]
+
+rownames(McNary_Ad_yr_tab)<-c("Chiwawa","Nason","White","Upper Wen","Lower Wen")
+
+McNary_Ad_yr_tab
+
+hist(McNary_Ad_ST$First.Day.Num)
+
+#Priest Rapids Adults
+Priest_Ad_ST<-droplevels(subset(mainTraps_Int,Site.Code.Value =="PRA" ))
+
+
+Priest_Ad_yr_tab<-table(Priest_Ad_ST$Mark.Site.Info.Code,Priest_Ad_ST$First.Year.YYYY)
+
+Priest_Ad_yr_tab[5,]<-colSums(Priest_Ad_yr_tab[5:6,])
+Priest_Ad_yr_tab<-Priest_Ad_yr_tab[-6,]
+
+rownames(Priest_Ad_yr_tab)<-c("Chiwawa","Nason","White","Upper Wen","Lower Wen")
+
+Priest_Ad_yr_tab
+
+hist(Priest_Ad_ST$First.Day.Num)
+
+#Rock Island Adults
+RIs_Ad_ST<-droplevels(subset(mainTraps_Int,Site.Code.Value =="RIA" ))
+
+
+RIs_Ad_yr_tab<-table(RIs_Ad_ST$Mark.Site.Info.Code,RIs_Ad_ST$First.Year.YYYY)
+
+RIs_Ad_yr_tab[5,]<-colSums(RIs_Ad_yr_tab[5:6,])
+RIs_Ad_yr_tab<-RIs_Ad_yr_tab[-6,]
+
+rownames(RIs_Ad_yr_tab)<-c("Chiwawa","Nason","White","Upper Wen","Lower Wen")
+
+RIs_Ad_yr_tab
+
+hist(RIs_Ad_ST$First.Day.Num)
+
+#Tumwater Adults
+Tum_Ad_ST<-droplevels(subset(mainTraps_Int,Site.Code.Value =="TUF" ))
+
+
+Tum_Ad_yr_tab<-table(Tum_Ad_ST$Mark.Site.Info.Code,Tum_Ad_ST$First.Year.YYYY)
+
+Tum_Ad_yr_tab[5,]<-colSums(Tum_Ad_yr_tab[5:6,])
+Tum_Ad_yr_tab<-Tum_Ad_yr_tab[-6,]
+
+rownames(Tum_Ad_yr_tab)<-c("Chiwawa","Nason","White","Upper Wen","Lower Wen")
+
+Tum_Ad_yr_tab
+
+hist(Tum_Ad_ST$First.Day.Num)
+
+```
+
+
+
+##Age at return
+
+##Dams
+```{r adult_time_vis}
+#Bonneville Adult
+Bon_Adult<-droplevels(subset(interrogation,(Site.Code.Value =="BO1" |Site.Code.Value =="BO2"|
+                             Site.Code.Value =="BO3" |Site.Code.Value =="BO4") &                              as.numeric(as.Date(Last.Date.MMDDYYYY,format="%m/%d/%Y")-
+  as.Date(Mark.Date.MMDDYYYY,format="%m/%d/%Y"))>400))
+
+hist(Bon_Adult$First.Day.Num,breaks=30)
+
+#McNary Adult
+McNary_Adult<-droplevels(subset(interrogation,(Site.Code.Value =="MC1" |Site.Code.Value =="MC2")&                             as.numeric(as.Date(Last.Date.MMDDYYYY,format="%m/%d/%Y")-
+  as.Date(Mark.Date.MMDDYYYY,format="%m/%d/%Y"))>400))
+
+hist(McNary_Adult$First.Day.Num,breaks=30)
+
+#Priest Rapids
+
+Priest_Adult<-droplevels(subset(interrogation,Site.Code.Value =="PRA" &                              as.numeric(as.Date(Last.Date.MMDDYYYY,format="%m/%d/%Y")-
+  as.Date(Mark.Date.MMDDYYYY,format="%m/%d/%Y"))>400))
+
+hist(Priest_Adult$First.Day.Num,breaks=30)
+
+
+
+#Rock Island
+Rock_Island_Adult<-droplevels(subset(interrogation,Site.Code.Value =="RIA" &                              as.numeric(as.Date(Last.Date.MMDDYYYY,format="%m/%d/%Y")-
+  as.Date(Mark.Date.MMDDYYYY,format="%m/%d/%Y"))>400))
+
+hist(Rock_Island_Adult$Last.Day.Num,breaks=30)
+
+
+#Tumwater
+Tum<-droplevels(subset(interrogation,Site.Code.Value =="TUF" & ( as.numeric(as.Date(Last.Date.MMDDYYYY,format="%m/%d/%Y")-
+  as.Date(Mark.Date.MMDDYYYY,format="%m/%d/%Y"))>400|Mark.Capture.Method.Name=="Adult Passage Ladder")))
+
+hist(Tum$First.Day.Num,breaks=30)
+
+
+```
+
+
+Fish tagged as adults at Tumwater Dam
+```{r}
+Tum_ad_tags<-droplevels(subset(tag_file,Mark.Site.Info.Code=="TUM" ))
+table(Tum_ad_tags$Capture.Method.Name)
+hist(Tum_ad_tags$Mark.Day.Number)
+hist(Tum_ad_tags$Length.mm)
+table(Tum_ad_tags$Mark.Year.YYYY)
+
+
+Tum_tag_Int<-droplevels(subset(interrogation,Mark.Site.Info.Code=="TUM"))
+
+sort(table(Tum_tag_Int$Site.Name))
+
+
+Tum_tag_Int<-Tum_tag_Int[,]
+
+
+```
+
