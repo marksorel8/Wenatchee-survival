@@ -1,0 +1,351 @@
+---
+title: "Wenatche_MSCJS_run"
+author: "mark sorel"
+date: "12/17/2020"
+output: html_document
+---
+
+This file is for fitting multistate CJS models for wenatchee river spring CHinook salmon between emigrating from their natal stream in the Wenatchee and returning as adults at after 1-3 years at sea.
+
+```{r, load_data}
+library(here)
+source(here("src","Wen_MSCJS_re.R"))
+```
+
+### look at #s of detections by year and site, then by life history (LH), stream, and site.
+```{r, data_examine}
+select(mark_file_CH,sea_Year_p,McN_J:Tum_A) %>% group_by(sea_Year_p) %>% summarise_all(function(x)sum((x>0))) %>% print(n=100)
+#not using TDD_A or JDD_A currently because of missing years and relatively good detection upstream.
+
+select(mark_file_CH,sea_Year_p,LH,stream,McN_J:Tum_A) %>% group_by(LH,stream) %>% summarise_all(function(x)sum((x>0)))%>% print(n=100)
+#no adult detections of white summer and few for white fall and smolt
+
+
+```
+
+Takeaways: Either 2020 adult detection data not uploaded yet or no 2020 adult detections. Will stop with downstream migration year 2016 for now, which would return through 2019. Also, first year (2003) followed by three year "gap", so will start analysis with 2006 downstream migration year. Adult detection the The Dalles Dam (TDD_A) and John Day Dam (JDD_A) started in 2010 and 2015 respectively. Could be included with detection fixed to 0 before then, but will exclude for now. 
+
+Numbers's of detections quite low for some stream x life history combinations, especially adults. 0 adult detections of White river summer emigrants. 
+
+
+Look at the distributions of tagged fish's lengths vs lengths of fish captured in the screw trap. Same for day of year. Grey is fish captured in the screw trap and red is tagged.
+```{r, examine_tag_distribution}
+ggplot(all_bio_data,aes(x=Length))+geom_density(alpha=.5,fill="black",color=NA)+facet_wrap(~LH,scales = "free_y")+geom_density(data=mark_file_CH,aes(x= `Length mm`), alpha=.5,fill="red",color=NA)
+
+ggplot(all_bio_data,aes(x=DOY))+geom_density(alpha=.5,fill="black",color=NA)+facet_wrap(~LH,scales = "free_y")+geom_density(data=mark_file_CH,aes(x=`Mark Day Number`), alpha=.5,fill="red",color=NA)
+
+
+```
+
+Takeaway: there is definitely a bias toward larger and later fish during summer being tagged (because their is a size cutoff for how small of a fish can be tagged). We will need to address this somehow. ALso, no fry tagged. Going to worry about this later.
+
+
+```{r, process_dat,echo=FALSE}
+mscjs_dat<-make_dat(mark_file_CH)
+```
+
+```{r, fit full model}
+
+#"full" model
+
+mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
+                         phi_formula=par.index~
+                           #fixed effect
+                           -1+ time + #occasion
+                           time:LH + #occasion:life history
+                           time1:streamWhite+time1:streamNason+#survival to McNary 
+                           time1:streamWhite:LHsummer+time1:streamWhite:LHsmolt+ 
+                           time1:streamNason:LHsummer+time1:streamNason:LHsmolt+
+                           time2:streamWhite+time2:streamNason+#to Bonneville
+                           # time2:streamWhite:LHsummer+time2:streamWhite:LHsmolt+ 
+                           # time2:streamNason:LHsummer+time2:streamNason:LHsmolt+
+                           time3:streamWhite+time3:streamNason+ #to Bonneville Adult
+                           stratum2+stratum3+ #stratum upstream
+                           #random effects
+                           cs(0+time1:stream:LH|mig_year)+ # to McNary
+                           diag(0+time2|mig_year)+ #to Bonneville Juvenile
+                           diag(0+time3|mig_year)+ #to Bonneville Adult
+                           diag(0+time4|mig_year)+ #to McNary Adult
+                           diag(0+time5|mig_year)+ #to Priest Rapids Adult
+                           diag(0+time6|mig_year)+ #to Rock Island Adult
+                           diag(0+time7|mig_year), #to Tumwater Dam Adult
+                           
+                           
+                         p_formula=    par.index~
+                           #fixed effects
+                           -1+ time+time:LH+
+                           time2:streamWhite+time2:streamNason+#McNary detection
+                           time2:streamWhite:LHsummer+time2:streamWhite:LHsmolt+
+                           time2:streamNason:LHsummer+time2:streamNason:LHsmolt+
+                           time3:streamWhite+time3:streamNason+#Bonneville juvenile
+                         stratum2+stratum3+#stratum upstream
+                          #random effects
+                          diag(0+time2|mig_year)+  #McNary Juveniles
+                           diag(0+time3|mig_year)+ # Bonneville Juvenile
+                           diag(0+time4|mig_year)+ # Bonnveille Adult
+                           diag(0+time5|mig_year)+ # Mcnary Adult
+                           diag(0+time6|mig_year)+ #Priest Rapids Adult
+                           diag(0+time7|mig_year), #Rock Island Adult
+                         # final detection (tumwater) fixed at 1.0
+                         
+
+                         
+                         psi_formula= par.index~
+                           #fixed effects
+                           tostratum+
+                           tostratum:LH+
+                           tostratum:stream+
+                           #random effects
+                           (tostratum|stream:LH)+
+                         (0+tostratum|mig_year),
+                         
+                         
+                         doFit = TRUE
+)
+
+
+mscjs_fit$Phi.design.glmmTMB$data.tmb$terms
+```
+
+```{r print_outputs}
+#function that prints random effect standard deviations and correlations in a nice table
+print_cov<-function(param){
+mat_out<-matrix(NA,nrow=0,ncol=4+100,dimnames = list(c(),c("Groups","Name","Std.Dev","SD(SD)","Corr",rep("",99))))
+ind<-0
+for(i in 1:length(mod_rep[[paste0("sd_",tolower(param))]])){
+ind2<-ind+length(mod_rep[[paste0("sd_",tolower(param))]][[i]])
+
+##RE variance
+value<-ad_rep_vals[names(ad_rep_vals)==paste0("exp(theta_",tolower(param),")")][(ind+1):ind2]
+
+###SE
+sd_val<-ad_rep_sds[names(ad_rep_vals)==paste0("exp(theta_",tolower(param),")")][(ind+1):ind2]
+##lower tri corr
+cor_mat<-mod_rep[[paste0("corr_",tolower(param))]][[i]]
+cor_mat[upper.tri(cor_mat,TRUE)]<-NA
+
+##combine
+mat_i<-matrix(NA,nrow=length(value),ncol=4+100,dimnames = list(rep("",length(value)),c("Groups","Name","Std.Dev","SD(SD)","Corr",rep("",99))))
+mat_i[1,1]<-mscjs_fit[[paste0(param,".design.glmmTMB")]]$grpVar[i]
+mat_i[,2]<-mscjs_fit[[paste0(param,".design.glmmTMB")]]$condList$reTrms$cnms[i][[1]]
+mat_i[,3]<-round(value,4)
+mat_i[,4]<-round(sd_val,4)
+if(ncol(cor_mat)>0){ mat_i[,5:(4+ncol(cor_mat))]<-round(cor_mat,4)
+}
+mat_out<-rbind(mat_out,mat_i)
+
+ind<-ind2
+
+}
+print(mat_out[,apply(mat_out,2,function(x)sum(!is.na(x)))>0],na.print = "",quote = FALSE)
+}
+
+#mscjs_fit$fit$time_for_run
+mscjs_fit$fit$time_for_MLE
+mscjs_fit$fit$time_for_sdreport
+
+#sd report
+#sd_rep<-sdreport(mod)
+#sd_rep
+fixed_est<-mscjs_fit$fit$SD$par.fixed
+fixed_sd<-sqrt(diag(mscjs_fit$fit$SD$cov.fixed))
+
+#report
+mod_rep<-mscjs_fit$mod$report()
+#ad report
+ad_rep_vals<-mscjs_fit$fit$SD$value
+ad_rep_sds<-mscjs_fit$fit$SD$sd
+
+
+print("Phi")
+print("fixed")
+tibble(par_name=colnames(mscjs_fit$Phi.design.glmmTMB$data.tmb$X),estimate=fixed_est[1:length(mscjs_fit$par_TMB$beta_phi)],sd=fixed_sd[1:length(mscjs_fit$par_TMB$beta_phi)]) %>%  mutate(p_value= round(2*pnorm(abs(estimate/sd), lower.tail = FALSE),3)) %>% print(n=100)
+print("Random covariance")
+print_cov("Phi")
+
+
+
+
+
+print("p")
+print("fixed")
+tibble(par_name=colnames(mscjs_fit$p.design.glmmTMB$data.tmb$X),estimate=fixed_est[seq(from=(length(mscjs_fit$par_TMB$beta_phi)+1),length=length(mscjs_fit$par_TMB$beta_p))],sd=fixed_sd[seq(from=(length(mscjs_fit$par_TMB$beta_phi)+1),length=length(mscjs_fit$par_TMB$beta_p))]) %>%  mutate(p_value= round(2*pnorm(abs(estimate/sd), lower.tail = FALSE),3)) %>% print(n=100)
+print("Random covariance")
+print_cov("p")
+
+
+print("Psi")
+print("fixed")
+tibble(par_name=colnames(mscjs_fit$Psi.design.glmmTMB$data.tmb$X),estimate=fixed_est[seq(from=(length(mscjs_fit$par_TMB$beta_phi)+length(mscjs_fit$par_TMB$beta_p)+1),length=length(mscjs_fit$par_TMB$beta_psi))],sd=fixed_sd[seq(from=(length(mscjs_fit$par_TMB$beta_phi)+length(mscjs_fit$par_TMB$beta_p)+1),length=length(mscjs_fit$par_TMB$beta_psi))]) %>%  mutate(p_value= round(2*pnorm(abs(estimate/sd), lower.tail = FALSE),3)) %>% print(n=100)
+print_cov("Psi")
+
+
+# random effect standard deviations and correlations
+
+mod_rep$sd_p
+mod_rep$corr_p
+mod_rep$sd_psi
+mod_rep$corr_psi
+
+mscjs_fit$fit$AIC
+
+
+mscjs_fit$mod$env$last.par.best
+
+
+
+```
+
+
+```{r plot_output?}
+head(mod_rep$psi)
+mod_rep$phi[1:20]
+mod_rep$p[1:3]
+sd_rep<-mscjs_fit$fit$SD
+Phi.design.dat2 <- mscjs_dat$Phi.design.dat%>% mutate(phi_fit=mod_rep$phi,
+                                            eta_phi= sd_rep$value[names(sd_rep$value)=="eta_phi"],
+                                            eta_phi_sd=sd_rep$sd[names(sd_rep$value)=="eta_phi"],
+                                            lcl_phi=plogis(qnorm(.025,eta_phi,eta_phi_sd)),
+                                            ucl_phi=plogis(qnorm(.975,eta_phi,eta_phi_sd))) %>% 
+  mutate(LH=fct_relevel(LH,"summer","fall","smolt"))
+
+p.design.dat <- mscjs_dat$p.design.dat %>% mutate(p_fit=mod_rep$p,
+                                            eta_p=sd_rep$value[names(sd_rep$value)=="eta_p"],
+                                            eta_p_sd=sd_rep$sd[names(sd_rep$value)=="eta_p"],
+                                            lcl_p=plogis(qnorm(.025,eta_p,eta_p_sd)),
+                                            ucl_p=plogis(qnorm(.975,eta_p,eta_p_sd)))
+
+
+  
+
+dev.new()
+ggplot(data= as_tibble(Phi.design.dat2),aes(x=as.numeric(mig_year) ,y=phi_fit,color=stream)) + geom_point(position=position_dodge(width = .75))+geom_linerange(aes(ymin=lcl_phi,ymax=ucl_phi),position=position_dodge(width = .75))+facet_grid(rows=vars(time),cols=vars(LH))
+
+dev.new()
+ggplot(data= as_tibble(p.design.dat),aes(x=as.numeric(mig_year) ,y=p_fit,color=stream)) + geom_point(position=position_dodge(width = .75))+geom_linerange(aes(ymin=lcl_p,ymax=ucl_p),position=position_dodge(width = .75))+facet_grid(rows=vars(time),cols=vars(LH))
+
+ggplot(data= as_tibble(p.design.dat),aes(x=as.numeric(mig_year) ,y=p_fit,color=LH)) + geom_point(position=position_dodge(width = .5))+geom_line(position=position_dodge(width = .5))+geom_linerange(aes(ymin=lcl_p,ymax=ucl_p),position=position_dodge(width = .5))+facet_wrap(~time,scales="free")
+
+
+par_list<-mod$env$parList(par=mod$env$last.par.best)
+length(par_list$b_phi)
+
+acf(par_list$b_phi[seq(from=((13*2)+1),length=13)])
+
+#stacked barplot percent age at return
+dev.new()
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Mark model for comparison
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+dat_out<-select(mark_file_CH,sea_Year_p,LH,stream, #grouping variables
+                McN_J:Est_J,Bon_A,McJ_A:Tum_A) %>% #sites/occasions to include in model
+  #first year with all stream data through last year where data on all three return ages is available (because it is 2020)
+  filter(sea_Year_p>=2007&sea_Year_p<=2016) %>%
+  #make grouping variables factors
+  #mutate_at(vars(sea_Year_p:stream),~as.factor(as.character(.x)))%>% mutate(McN_J=apply(select(.,McN_J,JDD_J),1,max)) %>% select(-JDD_J) %>% 
+  #create multistate capture histories
+  mutate(ch=select(., McN_J:Est_J) %>%  reduce(paste0)) %>%
+  #mutate(ch=select(., McN_J,Bon_J,Est_J) %>% reduce(paste0)) %>%
+  mutate(ch=paste0("1",ch)) 
+
+library(RMark)
+wenatchee.processed=process.data(dat_out,model="CJS",groups=c("LH","stream"))
+#wenatchee.processed=process.data(test_dat,model="MSCJS",strata.labels=c("A","B","C"))
+wenatchee.ddl=make.design.data(wenatchee.processed)
+
+
+
+#
+# p
+#
+#
+# States B&C dont exist for juveniles (times 2-5)
+
+#wenatchee.ddl$p<-wenatchee.ddl$p[-wenatchee.ddl$p$Time<=2&wenatchee.ddl$p$stratum!="A",]
+#wenatchee.ddl$S<-wenatchee.ddl$S[-wenatchee.ddl$S$Time<=2&wenatchee.ddl$S$stratum!="A",]
+
+
+
+#column for migration year where onupstream state A is seaward year +1, b +2, and c +3
+seaward_year_vec<-as.numeric(substr(wenatchee.ddl$p$sea_Year_p,2,5))
+wenatchee.ddl$p$det_year<-factor(ifelse(wenatchee.ddl$p$Time<2,seaward_year_vec,ifelse(wenatchee.ddl$p$stratum==1,seaward_year_vec+1,ifelse(wenatchee.ddl$p$stratum==2,seaward_year_vec+2,seaward_year_vec+3))))
+
+
+
+#wenatchee.ddl$p$fix=ifelse((wenatchee.ddl$p$stratum!="A"&wenatchee.ddl$p$Time<=4),0,NA)
+# set detection at Tumwater adult at 100% based on other work
+wenatchee.ddl$p$fix[wenatchee.ddl$p$time==5]=1
+
+
+#
+# Psi
+#
+# can only change state (other than death) at time 4
+# rest are fixed values
+wenatchee.ddl$Psi$fix=NA
+# stay in current state (year) other than time 4 (ocean)
+wenatchee.ddl$Psi$fix[wenatchee.ddl$Psi$stratum==
+                        wenatchee.ddl$Psi$tostratum & wenatchee.ddl$Psi$time!=(3)]=1
+
+wenatchee.ddl$Psi$fix[wenatchee.ddl$Psi$stratum!=
+                        wenatchee.ddl$Psi$tostratum &wenatchee.ddl$Psi$time!=(3)]=0
+
+wenatchee.ddl$Psi$fix[wenatchee.ddl$Psi$stratum!=1 &
+                        wenatchee.ddl$Psi$time==3]=0
+
+
+
+# 
+# S
+#
+#Add a columna for whether first occasion, which is necessarily  different for subyearlings and yearlings
+wenatchee.ddl$S$time_1<-ifelse(wenatchee.ddl$S$time==1,1,0)
+#
+#column for yearlings vs subs
+wenatchee.ddl$S$Yrlng<-ifelse(wenatchee.ddl$S$LH=="smolt",1,0)
+#
+#columns for whether white river, which might be different because above lake Wenatchee
+wenatchee.ddl$S$White<-ifelse(wenatchee.ddl$S$stream=="White",1,0)
+#
+#
+#column for migration year where onupstream state A is seaward year +1, b +2, and c +3
+seaward_year_vec<-as.numeric(substr(wenatchee.ddl$S$sea_Year_p,2,5))
+wenatchee.ddl$S$det_year<-factor(ifelse(wenatchee.ddl$S$Time<2,seaward_year_vec,ifelse(wenatchee.ddl$S$stratum=="A",seaward_year_vec+1,ifelse(wenatchee.ddl$S$stratum=="B",seaward_year_vec+2,seaward_year_vec+3))))
+
+
+wenatchee.ddl$S$upstream_time<-ifelse(wenatchee.ddl$S$Time>2,1,0)
+
+
+# fixing S to 1 in strata where fish cant be
+wenatchee.ddl$S$fix<-NA
+wenatchee.ddl$S$fix[wenatchee.ddl$S$stratum!=1 &
+                      wenatchee.ddl$S$Time<3]=1 #using numeric "Time" which starts at 0 hence 3 is 4
+
+
+
+
+
+# fit model
+p.timexstratum.tag=list(formula=~-1+time)
+Psi.sxtime=list(formula=~-1+tostratum)
+S.stratumxtime=list(formula=~-1+time)
+
+
+test<-RMark::mark(wenatchee.processed,wenatchee.ddl,
+                  model.parameters=list(S=S.stratumxtime,p= p.timexstratum.tag,Psi=Psi.sxtime),run=TRUE)
+
+real_test<-get.real(test,par="Phi")
+real_test$`Group:LHsmolt.streamChiwawa.sea_Year_py2007`
+
+test$results$beta
+
+sd_rep$value
+
+#compare parameters
+sd_rep$par.fixed - test$results$beta[,1]
+#compare standard errors
+sqrt(diag(sd_rep$cov.fixed)) - test$results$beta[,2]
+
+```
