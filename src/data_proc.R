@@ -13,6 +13,15 @@ mark_file<-read_csv(here("Data","ptagis","Tagging detail.csv")) %>%
 #code for getting day of year from ptagis date column
 #test<-lower_mid_col_dams %>% mutate(`First Date MMDDYYYY2`=as.Date(`First Date MMDDYYYY`,format="%m/%d/%Y"), doy=lubridate::yday(`First Date MMDDYYYY2`))
 
+# obs_dat<-read_csv(here("Data","ptagis","ptagis_obs_data_wen_trib_screwt.csv")) %>% 
+#   mutate(date_det=lubridate::date(lubridate::mdy_hms(obs_date))) %>% 
+# group_by(tag_id,obs_site) %>% mutate(first_date=min(date_det),last_det=max(date_det)) %>% 
+#   select(!obs_date:date_det) %>% droplevels() %>% 
+#  distinct() %>% ungroup() %>% 
+#   mutate("First Year YYYY"=lubridate::year(first_date),"Last Year YYYY"=lubridate::year(last_det)) %>% 
+#   mutate("First DOY"=lubridate::yday(first_date),"Last DOY"=lubridate::yday(last_det)) %>% 
+#   rename("Site Code Value"=obs_site,"Tag Code"=tag_id)
+
 #Lower and mid Columbia mainstem dam detections
 lower_mid_col_dams<-read_csv(here("Data","ptagis","mid_lower_Col_Interrogation_Summary.csv"))
 
@@ -157,5 +166,3 @@ mutate_at(vars(McN_J:Tum_A), ~.x-sea_Year_p) %>%
   #drop rows with capture history where only adult detection is at tumwater dam (because of concern about "ghost tags)
   filter(!( select(., Bon_A:RIs_A)%>% rowSums() ==0& Tum_A !=0))
 
-
-  

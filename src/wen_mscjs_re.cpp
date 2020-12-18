@@ -350,16 +350,22 @@ DATA_INTEGER(nDS_OCC);      //number of downstream survival/ reacputure
 DATA_INTEGER(n_states);      //number of possible adult return ages (i.e. statres -3) 
 DATA_INTEGER(n_groups);      //number groups (i.e., unique combos of LH,stream,downstream,year). Used in psi mlogit backtransform
 DATA_INTEGER(n_unique_CH); //number of unique capture occasions
-DATA_INTEGER(Est_J_time); // capture occasion of estuary Juvenile
+// DATA_INTEGER(Est_J_time); // capture occasion of estuary Juvenile
+// DATA_INTEGER(JDD_J_time); // capture occasion of John Day Dam Juvenile
+DATA_IVECTOR(PRa_RIs_A_times); // capture occasion of Priest Rapids and Rock Island Adult
+
+
 //CH data
 DATA_IMATRIX(CH);           //capture histories (excluding occasion at marking (which we are conditioning on))
 DATA_IVECTOR(freq);       //frequency of capture histories
 //design matrices fixed effects
 DATA_MATRIX(X_phi);         //fixed effect design matrix for phi
-DATA_MATRIX(X_p);         // fixed effect design matrix for psi
+DATA_MATRIX(X_p);         // fixed effect design matrix for p
 DATA_MATRIX(X_psi);         // fixed effect design matrix for psi
 //design matrices random effects
 DATA_SPARSE_MATRIX(Z_phi); //random effect design matrix for phi
+DATA_SPARSE_MATRIX(Z_p); //random effect design matrix for p
+DATA_SPARSE_MATRIX(Z_psi); //random effect design matrix for psi
 //PIMS
 DATA_STRUCT(Phi_pim, pim); //index vector of matrices for phi parameter vector for a given Ch x occasion
 DATA_STRUCT(p_pim, pim);   //index vector of matrices for p parameter vector for a given Ch x occasion
@@ -367,6 +373,8 @@ DATA_IVECTOR(Psi_pim);
 //DATA_IVECTOR(fix_p_last);  //indices of last occasion for p, to fix at 1
 // Covariance structures 
 DATA_STRUCT(phi_terms, terms_t);//  Covariance structure for the Phi model
+DATA_STRUCT(p_terms, terms_t);  //  Covariance structure for the p model
+DATA_STRUCT(psi_terms, terms_t);//  Covariance structure for the Psi model
 
 
 
@@ -376,19 +384,23 @@ DATA_STRUCT(phi_terms, terms_t);//  Covariance structure for the Phi model
   //fixed effects
   PARAMETER_VECTOR(beta_phi);  //Phi fixed effect coefficients
   PARAMETER_VECTOR(beta_p);    //p fixed effect coefficients
-  PARAMETER_VECTOR(beta_psi);    //psi fixed effect coefficients
+  PARAMETER_VECTOR(beta_psi);   //psi fixed effect coefficients
   //random effects
   PARAMETER_VECTOR(b_phi);      //phi random effects
+  PARAMETER_VECTOR(b_p);        //p random effects
+  PARAMETER_VECTOR(b_psi);      //psi random effects
   // Joint vector of covariance parameters
-  PARAMETER_VECTOR(theta_phi);   //phi
+  PARAMETER_VECTOR(theta_phi);  //phi
+  PARAMETER_VECTOR(theta_p);    //p
+  PARAMETER_VECTOR(theta_psi);  //psi
   
   //~~~~~~~~~~~~~~~~~~~
   // Variables
   //~~~~~~~~~~~~~~~~~~~
   
   // Joint negative log-likelihood
-  parallel_accumulator<Type> jnll(this);
-
+  // parallel_accumulator<Type> jnll(this);
+Type jnll = 0;
   // Linear predictors
   //// Fixed component
   vector<Type> eta_phi = X_phi*beta_phi;
@@ -396,8 +408,11 @@ DATA_STRUCT(phi_terms, terms_t);//  Covariance structure for the Phi model
   vector<Type> eta_psi = X_psi*beta_psi;
   //// Random component
    eta_phi += Z_phi*b_phi;
-  // eta_p = X_p*beta_p;
-  // eta_psi = X_psi*beta_psi;
+   eta_p += Z_p*b_p;
+   eta_psi += Z_psi*b_psi;
+   ADREPORT(eta_phi);
+   ADREPORT(eta_p);
+   ADREPORT(eta_psi);
 
   // Apply link
   vector<Type> phi=invlogit(eta_phi);
@@ -420,7 +435,9 @@ DATA_STRUCT(phi_terms, terms_t);//  Covariance structure for the Phi model
   //~~~~~~~~~~~~~~~~~~~
   
   // Random effects
-  jnll += allterms_nll(b_phi, theta_phi, phi_terms, this->do_simulate);
+  jnll += allterms_nll(b_phi, theta_phi, phi_terms, this->do_simulate);//phi
+  jnll += allterms_nll(b_p, theta_p, p_terms, this->do_simulate);//p
+  jnll += allterms_nll(b_psi, theta_psi, psi_terms, this->do_simulate);//psi
   
   
 
@@ -438,10 +455,11 @@ DATA_STRUCT(phi_terms, terms_t);//  Covariance structure for the Phi model
   //downstream migration
   for(int t=0; t<nDS_OCC; t++){       //loop over downstream occasions (excluding capture occasion)
     //survival process
-    if(t!=Est_J_time){                // fix survival at 1 between Bon_J and Est_J
+    // if(t!=Est_J_time&&t!=JDD_J_time){                // fix survival at 1 between McN_J and JDD_J
+                                                      // and Bon_J and Est_J
     pS(0) += Type((Type(1)-phi(Phi_pim(0)(n,t)))*pS(1)); //prob die or stay dead
     pS(1) *= Type(phi(Phi_pim(0)(n,t))); //prob stay alive
-    }
+    // }
     //observation process
     pS(1) *= Type(p(p_pim(0)(n,t))*CH(n,t)+ (Type(1)-p(p_pim(0)(n,t)))*(Type(1)-CH(n,t))); //prob observation given alive
     pS(0) *= Type(Type(1)-CH(n,t)); //prob observation given dead
@@ -452,7 +470,7 @@ DATA_STRUCT(phi_terms, terms_t);//  Covariance structure for the Phi model
   }
 
   //ocean occasion
-  int t = nDS_OCC;  //set occastion to be ocean occasion
+  int t = nDS_OCC;  //set occasion to be ocean occasion
   ////survival process
   pS(0) += Type((Type(1)-phi(Phi_pim(0)(n,t)))*pS(1)); //prob die or stay dead in ocean
   pS(1) *= Type(phi(Phi_pim(0)(n,t))); //prob survive ocean
@@ -482,7 +500,10 @@ DATA_STRUCT(phi_terms, terms_t);//  Covariance structure for the Phi model
   //end ocean occasion
 
   //upstream migration
-
+  
+  // if(t!=PRa_RIs_A_times(0)&&t!=PRa_RIs_A_times(1)){   // fix survival at 1 between McN_A and 
+    // RIs_A if applicable
+    
     ////survival process at time t
     pS(0) += Type((Type(1)-phi(Phi_pim(0)(n,t)))*pS(1))+
       Type((Type(1)-phi(Phi_pim(1)(n,t)))*pS(2))+
@@ -490,7 +511,9 @@ DATA_STRUCT(phi_terms, terms_t);//  Covariance structure for the Phi model
     pS(1) *= Type(phi(Phi_pim(0)(n,t)));                 // sum(prob vec * 0,   phi_1,       0,       0)
     pS(2) *=  Type(phi(Phi_pim(1)(n,t)));                 // sum(prob vec * 0,       0,   phi_2,       0)
     pS(3) *=  Type(phi(Phi_pim(2)(n,t)));                 // sum(prob vec * 0,       0,       0,   phi_3)
+  // }
   }
+  
     
     ////observation process at final time assuming detection probability is 1
     if(!CH(n,(n_OCC-1))){
@@ -502,7 +525,7 @@ DATA_STRUCT(phi_terms, terms_t);//  Covariance structure for the Phi model
       pS.setZero();
       pS(CH(n,(n_OCC-1)))=tmp;
     }
-    //accmulate NLL
+    //accumulate NLL
   u = pS.sum();  //sum of probs
   pS = pS/u; //normalize probs
   NLL_it  +=log(u);    //accumulate nll
@@ -512,6 +535,50 @@ DATA_STRUCT(phi_terms, terms_t);//  Covariance structure for the Phi model
   jnll-=(NLL_it*freq(n));
   }
   //end of likelihood
+  
+  //~~~~~~~~~~~~~~~~~~~
+  // Report (code copied from glmmTMB)
+  //~~~~~~~~~~~~~~~~~~~
+  vector<matrix<Type> > corr_phi(phi_terms.size());
+  vector<vector<Type> > sd_phi(phi_terms.size());
+  for(int i=0; i<phi_terms.size(); i++){
+    // NOTE: Dummy terms reported as empty
+    if(phi_terms(i).blockNumTheta > 0){
+      corr_phi(i) = phi_terms(i).corr;
+      sd_phi(i) = phi_terms(i).sd;
+    }
+  }
+ 
+ vector<matrix<Type> > corr_p(p_terms.size());
+  vector<vector<Type> > sd_p(p_terms.size());
+  for(int i=0; i<p_terms.size(); i++){
+    // NOTE: Dummy terms reported as empty
+    if(p_terms(i).blockNumTheta > 0){
+      corr_p(i) = p_terms(i).corr;
+      sd_p(i) = p_terms(i).sd;
+    }
+  }
+  
+  vector<matrix<Type> > corr_psi(psi_terms.size());
+  vector<vector<Type> > sd_psi(psi_terms.size());
+  for(int i=0; i<psi_terms.size(); i++){
+    // NOTE: Dummy terms reported as empty
+    if(psi_terms(i).blockNumTheta > 0){
+      corr_psi(i) = psi_terms(i).corr;
+      sd_psi(i) = psi_terms(i).sd;
+    }
+  }
+ 
+  REPORT(corr_phi);
+  REPORT(sd_phi);
+  REPORT(corr_p);
+  REPORT(sd_p);
+  REPORT(corr_psi);
+  REPORT(sd_psi);
+  ADREPORT(exp(theta_phi));
+  ADREPORT(exp(theta_p));
+  ADREPORT(exp(theta_psi));
+  
   //return jnll
   return(jnll);
 }
