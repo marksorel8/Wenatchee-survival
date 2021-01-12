@@ -10,17 +10,17 @@ source(here("src","data_proc.r"))
 
 all_bio_data<-read_csv(here("data","all_bio_data.csv"))
 
-make_dat<-function(mark_file_CH=mark_file_CH){
+make_dat<-function(mark_file_CH=mark_file_CH,sites=c("McN_J","JDD_J","Bon_J","Est_J","Bon_A","McJ_A","PRa_A","RIs_A","Tum_A")){
 
 #subset columns needed for analysis
 dat_out<-select(mark_file_CH,sea_Year_p,LH,stream, #grouping variables
-                McN_J,Bon_J,Bon_A,McJ_A:Tum_A) %>% #sites/occasions to include in model
+                all_of(sites)) %>% #sites/occasions to include in model
   #first year with all stream data through last year where data on all three return ages is available (because it is 2020)
   filter(sea_Year_p>=2007&sea_Year_p<=2016) %>%
   #make grouping variables factors
   mutate_at(vars(sea_Year_p:stream),~as.factor(as.character(.x))) %>% 
   #create multistate capture histories
-  mutate(ch=select(., McN_J:Tum_A) %>%  reduce(paste0)) %>%
+  mutate(ch=select(., sites[1]: sites[length(sites)]) %>%  reduce(paste0)) %>%
   #mutate(ch=select(., McN_J,Bon_J,Est_J) %>% reduce(paste0)) %>%
   mutate(ch=paste0("1",ch)) %>% 
   #reduce data to unqiue capture history/ groups combos and counts
@@ -28,7 +28,7 @@ dat_out<-select(mark_file_CH,sea_Year_p,LH,stream, #grouping variables
 
 
 #Occasion sites
-occasion_sites<-colnames(select(dat_out,McN_J:Tum_A))
+occasion_sites<-colnames(select(dat_out,sites[1]: sites[length(sites)]))
 #get number of site/occasions
 nOCC<-nchar(dat_out$ch[1])-1
 #get number of downstream sites/occasiosn
@@ -38,12 +38,12 @@ n_unique_CH<-nrow(dat_out)
 #number of states
 n_states<-3
 # if Est_J included. This is the towed array. Will fix survival at 1 between Bonneville and Estuary Towed array. Therefore mortality in that period will end up in the ocean period. 
-Est_J_time<-ifelse(max(occasion_sites=="Est_J"), which(occasion_sites=="Est_J"),100)
+# Est_J_time<-ifelse(max(occasion_sites=="Est_J"), which(occasion_sites=="Est_J"),100)
 # if JDD_J included, fix survival at 1 between Bonneville and Estuary Towed array. Therefore mortality in that period will end up between JDD and Bonneville_J
-JDD_J_time<-ifelse(max(occasion_sites=="JDD_J"), which(occasion_sites=="JDD_J"),100)
+# JDD_J_time<-ifelse(max(occasion_sites=="JDD_J"), which(occasion_sites=="JDD_J"),100)
 # if PRa_A or RIs_A included, fix survival at 1 from McN_A to these sites
-PRa_RIs_A_times<-match(c("PRa_A","RIs_A"),(occasion_sites))
-PRa_RIs_A_times[is.na(PRa_RIs_A_times)]<-100
+# PRa_RIs_A_times<-match(c("PRa_A","RIs_A"),(occasion_sites))
+# PRa_RIs_A_times[is.na(PRa_RIs_A_times)]<-100
 
 
 #process data using RMark function. Specifies grouping variables for parameters, and type of model and hence parameters. "Multistrate" used S(Phi), p, and psi
@@ -59,11 +59,11 @@ wenatchee.ddl<-RMark::make.design.data(wenatchee.processed,parameters=list(S=lis
 #extract the individual design data for each parameter
 ##phi/s survival
 Phi.design.dat<-wenatchee.ddl$S %>% 
-  filter(Time>(nDS_OCC-1)|stratum==1) %>%  #cant be in strata (fish age) other than 1 on downstream, or ocean for survival. Note "Time" column indexing starts at 0, so occasion/Time (nDS_OCC-1) is the last juvenile detection occasion
+  filter(Time>(nDS_OCC)|stratum==1) %>%  #cant be in strata (fish age) other than 1 on downstream, or ocean for survival. Note "Time" column indexing starts at 0, so occasion/Time (nDS_OCC-1) is the last juvenile detection occasion
   # filter(!Time%in%(c(JDD_J_time,Est_J_time,PRa_RIs_A_times)-1)) %>% 
-   filter(!Time%in%(c(JDD_J_time,Est_J_time)-1)) %>% 
+   # filter(!Time%in%(c(JDD_J_time,Est_J_time)-1)) %>% 
   # if Est_J of JDD included, I will fix survival to be 1 between McN_J and JDD_J and Bon_J and Est_J within the cpp code, but want to pull it out of design matrix here
-  mutate(mig_year=as.factor(ifelse(Time<=(nDS_OCC-1),as.numeric(as.character(sea_Year_p)) ,as.numeric(as.character(sea_Year_p)) +as.numeric(as.character(stratum)))),
+  mutate(mig_year=as.factor(ifelse(Time<=(nDS_OCC),as.numeric(as.character(sea_Year_p)) ,as.numeric(as.character(sea_Year_p)) +as.numeric(as.character(stratum)))),
          mig_year_num=as.numeric(mig_year)) %>%   #add a column for the actual migration year, which is the seaward year for juveniles and the seaward + stratum for adults
 cbind(.,model.matrix(~time-1+stream-1+LH-1+stratum-1,data=.))
   
@@ -126,6 +126,7 @@ n_groups<-nrow(Psi.design.dat)/2
 
 
 return(list(dat_out=dat_out,
+            sites=sites,
             Phi.design.dat=Phi.design.dat,
             p.design.dat=p.design.dat,
             Psi.design.dat=Psi.design.dat,
@@ -137,16 +138,16 @@ return(list(dat_out=dat_out,
             nOCC=nOCC,
             nDS_OCC=nDS_OCC,
             n_unique_CH=n_unique_CH,
-            n_states=n_states,
-            Est_J_time=Est_J_time,
-            JDD_J_time=JDD_J_time,
-            PRa_RIs_A_times=PRa_RIs_A_times
+            n_states=n_states
+            # Est_J_time=Est_J_time,
+            # JDD_J_time=JDD_J_time,
+            # PRa_RIs_A_times=PRa_RIs_A_times
             ))
 
 }
 
 
-fit_wen_mscjs<-function(x,phi_formula, p_formula, psi_formula,doFit=TRUE){
+fit_wen_mscjs<-function(x,phi_formula, p_formula, psi_formula,doFit=TRUE,silent=FALSE){
 #~~~~
 #glmmTMB objects to get design matrices etc. for each parameter
 ## phi
@@ -172,10 +173,10 @@ dat_TMB<-with(x,list(
   n_states=n_states,
   n_groups=n_groups,
   n_unique_CH=n_unique_CH,
-  Est_J_time=Est_J_time-1,
-  JDD_J_time=JDD_J_time-1,
-  PRa_RIs_A_times=PRa_RIs_A_times-1,
-  CH=select(dat_out,McN_J:Tum_A) %>% as.matrix(),
+  # Est_J_time=Est_J_time-1,
+  # JDD_J_time=JDD_J_time-1,
+  # PRa_RIs_A_times=PRa_RIs_A_times-1,
+  CH=select(dat_out,sites[1]:sites[length(sites)]) %>% as.matrix(),
   freq=dat_out$freq,
   X_phi=Phi.design.glmmTMB$data.tmb$X,
   X_p=p.design.glmmTMB$data.tmb$X,
@@ -212,7 +213,7 @@ if(doFit){
   TMB::compile("wen_mscjs_re.cpp")
   dyn.load(dynlib("wen_mscjs_re"))
 #initialize model
-mod<-TMB::MakeADFun(data=dat_TMB,parameters = par_TMB,random=c("b_phi","b_p","b_psi"),DLL ="wen_mscjs_re")
+mod<-TMB::MakeADFun(data=dat_TMB,parameters = par_TMB,random=c("b_phi","b_p","b_psi"),DLL ="wen_mscjs_re", silent = silent)
 
 fit<-TMBhelper::fit_tmb(mod,newtonsteps = 1,getsd = TRUE)
 }else{

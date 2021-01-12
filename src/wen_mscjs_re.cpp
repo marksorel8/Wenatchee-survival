@@ -352,7 +352,7 @@ DATA_INTEGER(n_groups);      //number groups (i.e., unique combos of LH,stream,d
 DATA_INTEGER(n_unique_CH); //number of unique capture occasions
 // DATA_INTEGER(Est_J_time); // capture occasion of estuary Juvenile
 // DATA_INTEGER(JDD_J_time); // capture occasion of John Day Dam Juvenile
-DATA_IVECTOR(PRa_RIs_A_times); // capture occasion of Priest Rapids and Rock Island Adult
+// DATA_IVECTOR(PRa_RIs_A_times); // capture occasion of Priest Rapids and Rock Island Adult
 
 
 //CH data
