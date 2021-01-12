@@ -228,8 +228,8 @@ test2cl(dat_out_group %>% select(mark:adult_all) %>% as.matrix(),dat_out_group$f
 
 
 ```{r, process_dat,echo=FALSE}
-mscjs_dat<- make_dat(mark_file_CH,sites=c( #"McN_J",
-  #"JDD_J",
+mscjs_dat<- make_dat(mark_file_CH,sites=c(# "McN_J",
+  "JDD_J",
   "Bon_J",
   #"Est_J",
   "Bon_A","McJ_A","PRa_A","RIs_A","Tum_A"))
@@ -237,7 +237,7 @@ mscjs_dat<- make_dat(mark_file_CH,sites=c( #"McN_J",
 
 ```{r, fit full model}
 # "null" model
-mscjs_fit3<-fit_wen_mscjs(x=mscjs_dat,
+mscjs_fit2<-fit_wen_mscjs(x=mscjs_dat,
                          phi_formula=par.index~
                            
                            #fixed effect
@@ -256,7 +256,7 @@ mscjs_fit3<-fit_wen_mscjs(x=mscjs_dat,
                          doFit = TRUE,silent=TRUE
 )
 
-mscjs_fit$fit$opt
+mscjs_fit3$fit$par
 colnames(mscjs_fit$dat_TMB$X_p)
 
 

@@ -7,8 +7,9 @@ if(file.exists(here("src","mark_fil_ch_12032020.Rdata"))){
 source(here("src","data_proc.r"))
 }
 
-
+if(file.exists(ere("data","all_bio_data.csv"))){
 all_bio_data<-read_csv(here("data","all_bio_data.csv"))
+}
 
 make_dat<-function(mark_file_CH=mark_file_CH,sites=c("McN_J","JDD_J","Bon_J","Est_J","Bon_A","McJ_A","PRa_A","RIs_A","Tum_A")){
 
