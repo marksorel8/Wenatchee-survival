@@ -7,7 +7,7 @@ if(file.exists(here("src","mark_fil_ch_12032020.Rdata"))){
 source(here("src","data_proc.r"))
 }
 
-if(file.exists(ere("data","all_bio_data.csv"))){
+if(file.exists(here("data","all_bio_data.csv"))){
 all_bio_data<-read_csv(here("data","all_bio_data.csv"))
 }
 
