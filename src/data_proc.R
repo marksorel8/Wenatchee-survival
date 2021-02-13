@@ -22,6 +22,9 @@ mark_file<-read_csv(here("Data","ptagis","Tagging detail.csv")) %>%
 #   mutate("First DOY"=lubridate::yday(first_date),"Last DOY"=lubridate::yday(last_det)) %>% 
 #   rename("Site Code Value"=obs_site,"Tag Code"=tag_id)
 
+#recaptures in lower Wenatchee dams
+lower_wen_traps_recaps<-read_csv(here("Data","ptagis","ptagis_recap_data_wen_trib_screwt.csv")) %>% mutate(recap_date=lubridate::mdy_hms(recap_date),"First Year YYYY"=lubridate::year(recap_date)) %>% rename("Tag Code" = tag_id ) %>% arrange(recap_date)
+
 #Lower and mid Columbia mainstem dam detections
 lower_mid_col_dams<-read_csv(here("Data","ptagis","mid_lower_Col_Interrogation_Summary.csv"))
 
@@ -34,9 +37,17 @@ load(here("Data","cutoffs_and_props.Rdata"))
 #add capture histories to mark file
 mark_file_CH<-mark_file %>% 
 
+#Lower Wenatchee Juvenile recapture
+ left_join(lower_wen_traps_recaps %>%
+              filter(`recap_site` %in% c("WENA4T","WENATT")) %>% #subset McNary juvenile detection sites
+              select(c(`Tag Code`,`First Year YYYY`)) %>% #take columns first detection year and pit code
+             # arrange(recap_date) %>% #arrange in order of increasing recap_date
+             distinct(`Tag Code`,.keep_all=TRUE) %>% #remove duplicate detections at multiple "sites" at this trap 
+              rename("LWe_J"="First Year YYYY"),by="Tag Code") %>%   #rename to represent site for merging
+
 #McNary Juvenile detection
   left_join(lower_mid_col_dams %>% 
-            filter(`Site Code Value` =="MCJ") %>% #subset mcnary juvenile detection sites 
+            filter(`Site Code Value` =="MCJ") %>% #subset McNary juvenile detection sites 
             select(c(`Tag Code`,`First Year YYYY`)) %>% #take columns first detection year and pit code 
             rename("McN_J"="First Year YYYY"),by="Tag Code") %>%   #rename to represent site for merging
 
@@ -124,7 +135,7 @@ left_join(lower_mid_col_dams %>%
   
 
 #get rid of fish whose tag ages are consistent with observed juvenile migration year
- mutate(seaward_year_obs= select(., McN_J:Est_J) %>% reduce(pmin,na.rm=TRUE)) %>%  # add year of seaward migration
+ mutate(seaward_year_obs= select(., LWe_J:Est_J) %>% reduce(pmin,na.rm=TRUE)) %>%  # add year of seaward migration
 mutate(mark_to_seward=`seaward_year_obs`-`Mark Year YYYY`) %>% # add years between tagging and seaward migration (for those fish detected migrating downstream as juveniles)
 filter(
   is.na(`mark_to_seward`)|(age=="sub"&`mark_to_seward`==1)|
@@ -152,9 +163,9 @@ mutate(stream = case_when(
 mutate(sea_Year_p = ifelse(age=="YCW",`Mark Year YYYY`,`Mark Year YYYY`+1)) %>% 
 
 #mutate detections to be years between seaward migration year and detection year 
-mutate_at(vars(McN_J:Tum_A), ~.x-sea_Year_p) %>%  
+mutate_at(vars(LWe_J:Tum_A), ~.x-sea_Year_p) %>%  
    #make juvenile detection "A" and non-detections "0"
-  mutate_at(vars(McN_J:Est_J), ~case_when(is.na(.x)~ 0,
+  mutate_at(vars(LWe_J:Est_J), ~case_when(is.na(.x)~ 0,
                                           .x==0~1)) %>%
   # #make adult detections after 1 year "1", after 2 year "2" after three years "3" otherwise "0"
   mutate_at(vars(Bon_A:Tum_A), ~case_when(is.na(.x)~ 0,

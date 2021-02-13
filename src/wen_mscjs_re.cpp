@@ -20,7 +20,7 @@
 //     
 //     I can be contacted at marks6@uw.edu or at:
 //       Mark Sorel
-//       1122 NA Boat Street,
+//       1122 NE Boat Street,
 //       Seattle, WA 98105
 // 
 
@@ -345,7 +345,7 @@ Type objective_function<Type>::operator() ()
 //~~~~~~~~~~~~~~~~~~~
 // Data
 //~~~~~~~~~~~~~~~~~~~
-DATA_INTEGER(n_OCC);      //number of total survival/ reacputure occasions;
+DATA_INTEGER(n_OCC);      //number of total survival/ recputure occasions;
 DATA_INTEGER(nDS_OCC);      //number of downstream survival/ reacputure
 DATA_INTEGER(n_states);      //number of possible adult return ages (i.e. statres -3) 
 DATA_INTEGER(n_groups);      //number groups (i.e., unique combos of LH,stream,downstream,year). Used in psi mlogit backtransform
@@ -399,8 +399,8 @@ DATA_STRUCT(psi_terms, terms_t);//  Covariance structure for the Psi model
   //~~~~~~~~~~~~~~~~~~~
   
   // Joint negative log-likelihood
-  // parallel_accumulator<Type> jnll(this);
-Type jnll = 0;
+  parallel_accumulator<Type> jnll(this);
+// Type jnll = 0;
   // Linear predictors
   //// Fixed component
   vector<Type> eta_phi = X_phi*beta_phi;
@@ -416,17 +416,17 @@ Type jnll = 0;
 
   // Apply link
   vector<Type> phi=invlogit(eta_phi);
-  vector<Type> p=invlogit(eta_p);
-  // for (int i =0; i<fix_p_last.size(); i++) p(fix_p_last(i))=1; //fix detection at 1 on last occasion
-  //** will this crash things if fix_p_last.size() =0?**
+  vector<Type> p(eta_p.size()+1);
+  p.head(eta_p.size())=invlogit(eta_p);
+  p.tail(1)=Type(0);
   REPORT(phi);
   REPORT(p);
   ////phi inverse multinomial logit
   matrix<Type> psi(n_groups,n_states);
   eta_psi= exp(eta_psi);
   vector<Type> denom = eta_psi.segment(0,n_groups)+eta_psi.segment(n_groups,n_groups)+Type(1);
-  psi.col(0)= Type(1)/denom;                      //return after 1 year
-  psi.col(1)= eta_psi.segment(0,n_groups)/denom; //return after 2 year
+  psi.col(0)= eta_psi.segment(0,n_groups)/denom;        //return after 1 year
+  psi.col(1)= Type(1)/denom;                            //return after 2 year
   psi.col(2)= eta_psi.segment(n_groups,n_groups)/denom; //return after 3 year
   REPORT(psi);
 
@@ -455,11 +455,9 @@ Type jnll = 0;
   //downstream migration
   for(int t=0; t<nDS_OCC; t++){       //loop over downstream occasions (excluding capture occasion)
     //survival process
-    // if(t!=Est_J_time&&t!=JDD_J_time){                // fix survival at 1 between McN_J and JDD_J
-                                                      // and Bon_J and Est_J
     pS(0) += Type((Type(1)-phi(Phi_pim(0)(n,t)))*pS(1)); //prob die or stay dead
     pS(1) *= Type(phi(Phi_pim(0)(n,t))); //prob stay alive
-    // }
+
     //observation process
     pS(1) *= Type(p(p_pim(0)(n,t))*CH(n,t)+ (Type(1)-p(p_pim(0)(n,t)))*(Type(1)-CH(n,t))); //prob observation given alive
     pS(0) *= Type(Type(1)-CH(n,t)); //prob observation given dead
@@ -500,10 +498,6 @@ Type jnll = 0;
   //end ocean occasion
 
   //upstream migration
-  
-  // if(t!=PRa_RIs_A_times(0)&&t!=PRa_RIs_A_times(1)){   // fix survival at 1 between McN_A and 
-    // RIs_A if applicable
-    
     ////survival process at time t
     pS(0) += Type((Type(1)-phi(Phi_pim(0)(n,t)))*pS(1))+
       Type((Type(1)-phi(Phi_pim(1)(n,t)))*pS(2))+
@@ -511,7 +505,7 @@ Type jnll = 0;
     pS(1) *= Type(phi(Phi_pim(0)(n,t)));                 // sum(prob vec * 0,   phi_1,       0,       0)
     pS(2) *=  Type(phi(Phi_pim(1)(n,t)));                 // sum(prob vec * 0,       0,   phi_2,       0)
     pS(3) *=  Type(phi(Phi_pim(2)(n,t)));                 // sum(prob vec * 0,       0,       0,   phi_3)
-  // }
+
   }
   
     
@@ -578,6 +572,111 @@ Type jnll = 0;
   ADREPORT(exp(theta_phi));
   ADREPORT(exp(theta_p));
   ADREPORT(exp(theta_psi));
+  
+  //calculate expected numbers of detections 
+  ////going to use do so by unique CH, even though it is redundant, just because the PIMS are already 
+  ////available for unique CH. 
+  SIMULATE {
+//expected detections 
+    matrix<Type> det_1(n_unique_CH,n_OCC);        //expected detections for state 1
+    matrix<Type> det_2(n_unique_CH,n_OCC-nDS_OCC); //expected detections for state 2
+    matrix<Type> det_3(n_unique_CH,n_OCC-nDS_OCC); //expected detections for state 3
+   
+
+//simulated survival and state
+matrix<Type> sim_state_1(n_unique_CH,n_OCC+1);       // alive for state 1 (times a bit different to have first column represent numebr released)
+matrix<Type> sim_state_2(n_unique_CH,n_OCC-nDS_OCC); // alive for state 2
+matrix<Type> sim_state_3(n_unique_CH,n_OCC-nDS_OCC); // alive for state 3
+
+//simulated detections 
+matrix<Type> sim_det_1(n_unique_CH,n_OCC);         // detections for state 1                               
+matrix<Type> sim_det_2(n_unique_CH,n_OCC-nDS_OCC); // detections for state 2
+matrix<Type> sim_det_3(n_unique_CH,n_OCC-nDS_OCC); // detections for state 3
+
+Type temp = 0; //placeholder for number surviving ocean
+
+
+    ////Variables
+    vector<Type> pS(4); //state probs: dead, 1, 2, 3
+
+    for(int n=0; n<n_unique_CH; n++){ // loop over individual unique capture histories
+      pS.setZero(); //initialize at 0,1,0,0 (conditioning at capture)
+      pS(1)=Type(1);
+      sim_state_1(n,0)=Type(freq(n));    //initialize with number released for each CH at time 1
+      
+
+      //downstream migration
+      for(int t=0; t<nDS_OCC; t++){       //loop over downstream occasions (excluding capture occasion)
+        //survival process
+        pS(1) *= Type(phi(Phi_pim(0)(n,t))); //prob stay alive
+        sim_state_1(n,t+1) = rbinom(Type( sim_state_1(n,t)),phi(Phi_pim(0)(n,t))); //simulated stay alive
+
+        //observation process
+        det_1(n,t) = Type(p(p_pim(0)(n,t))*pS(1)*freq(n)); //expected obs
+        sim_det_1(n,t) = rbinom(Type( sim_state_1(n,t+1)), Type(p(p_pim(0)(n,t)))); //simulated obs
+      }
+
+      //ocean occasion
+      int t = nDS_OCC;  //set occasion to be ocean occasion
+      ////survival process
+      pS(1) *= Type(phi(Phi_pim(0)(n,t))); //prob survive ocean
+      temp = rbinom(Type(sim_state_1(n,t)),Type(phi(Phi_pim(0)(n,t)))); //simulated survive ocean
+
+      //maturation age process
+      pS(2) = pS(1) * psi(Psi_pim(n),1); //return prob after 2 year
+      pS(3) = pS(1) * psi(Psi_pim(n),2); //return prob after 3 year
+      pS(1) *= psi(Psi_pim(n),0);        //return prob after 1 year
+
+      //maturation age simulation. rmultinomial through sequential rbinom
+      sim_state_1(n,t+1) = rbinom(Type(temp),Type(psi(Psi_pim(n),0)));        //simulated return after 1 year
+      sim_state_2(n,0) = rbinom(Type(temp-sim_state_1(n,t+1)),
+                  Type(psi(Psi_pim(n),1)/(Type(1)-Type(psi(Psi_pim(n),0))))); //simulated return after 2 year
+      sim_state_3(n,0) = temp-sim_state_1(n,t+1)-sim_state_2(n,0);        //simulated return after 1 year
+
+      for(int t=(nDS_OCC+1); t<n_OCC; t++){       //loop over upstream occasions
+
+        ////observation process at t-1 (Obs_t below), because I'm going to fix the detection prob at 1 for the last occasion after this loop
+        int Obs_t=t-1;
+        //////expected obs
+          det_1(n,Obs_t) = pS(1) * p(p_pim(0)(n,Obs_t)) * freq(n);
+          det_2(n,Obs_t-nDS_OCC) =pS(2) * p(p_pim(1)(n,Obs_t)) * freq(n);
+          det_3(n,Obs_t-nDS_OCC) =pS(3) * p(p_pim(2)(n,Obs_t)) * freq(n);
+        //////simulated obs
+          sim_det_1(n,Obs_t) = rbinom(Type(sim_state_1(n,Obs_t+1)), Type(p(p_pim(0)(n,Obs_t))));
+          sim_det_2(n,Obs_t-nDS_OCC) = rbinom(Type(sim_state_2(n,Obs_t-nDS_OCC)),  Type(p(p_pim(1)(n,Obs_t))));
+          sim_det_3(n,Obs_t-nDS_OCC) = rbinom(Type(sim_state_3(n,Obs_t-nDS_OCC)),  Type(p(p_pim(2)(n,Obs_t))));
+
+        //upstream migration
+        ////survival process at time t
+        pS(1) *= Type(phi(Phi_pim(0)(n,t)));                 // sum(prob vec * 0,   phi_1,       0,       0)
+        pS(2) *=  Type(phi(Phi_pim(1)(n,t)));                 // sum(prob vec * 0,       0,   phi_2,       0)
+        pS(3) *=  Type(phi(Phi_pim(2)(n,t)));                 // sum(prob vec * 0,       0,       0,   phi_3)
+
+        ////survival simulation at time t
+        sim_state_1(n,t+1) = rbinom(Type(sim_state_1(n,t)), Type(phi(Phi_pim(0)(n,t))));                 // sum(prob vec * 0,   phi_1,       0,       0)
+        sim_state_2(n,t-nDS_OCC) = rbinom(Type(sim_state_2(n,t-nDS_OCC-1)),  Type(phi(Phi_pim(1)(n,t))));                 // sum(prob vec * 0,       0,   phi_2,       0)
+        sim_state_3(n,t-nDS_OCC) = rbinom(Type(sim_state_3(n,t-nDS_OCC-1)), Type(phi(Phi_pim(2)(n,t))));                 // sum(prob vec * 0,       0,       0,   phi_3)
+
+      }
+
+      ////observation process at final time assuming detection probability is 1
+      //////expected obs
+      det_1(n,n_OCC-1) = pS(1) * freq(n);
+      det_2(n,n_OCC-nDS_OCC-1) =pS(2)  * freq(n);
+      det_3(n,n_OCC-nDS_OCC-1) =pS(3)  * freq(n);
+      //////simulated obs (final occasion detection prob = 1)
+      sim_det_1(n,n_OCC-1) =  sim_state_1(n,n_OCC) ;
+      sim_det_2(n,n_OCC-nDS_OCC-1) =  sim_state_2(n,n_OCC-nDS_OCC-1);
+      sim_det_3(n,n_OCC-nDS_OCC-1) =  sim_state_3(n,n_OCC-nDS_OCC-1);
+    } // end of loop of unique CH
+
+    REPORT(det_1);
+    REPORT(det_2);
+    REPORT(det_3);
+    REPORT(sim_det_1);
+    REPORT(sim_det_2);
+    REPORT(sim_det_3);
+      } //end simulate
   
   //return jnll
   return(jnll);
