@@ -25,7 +25,8 @@ Type objective_function<Type>::operator() ()
   
   
   // Joint negative log-likelihood
-  parallel_accumulator<Type> jnll(this);
+  // parallel_accumulator<Type> jnll(this);
+  Type jnll = 0;
   
   // Linear predictors
   vector<Type> eta_phi = X_phi*beta_phi;

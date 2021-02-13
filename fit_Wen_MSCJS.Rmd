@@ -485,7 +485,7 @@ mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
                            time5:age_class +              #to McNary
                            time6 + time6:stratum3 +      #to Tumwater
                            #random
-                            (0+time1:age_0|mig_year) +  # to trap
+                            diag(0+time1:age_class|mig_year) +  # to trap
                            (0+time2|mig_year) + # (0+time2|mig_year:LH:stream) + #to mcNary
                            (0+time3:age_0|mig_year) +# (0+time3|mig_year:LH:stream) + # to Bonneville
                            (0+time4|mig_year) +diag(0+time4:age_class|mig_year) + #(0+time4|mig_year:LH:stream) +  #to Bonn adults
@@ -503,9 +503,11 @@ mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
                            time5:stratum +           # Bonn adult
                            time6 + #:stratum +         #McNary adult
                            #random
-                          diag(0+time2:LH|mig_year) + #(0+time2|mig_year:LH:stream) +  # lower trap
-                           diag(0+time3|mig_year:age_class:stream) +# (0+time3|mig_year:LH:stream) + # McNary
-                           diag(0+time4:age_class|mig_year) +# (0+time4|mig_year:LH:stream) +  #Bonneville
+                          diag(0+time2:LH|mig_year:stream) + #(0+time2|mig_year:LH:stream) +  # lower trap
+                           diag(0+time3|mig_year)+ 
+                           +diag(0+time3|mig_year:age_class:stream) +# (0+time3|mig_year:LH:stream) + # McNary
+                           diag(0+time4|mig_year)+
+                           diag(0+time4|mig_year:age_class:stream) +# (0+time4|mig_year:LH:stream) +  #Bonneville
                            diag(0+time4:McN_J|mig_year)#Bonneville
                          ,
                          
@@ -544,12 +546,12 @@ obs_dat<-mscjs_dat$dat_out %>%
 sim_posterior<-rmvnorm_prec(mu=mscjs_fit$mod$env$last.par.best, 
                             prec=mscjs_fit$fit$SD$jointPrecision, 500, random_seed=1 )
 
-FT_ref_vec<-FT_sim_vec<-numeric(100)
+FT_ref_vec<-FT_sim_vec<-numeric(200)
 
 
 options(dplyr.summarise.inform = FALSE)
 gc()
-for(i in 1:100){
+for(i in 1:200){
   sim<-mscjs_fit$mod$simulate(par=sim_posterior[,i])
 
 # *expected detections*
@@ -753,7 +755,9 @@ ggplot(data= as_tibble(Psi.design.dat), aes(fill=years ,x = mig_year, y =prop)) 
 #detection probability
 #time 2 (LH x stream x year)
 # dev.new()
-ggplot(data= as_tibble(p.design.dat) %>% filter(Time<=1),aes(x=mig_year ,y=p_fit,color=LH)) + geom_point(position=position_dodge(width = .5))+geom_linerange(aes(ymin=lcl_p,ymax=ucl_p),position=position_dodge(width = .5))+facet_grid(time~stream,scales="free",labeller =  labeller(time=c(`2`="Lower Wenatchee",`3`="McNary")))+xlab("Smolt year")+ylab("Detection")
+ggplot(data= as_tibble(p.design.dat) %>% filter(Time==0),aes(x=mig_year ,y=p_fit,color=LH)) + geom_point(position=position_dodge(width = .5))+geom_linerange(aes(ymin=lcl_p,ymax=ucl_p),position=position_dodge(width = .5))+facet_grid(time~stream,scales="free",labeller =  labeller(time=c(`2`="Lower Wenatchee",`3`="McNary")))+xlab("Smolt year")+ylab("Detection")
+
+ggplot(data= as_tibble(p.design.dat) %>% filter(Time==1),aes(x=mig_year ,y=p_fit,color=LH)) + geom_point(position=position_dodge(width = .5))+geom_linerange(aes(ymin=lcl_p,ymax=ucl_p),position=position_dodge(width = .5))+facet_grid(LWe_J~stream,scales="free",labeller =  labeller(LWe_J=c(`1`="NOT Detected at Lower Wenatchee",`2`="Detected at lwoer wen")))+xlab("Smolt year")+ylab("Detection")+ylim(0,1)
 
 #time 3 (McN_J LH x stream x year)
 # dev.new()
