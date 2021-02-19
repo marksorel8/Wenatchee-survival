@@ -13,9 +13,9 @@ One of the most important aspects of population dynamics is stochasticity (Lande
 
 Another primary driver of population dynamics is individual heterogeneity (Pfister and Stevens 2003). Variability exists among individuals of a population in traits, such as growth rate, that are related to demographic rates like survival. Furthermore, individual heterogeneity can interact with stochasticity to determine demographic variability through time and space (Vindenes et al. 2008). Including individual heterogeneity in population models can enable more accurate characterization of population dynamics and provide valuable insights into the drivers of population dynamics (Conner and White 1999). 
 
-For certain populations of Chinook salmon, it may be necessary to develop models of demographic rates that account for both stochasticity and individual heterogeneity. Salmon are subject to substantial environmental variability, which has large effects on survival, especially in the marine environment (Zabel et al. 2006). They also exhibit considerable variation in traits, such as the timing of juvenile emigration from natal streams and age at maturity (Copeland and Venditti 2009). Juveniles that emigrate from natal streams at different times and at different sizes are likely to have different survival rates in subsequent life stages and may also be diferentially affected by variable environments (Copeland et al. 2014).
+For certain populations of Chinook salmon, it may be necessary to develop models of demographic rates that account for both stochasticity and individual heterogeneity. Salmon are subject to substantial environmental variability, which has large effects on survival, especially in the marine environment (Zabel et al. 2006). They also exhibit considerable variation in traits, such as the timing of juvenile emigration from natal streams and age at maturity (Copeland and Venditti 2009). Juveniles that emigrate from natal streams at different times and at different sizes are likely to have different survival rates in subsequent life stages and may also be deferentially affected by variable environments (Copeland et al. 2014).
 
-In this chapter, I will characterize how Chinook salmon survival and age at return vary through time due to stochasticity and due to individual heterogeneity (i.e., the timing of emigration from natal streams). Characterizing variability in vital rates is key to ultimately evaluating extinction risk, which can inform how management actions such as hatchery supplementation can be deployed to prevent extinction. Characterizing how the timing of juvenile emigrants affects their subsequent survival and age at maturity will enable more mechanistic predictions of the effect of different habitat restoration treatments on population dynamics. I will also evaluate how survival is related to environmental variables like river temperature and sea surface temperature, to enable simulation of the effects of climate warming on survival, in future analyses. 
+In this chapter, I will characterize how Chinook salmon survival and age at return vary through time due to stochasticity and due to individual heterogeneity (i.e., the timing of emigration from natal streams). Characterizing variability in vital rates is key to ultimately evaluating extinction risk, which can inform how management actions such as hatchery supplementation, habitat restoration, and hydroelectric dam operations can be deployed to prevent extinction. Characterizing how the timing of juvenile emigrants affects their subsequent survival and age at maturity will enable more mechanistic predictions of the effect of different habitat restoration treatments on population dynamics. I will also evaluate how survival is related to environmental variables like river temperature and sea surface temperature, to enable simulation of the effects of climate warming on survival, in future analyses. 
 
 
 ## Methods
@@ -37,13 +37,13 @@ In this chapter, I will characterize how Chinook salmon survival and age at retu
   
 We studied a population of spring run Chinook salmon that spawns in the Wenatchee River basin as a case study for model development and to learn about how vital rates vary among among streams and juvenile life histories, as well as their associations with environmental covariates. The Wenatchee River is a tributary of the upper Columbia River (RKm 754) located in north-central Washington State, with a drainage area of roughly 3,437 km2 (Figure 1).The population of spring Chinook salmon in the Wenatchee River has been intensively monitored since the mid 1990's due to its endangered status under the ESA and to evaluate the efficacy of a conservation hatchery program that serves as mitigation for impacts on fish of hydroelectric dams on the main stem of the Columbia River. 
 
-The population is considered a spring run due to the early return timing of adults from the ocean. This early return timing, before adults have fully matured, is an adaptation to allow for increased access to high elevation spawning reaches prior to the onset of low flows and high temperatures during the summer, however, adults don't spawn until early fall. Juveniles emerge from the gravel in late winter and in the Columbia River basin tend to exhibit a stream-type life history, wherein they rear in freshwater extensively prior to migrating to the marine environment (smolting). The most common juvenile life history for spring Chinook salmon populations in the Columbia River Basin is to smolt in their second spring, just over a year following emergence. Wenatchee River spring Chinook express this juvenile life history with remarkable consistency, whereas other species of anadromous salmonids and other populations of Chinook exhibit more life history diversity in terms of  age at smolting. 
+The population is considered a spring run due to the early return timing of adults from the ocean. This early return timing, before adults have fully matured, is an adaptation to allow for increased access to high elevation spawning habitat prior to the onset of low flows and high temperatures during the summer, however, adults don't spawn until early fall. Juveniles emerge from the gravel in late winter and in the Columbia River basin tend to exhibit a stream-type life history, wherein they rear in freshwater extensively prior to migrating to the marine environment (smolting). The most common juvenile life history for spring Chinook salmon populations in the Columbia River Basin is to smolt in their second spring, just over a year following emergence. Wenatchee River spring Chinook express this juvenile life history with remarkable consistency, whereas other species of anadromous salmonids and other populations of Chinook exhibit more life history diversity in terms of age at smolting. 
 
-Spring Chinook salmon do exhibit considerable life hitory diversity with regards to dispersal from natal sites for freshwater rearing, however. Spawning tends to occur in the upper reaches or watersheds and some juveniles disperse to use downstream rearing habitats, while others remain in natal areas until smolting. This diversity in juvenile freshwater habitat use appears to provide a stabilizing effect on the population and may increase the capacity of freshwater habitat to support juveniles rearing, however, it complicates monitoring because juveniles are often enumerated when emigrating from their natal reach. Juvenile emigrating from natal reaches at different times of year will have different survival rates to adulthood and use different habitats, so understanding their survival following emigration is paramount to understanding the contribution of different dispersal strategies to population productivity.  
+Spring Chinook salmon do exhibit considerable life history diversity with regards to dispersal from natal sites for freshwater rearing, however. Spawning tends to occur in the upper reaches or watersheds and some juveniles disperse to use downstream rearing habitats, while others remain in natal areas until smolting. This diversity in juvenile freshwater habitat use may increase population stabality and increase the capacity of freshwater habitat to support juveniles rearing, however, it complicates monitoring because juveniles are often enumerated when emigrating from their natal reach. Juvenile emigrating from natal reaches at different times of year have different survival rates to adulthood and use different habitats, so understanding their survival following emigration is paramount to understanding the contribution of different juvenile life history strategies to population productivity.  
 
-Regardless of their dispersal behavior and rearing habitat within freshwater, nearly all juveniles smolt during their second spring. When migrating to the ocean, juvenile salmon and steelhead from the Wenatchee River must pass three hydroelectic Dams on the upper Columbia River above the confluence with the Snake River: Rock Island Dam (rkm 729), Wanapum Dam (rkm 668), and Priest Rapids Dam (rkm 639) (Figure 1). They pass an additional four dams on the main stem of the Columbia River downstream of the confluence with the Snake River: McNary Dam (rkm 470), John Day Dam (rkm 347), The Dalles Dam (rkm 307), and Bonneville Dam (rkm 234). All seven dams are equipped with systems to divert fish away for turbines and into pathways designed to pass juvenile fish downstream. In addition, when water is spilled over top of dams fish may pass dams via the spillways. The hydrograph of the Columbia River is regulated by the storage and release of water from manmade reservoirs in it's upper reaches and tributaries. While regulation has reduced the magnitude of the spring freshet, water is released from storage reservoirs during the spring smolt migration and water is spilled over dams in the migration corridor to aid fish migration and dam passage. 
+Regardless of their dispersal behavior and rearing habitat within freshwater, nearly all juveniles smolt during their second spring. When migrating to the ocean, juvenile salmon and steelhead from the Wenatchee River must pass three hydroelectic Dams on the upper Columbia River above the confluence with the Snake River: Rock Island Dam (rkm 729), Wanapum Dam (rkm 668), and Priest Rapids Dam (rkm 639) (Figure 1). They pass an additional four dams on the main stem of the Columbia River downstream of the confluence with the Snake River: McNary Dam (rkm 470), John Day Dam (rkm 347), The Dalles Dam (rkm 307), and Bonneville Dam (rkm 234). All seven dams are equipped with systems to divert fish away for turbines and into pathways designed to pass juvenile fish downstream. In addition, water is spilled over top of dams so that fish may pass dams via the spillways. The hydrograph of the Columbia River is regulated by the storage and release of water from manmade reservoirs in it's upper reaches and tributaries. While this regulation has reduced the magnitude of the spring freshet, water is released from storage reservoirs during the spring smolt migration and water is spilled over dams in the migration corridor to aid fish migration and dam passage. 
 
-Once fish enter the marine environment, Columbia River spring Chinook generally swim northward to the productive marine waters in the Gulf of Alaska, and reside off the continental shelf for one to three years before returning to the Columbia River in spring. The majority of adults spend two years at sea, and most fish that spend only one year at sea are males (known as Jacks). Upstream migrating salmon pass dams via fish ladders, that provide flowing water at an appropriate gradiant and with holding pools such that fish are attracted to and able to navigate upstream through them. In addition to the dams on the Columbia River, fish must pass Tumwater Dam on the main stem of the Wenatchee River (RkM ___) (Figure 1). This dam is no longer used for power generation and is equipped with adult fish passage facilties. 
+Once fish enter the marine environment, Columbia River spring Chinook generally swim northward to the productive marine waters in the Gulf of Alaska, and reside off the continental shelf for one to three years before returning to the Columbia River in spring. The majority of adults spend two years at sea, and most fish that spend only one year at sea are males (known as Jacks). Upstream migrating salmon pass dams via fish ladders that provide flowing water at an appropriate gradiant and with holding pools such that fish are attracted to and able to navigate upstream through them. In addition to the dams on the Columbia River, fish must pass Tumwater Dam on the main stem of the Wenatchee River (RkM ___) (Figure 1). This dam is no longer used for power generation and is equipped with adult fish passage facilties. 
 
 
 ### Data
@@ -58,14 +58,15 @@ Once fish enter the marine environment, Columbia River spring Chinook generally 
     - Length effects
   - Adult fish ladders
   
-A sample of juvenile spring Chinook salmon were captured with rotary screw traps (*cite*) when emigrating from three natal tributaries - the Chiwawa River, Nason Creek, and the White River (Figure 1). The traps were installed in early spring and operated continuously through late fall. From 2006 through 2016, captured juveniles > 60 mm were implanted with passive integrated transponder (PIT) tags within their peritoneal cavity using a syringe. *Add information on tag loss and tagging mortality*. Each PIT tag had a unique radio-frequency identification (RFID) code that transmitted when triggered by an electromagnetic interrogation pulse from an RFID reader device. 
+Upon emigration from three natal stream - the Chiwawa River, Nason Creek, and the White River - juvenile spring Chinook salmon were sampled with rotary screw traps (*cite*) (Figure 1). The traps were installed in early spring and operated continuously through late fall. From 2006 through 2016, juveniles > 60 mm were implanted with passive integrated transponder (PIT) tags within their peritoneal cavity using a syringe. *Add information on tag loss and tagging mortality*. Each PIT tag had a unique radio-frequency identification (RFID) code that transmitted when triggered by an electromagnetic interrogation pulse from an RFID reader device. 
 
-Fish-passage pathways for both juveniles and adults at certain dams were equipped with RFID reader devices, and the ID codes and timing of fish using these pathways was recorded. We used the detection histories of individuals passing dams to learn about their survival and age at maturation. Specifically, we used detections of juveniles of juveniles at McNary and Bonneville Dams, and defections of Adults at Bonneville, McNary, Priest Rapids, Rock Island, and Tumwater Dams. Only juveniles which passed via the turbine-bypass pathways had the change of to be detected, as there were no RFID readers in the spillways or the turbine penstocks. The dates and locations that marked fish were released and subsequent detected at dams were downloaded from the Columbia Basin PIT Tag Information System (data citation).  
+Fish-passageways for both juveniles and adults at certain dams were equipped with RFID reader devices, and the ID codes and timing of fish using these passageways were recorded. We used the detection histories of individuals passing dams to learn about their survival and maturation age probabilities. Specifically, we used detections of juveniles at McNary and Bonneville Dams, and defections of Adults at Bonneville, McNary, Priest Rapids, Rock Island, and Tumwater Dams. Only juveniles which passed via the turbine-bypass pathways had the change of to be detected, as there were no RFID readers in the spillways or the turbine penstocks. The dates and locations that marked fish were released and subsequent detected at dams were downloaded from the Columbia Basin PIT Tag Information System (data citation).  
 
 Table. Detectios by site and year.
 
 ```{r, load_data}
 library(here)
+source(here("src","mscjs_wen_helper_funcs.R"))
 source(here("src","Wen_MSCJS_re.R"))
 
 mark_file_CH$rel_DOY_2<-mark_file_CH$`Release Day Number`+ifelse(mark_file_CH$LH=="smolt",365,0)
@@ -111,7 +112,7 @@ For whatever reason, when I include JDD_J (John Day Dam juvenile) in the model, 
 - Goodness of fit testing
   - UCare
 
-We used a multistate Cormack-Jolly-Seber model to estimate survival rates and adult-return ages (*check term used for consistency throughout*), where the states corresponded with the number of years spent at sea. Therefore, for all intervals other than that between when juveniles passed downstream of Bonneville Dam and when they passed upstream of Bonneville Dam as adults, the only possible state transition was between their current state and the dead state. Only during the ocean-residence period could fish transition between multiple states, returning as 3, 4, or 5 year-olds. However, once smolts passed downstream of Bonneville Dam, they could not have been detected again until they returned to the Columbia River and passed upstream of Bonneville Dam, so probabilities of marine-survival were confounded with probabilities of returning at alternative ages and only the joint probabilities of survival and return age were identifiable (Buchanan and Skalski 2007).  
+We used a multistate Cormack-Jolly-Seber model to estimate survival and maturation age probabilities (*check term used for consistency throughout*), where the states corresponded with the number of years spent at sea. Therefore, for all intervals other than that between when juveniles passed downstream of Bonneville Dam and when they passed upstream of Bonneville Dam as adults, the only possible state transition was between their current state and the dead state. Only during the ocean-residence period could fish transition between multiple states, returning as 3, 4, or 5 year-olds. However, once smolts passed downstream of Bonneville Dam, they could not have been detected again until they returned to the Columbia River and passed upstream of Bonneville Dam, so probabilities of marine-survival were confounded with probabilities of returning at alternative ages and only the joint probabilities of survival and return age were identifiable (Buchanan and Skalski 2007).  
 
 We considered 4 group covariates over which vital rates and detection probabilities might vary: juvenile life history strategy, natal stream, year, and adult age. The first time period in the model was between juvenile emigration from their natal stream and when they passed McNary Dam en route to the ocean. However, the length of time that this period represented varied from nearly a year for the earliest emigrating juveniles to as little as several days for fish that reared entirely within the natal stream. To account for the heterogeneity in survival rates that this range of elapsed times would cause, we divided fish into three juvenile life-history groups, that corresponded with modes of emigration timing from the natal stream delineated in previous work (Chapter 1). The earliest emigrating juveniles from the natal stream (hereafter summer emigrants), emigrated as subyearlings between day of year 141 and 262. The subsequent group of emigrants (hereafter fall emigrants), emigrated as subyearlings from day of year 263 through when the traps were removed in early winter. The final group of emigrants (hereafter "smolts"), emigrated as yearlings in spring (day of year 53-179), and were delineated from subyearlings based on a previously developed length-date cutoff rule (chapter 1). We also considered whether fish in these different groups had different survival, maturation age, and detection probabilities at subsequent life stages, as could result from variation in vitality or growth rates of fish that expressed different juvenile life histories. We also considered whether vital rates and detection probabilities could vary among fish from different natal streams, among years, and for different aged adults during their upstream migration.    
 
@@ -199,7 +200,7 @@ Use R2ucare to evaluate the presence of trap dependency and overdispersion in th
 library(R2ucare)
 
 dat_out<-select(mark_file_CH,sea_Year_p,LH,stream, #grouping variables
-                LWe_J:Est_J,Bon_A,McJ_A:Tum_A) %>%
+                LWe_J:Est_J,Bon_A,McN_A:Tum_A) %>%
   #sites/occasions to include in model
   #first year with all stream data through last year where data on all three return ages is available (because it is 2020)
   mutate(adult_all = select(., Bon_A:Tum_A) %>%  reduce(pmax)) %>% #,
@@ -344,7 +345,7 @@ mscjs_dat<- make_dat(mark_file_CH,sites=c( "LWe_J",
   #"JDD_J",
    "Bon_J",
    #"Est_J",
-  "Bon_A","McJ_A",
+  "Bon_A","McN_A",
   #"PRa_A","RIs_A",
   "Tum_A"),cont_cov=c(),length_bin = 5,doy_bin = 10)#,"rel_DOY_bin","length_bin"
 
@@ -360,25 +361,31 @@ mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
                          phi_formula=par.index~
                            
                            #fixed effect
-                           -1+ time1:LH+time1:streamWhite +time2:age_class +time3:LH+time4:LH + time5+time6,
+                           -1+ time1:LH+time1:streamWhite +time2:age_class+time3 +time3:age_class+time4:age_class+time4 +time5+time6,
                       
                          p_formula= par.index~
                            #fixed effects
-                           -1+ time2+time3+time3:LHsmolt+ time3:LWe_J+ time4 +McN_J:time4 +time5 +time6,
+                           -1+ time2+time3+ time4  +time5  +time6,
                          
                          psi_formula= par.index~
                            #fixed effects
                            -1+tostratum,
                          
-                         doFit = TRUE,silent=TRUE
+                         doFit = TRUE,silent=TRUE,sim_rand = 0
 )
 
 print_out(mscjs_fit)
 test<-mscjs_fit$mod$simulate()
-obs<-mscjs_fit$dat_TMB$CH*mscjs_fit$dat_TMB$freq
-colSums(test$sim_det_1)
+obs<-mscjs_fit$dat_TMB$CH
+obs[obs>0]<-1
+obs<-obs*mscjs_fit$dat_TMB$freq
 colSums(obs)
+colSums(test$sim_det_1)
+colSums(test$sim_det_2)
 colSums(test$sim_det_3)
+colSums(test$det_1)
+colSums(test$det_2)
+colSums(test$det_3)
 
 
 
@@ -421,7 +428,7 @@ mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
                            (0+tostratum|mig_year)
                          ,
                          
-                         doFit = TRUE,silent=TRUE
+                         doFit = FALSE,silent=TRUE
 )
 mscjs_fit$p.design.glmmTMB$data.tmb$terms
 
@@ -485,10 +492,10 @@ mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
                            time5:age_class +              #to McNary
                            time6 + time6:stratum3 +      #to Tumwater
                            #random
-                            diag(0+time1:age_class|mig_year) +  # to trap
+                            diag(0+time1:age_0|mig_year) +  # to trap
                            (0+time2|mig_year) + # (0+time2|mig_year:LH:stream) + #to mcNary
                            (0+time3:age_0|mig_year) +# (0+time3|mig_year:LH:stream) + # to Bonneville
-                           (0+time4|mig_year) +diag(0+time4:age_class|mig_year) + #(0+time4|mig_year:LH:stream) +  #to Bonn adults
+                           (0+time4|mig_year) +diag(0+time4|mig_year:age_class) + #(0+time4|mig_year:LH:stream) +  #to Bonn adults
                             (0+time5|mig_year) #+                              # to Mcanry
                              # (0+time6|mig_year)                               # to Tumwater
                          ,
@@ -497,39 +504,93 @@ mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
                            #fixed effects
                            -1+ time2:LH+ time2:streamWhite + time2:LWe_new+# lower trap
                             time3:age_class+     #McNary
-                           time3:LWe_J:age_0 +               #McNary
+                           # time3:LWe_J:age_0 +               #McNary
                             time4:age_class + time4:streamChiwawa +  #Bonneville
-                           time4:McN_J +   #Bonneville
+                           # time4:McN_J +   #Bonneville
                            time5:stratum +           # Bonn adult
                            time6 + #:stratum +         #McNary adult
                            #random
                           diag(0+time2:LH|mig_year:stream) + #(0+time2|mig_year:LH:stream) +  # lower trap
                            diag(0+time3|mig_year)+ 
-                           +diag(0+time3|mig_year:age_class:stream) +# (0+time3|mig_year:LH:stream) + # McNary
+                           +diag(0+time3|mig_year:stream:age_class) +# (0+time3|mig_year:LH:stream) + # McNary
                            diag(0+time4|mig_year)+
-                           diag(0+time4|mig_year:age_class:stream) +# (0+time4|mig_year:LH:stream) +  #Bonneville
-                           diag(0+time4:McN_J|mig_year)#Bonneville
+                           diag(0+time4|mig_year:stream:age_class) #+# (0+time4|mig_year:LH:stream) +  #Bonneville
+                           # diag(0+time4:McN_J|mig_year)#Bonneville
                          ,
                          
                          psi_formula= par.index~
                            #fixed effects
-                           -1+tostratum+tostratum:LHsmolt+
+                           -1+tostratum+tostratum:LHsmolt+tostratum:streamNason+
                            #random
                             (0+tostratum|mig_year)
                          ,
                          
-                         doFit = TRUE,silent=TRUE
+                         doFit = FALSE,silent=TRUE,
+                         sim_rand = 0
 )
 
 
 
 
+#experimental
+mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
+                         phi_formula=par.index~
+                           
+                           #fixed effect
+                           -1+ time1:LH+ time1:stream+ # time1:streamWhite +#to lower wenatchee trap
+                           time2:age_class  + #(0+time1|LH:stream)+ #to mcnary
+                           time3:age_class + #time3:LHsmolt +#to Bonneville
+                           time4:age_class + #to Bonn adult
+                           time5:stratum +   #to McNary
+                           time6:stratum +      #to Tumwater
+                           #random
+                            (0+time1|mig_year) +  # to trap
+                           (0+time2|mig_year)+ + # (0+time2|mig_year:LH:stream) + #to mcNary
+                           (0+time3|mig_year) +# (0+time3|mig_year:LH:stream) + # to Bonneville
+                           (0+time4|mig_year) + #(0+time4|mig_year:LH:stream) +  #to Bonn adults
+                            (0+time5|mig_year) #+ #+                              # to Mcanry
+                             # (0+time6|mig_year)                               # to Tumwater
+                         ,
+                      
+                         p_formula= par.index~
+                           #fixed effects
+                           -1+ time2:LH+ time2:stream+ time2:LWe_new+# lower trap
+                            time3:age_class+     #McNary
+                           # time3:LWe_J +               #McNary
+                            time4:age_class + #Bonneville
+                           # time4:McN_J +   #Bonneville
+                           time5:stratum +           # Bonn adult
+                           time6:stratum + #:stratum +         #McNary adult
+                           #random
+                          (0+time2|mig_year) + #(0+time2|mig_year:LH:stream) +  # lower trap
+                           (0+time3|mig_year)+ 
+                           # +diag(0+time3:age_class|mig_year:stream) +# (0+time3|mig_year:LH:stream) + # McNary
+                           (0+time4|mig_year)#+
+                           # (0+time4:McN_J|mig_year)#+#Bonneville
+                          # (0+time5|mig_year)+
+                            # (0+time6|mig_year)
+                           
+                           ,
+                         
+                         psi_formula= par.index~
+                           #fixed effects
+                           -1+tostratum+tostratum:LHsmolt+
+                           #random
+                             (0+tostratum|mig_year)
+                         ,
+                         
+                         doFit = FALSE,silent=TRUE,
+                         sim_rand = 1
+)
 
 
+
+
+last_best<-mscjs_fit$mod$env$last.par.best
 #mscjs_fit$Phi.design.glmmTMB$data.tmb$terms
 
 print_out(mscjs_fit)
-
+ 
 # * observed detections data*
 obs_dat<-mscjs_dat$dat_out %>% 
   #make states their own columns
@@ -541,58 +602,94 @@ obs_dat<-mscjs_dat$dat_out %>%
   #drop unneeded columns 
    select(!length_bin:freq) %>% 
   #sum detection by stream, year, and life history
-  group_by(sea_Year_p,LH,age_class,stream) %>% summarise(across(LWe_J :Tum_A_3, sum)) %>% ungroup()
+  group_by(LH,age_class,stream,sea_Year_p) %>% summarise(across(LWe_J :Tum_A_3, sum)) %>% ungroup()
 
+obs_dat_long<- obs_dat%>% pivot_longer(LWe_J :Tum_A_3) 
+
+# * expected detections data*
+sim<-mscjs_fit$mod$simulate(par=last_best)
+exp_det_MLE<-cbind(obs_dat %>% select(LH:sea_Year_p) , sim$det_1,sim$det_2,sim$det_3) %>% `colnames<-`(colnames(obs_dat %>% select(LH  :Tum_A_3))) %>% 
+    #sum detection by stream, year, and life history
+  group_by(LH,age_class,stream,sea_Year_p) %>% summarise(across(LWe_J :Tum_A_3, sum)) %>% ungroup() %>% pivot_longer(LWe_J :Tum_A_3) 
+
+ 
+ 
+# * posterior predictions *
 sim_posterior<-rmvnorm_prec(mu=mscjs_fit$mod$env$last.par.best, 
-                            prec=mscjs_fit$fit$SD$jointPrecision, 500, random_seed=1 )
+                            prec=mscjs_fit$fit$SD$jointPrecision, 250, random_seed=1 )
 
-FT_ref_vec<-FT_sim_vec<-numeric(200)
+FT_ref_vec<-FT_sim_vec<-numeric(250)
+post_pred<-matrix(NA,nrow=nrow(exp_det_MLE),ncol=250)
 
+test<-numeric(250)
 
 options(dplyr.summarise.inform = FALSE)
 gc()
-for(i in 1:200){
+for(i in 1:250){
   sim<-mscjs_fit$mod$simulate(par=sim_posterior[,i])
+  
 
-# *expected detections*
-exp_det<-cbind(mscjs_dat$dat_out %>% select(sea_Year_p:stream), sim$det_1,sim$det_2,sim$det_3) %>% `colnames<-`(colnames(obs_dat %>% select(sea_Year_p  :Tum_A_3))) %>% 
+  exp_det<-cbind(obs_dat %>% select(LH:sea_Year_p) , sim$det_1,sim$det_2,sim$det_3) %>% `colnames<-`(colnames(obs_dat %>% select(LH  :Tum_A_3))) %>% 
     #sum detection by stream, year, and life history
-  group_by(sea_Year_p,LH,age_class,stream) %>% summarise(across(LWe_J :Tum_A_3, sum)) %>% ungroup()
-
-
+  group_by(LH,age_class,stream,sea_Year_p) %>% summarise(across(LWe_J :Tum_A_3, sum)) %>% ungroup() %>% pivot_longer(LWe_J :Tum_A_3) 
 
 # * simulated detection from model *
-sim_obs<-cbind(mscjs_dat$dat_out %>% select(sea_Year_p:stream), sim$sim_det_1,sim$sim_det_2,sim$sim_det_3) %>% `colnames<-`(colnames(obs_dat %>% select(sea_Year_p  :Tum_A_3))) %>% 
+sim_obs<-cbind(obs_dat %>% select(LH:sea_Year_p), sim$sim_det_1,sim$sim_det_2,sim$sim_det_3) %>% `colnames<-`(colnames(obs_dat %>% select(LH  :Tum_A_3))) %>% 
     #sum detection by stream, year, and life history
-  group_by(sea_Year_p,LH,age_class,stream) %>% summarise(across(LWe_J :Tum_A_3, sum)) %>% ungroup()
+  group_by(LH,age_class,stream,sea_Year_p) %>% summarise(across(LWe_J :Tum_A_3, sum)) %>% ungroup() %>% pivot_longer(LWe_J :Tum_A_3) 
+  
+
+post_pred[,i]<-sim_obs$value
 
 #freeman Tukey
-FT_ref_vec[i]<- sum((sqrt(obs_dat[,-1:-4])-sqrt(exp_det[,-1:-4]))^2)
-FT_sim_vec[i]<- sum((sqrt(sim_obs[,-1:-4])-sqrt(exp_det[,-1:-4]))^2)
+FT_ref_vec[i]<- sum((sqrt(obs_dat_long$value)-sqrt(exp_det$value))^2)
+FT_sim_vec[i]<- sum((sqrt(sim_obs$value)-sqrt(exp_det$value))^2)
 if((i/50)%%1==0){gc()}
 }
+
+#Bayesian P-value
 sum(FT_sim_vec>FT_ref_vec)/i
 
-summary(FT_ref_vec)
-summary(FT_sim_vec)
-test<-(cbind(obs_dat %>% select(sea_Year_p:stream),((sim_obs[,-1:-4])-(exp_det[,-1:-4]))))
+#residuals
+test<-(cbind(obs_dat_long %>% select(LH:name),value=((obs_dat_long$value)-(exp_det_MLE$value))))
+#sum residuals across years
+test %>% group_by(LH,stream,name) %>% summarise(across(value, sum)) %>% pivot_wider()
+#sum residuals acorss years, streams, and LHs
+test %>%  group_by(name) %>% summarise(across(value, sum))
 
-test %>% group_by(stream,LH) %>% summarise(across(LWe_J :Tum_A_3, sum))
-test %>%  select(LWe_J :Tum_A_3) %>%  colSums()
-
-
-View(test)
-
-colSums( obs_dat %>% select(LWe_J :Tum_A_3) )
-head(exp_det)
-colSums(sim_obs)
+library(DHARMa)
 
 
-mscjs_fit$par_TMBmscjs_fit$fit$parmscjs_fit$fitmscjs_fit$fit$AIC
+post_pred<-replicate(250,{
+   sim_data<-mscjs_fit$mod$simulate(par=last_best)
+   # * simulated detection from model *
+sim_obs<-cbind(obs_dat %>% select(LH:sea_Year_p), sim_data$sim_det_1,sim_data$sim_det_2,sim_data$sim_det_3) %>% `colnames<-`(colnames(obs_dat %>% select(LH  :Tum_A_3))) %>%
+    #sum detection by stream, year, and life history
+  group_by(LH,age_class,stream,sea_Year_p) %>% summarise(across(LWe_J :Tum_A_3, sum)) %>% ungroup() %>% pivot_longer(LWe_J :Tum_A_3)
+   sim_obs$value
+})
 
 
+dharm_sim<-createDHARMa(simulatedResponse = post_pred,
+                        observedResponse = obs_dat_long$value,
+                         fittedPredictedResponse = exp_det_MLE$value,
+                        integerResponse = TRUE)
 
+plot(dharm_sim,quantreg=TRUE)
+#testDispersion(dharm_sim)
 
+out_group<-recalculateResiduals(dharm_sim,group=paste(obs_dat_long$name,obs_dat_long$LH))
+
+#scaled residuals
+sr<-out_group$scaledResiduals
+names(sr)<-sort(unique(out_group$group))
+sr
+sr[sr>0.75]
+sr[sr<0.25]
+
+plot(out_group,quantreg=TRUE)
+plotResiduals(out_group,quantreg=FALSE,form=1:12)
+out_group
 
 mscjs_fit$par_TMB
 mscjs_fit$fit$par
@@ -611,105 +708,6 @@ $$
 $$ $$
 
 
-
-```{r print_outputs}
-
-
-
-
-print_out<-function(mscjs_fit){
-  
-  
-  #function that prints random effect standard deviations and correlations in a nice table
-print_cov<-function(param){
-mat_out<-matrix(NA,nrow=0,ncol=4+100,dimnames = list(c(),c("Groups","Name","Std.Dev","SD(SD)","Corr",rep("",99))))
-ind<-0
-for(i in 1:length(mod_rep[[paste0("sd_",tolower(param))]])){
-ind2<-ind+length(mod_rep[[paste0("sd_",tolower(param))]][[i]])
-
-##RE variance
-value<-ad_rep_vals[names(ad_rep_vals)==paste0("exp(theta_",tolower(param),")")][(ind+1):ind2]
-
-###SE
-sd_val<-ad_rep_sds[names(ad_rep_vals)==paste0("exp(theta_",tolower(param),")")][(ind+1):ind2]
-##lower tri corr
-cor_mat<-mod_rep[[paste0("corr_",tolower(param))]][[i]]
-cor_mat[upper.tri(cor_mat,TRUE)]<-NA
-
-##combine
-mat_i<-matrix(NA,nrow=length(value),ncol=4+100,dimnames = list(rep("",length(value)),c("Groups","Name","Std.Dev","SD(SD)","Corr",rep("",99))))
-mat_i[1,1]<-mscjs_fit[[paste0(param,".design.glmmTMB")]]$grpVar[i]
-mat_i[,2]<-mscjs_fit[[paste0(param,".design.glmmTMB")]]$condList$reTrms$cnms[i][[1]]
-mat_i[,3]<-round(value,4)
-mat_i[,4]<-round(sd_val,4)
-if(ncol(cor_mat)>0){ mat_i[,5:(4+ncol(cor_mat))]<-round(cor_mat,4)
-}
-mat_out<-rbind(mat_out,mat_i)
-
-ind<-ind2
-
-}
-print(mat_out[,apply(mat_out,2,function(x)sum(!is.na(x)))>0],na.print = "",quote = FALSE)
-}
-  
-  
-#mscjs_fit$fit$time_for_run
-mscjs_fit$fit$time_for_MLE
-mscjs_fit$fit$time_for_sdreport
-print(mscjs_fit$fit$time_for_run)
-print(mscjs_fit$fit$AIC)
-#sd report
-#sd_rep<-sdreport(mod)
-#sd_rep
-fixed_est<-mscjs_fit$fit$SD$par.fixed
-fixed_sd<-sqrt(diag(mscjs_fit$fit$SD$cov.fixed))
-
-#report
-mod_rep<-mscjs_fit$mod$report()
-#ad report
-ad_rep_vals<-mscjs_fit$fit$SD$value
-ad_rep_sds<-mscjs_fit$fit$SD$sd
-
-#par_out<-mscjs_fit$mod$env$parList()
-
-print("Phi")
-print("fixed")
-tibble(par_name=colnames(mscjs_fit$Phi.design.glmmTMB$data.tmb$X),estimate=fixed_est[1:length(mscjs_fit$par_TMB$beta_phi)],sd=fixed_sd[1:length(mscjs_fit$par_TMB$beta_phi)]) %>%  mutate(p_value= round(2*pnorm(abs(estimate/sd), lower.tail = FALSE),3)) %>% print(n=100)
-print("Random covariance")
-try(print_cov("Phi"))
-
-
-
-
-
-print("p")
-print("fixed")
-tibble(par_name=colnames(mscjs_fit$p.design.glmmTMB$data.tmb$X),estimate=fixed_est[seq(from=(length(mscjs_fit$par_TMB$beta_phi)+1),length=length(mscjs_fit$par_TMB$beta_p))],sd=fixed_sd[seq(from=(length(mscjs_fit$par_TMB$beta_phi)+1),length=length(mscjs_fit$par_TMB$beta_p))]) %>%  mutate(p_value= round(2*pnorm(abs(estimate/sd), lower.tail = FALSE),3)) %>% print(n=100)
-print("Random covariance")
-try(print_cov("p"))
-
-
-print("Psi")
-print("fixed")
-tibble(par_name=colnames(mscjs_fit$Psi.design.glmmTMB$data.tmb$X),estimate=fixed_est[seq(from=(length(mscjs_fit$par_TMB$beta_phi)+length(mscjs_fit$par_TMB$beta_p)+1),length=length(mscjs_fit$par_TMB$beta_psi))],sd=fixed_sd[seq(from=(length(mscjs_fit$par_TMB$beta_phi)+length(mscjs_fit$par_TMB$beta_p)+1),length=length(mscjs_fit$par_TMB$beta_psi))]) %>%  mutate(p_value= round(2*pnorm(abs(estimate/sd), lower.tail = FALSE),3)) %>% print(n=100)
-try(print_cov("Psi"))
-}
-
-
-#function for simulation from a multivariate normal, taken fron J. Thorson's Fish Utils. Package
-rmvnorm_prec <- function(mu, prec, n.sims, random_seed ) {
-  set.seed( random_seed )
-  z = matrix(rnorm(length(mu) * n.sims), ncol=n.sims)
-  L = Matrix::Cholesky(prec, super=TRUE)
-  z = Matrix::solve(L, z, system = "Lt") ## z = Lt^-1 %*% z
-  z = Matrix::solve(L, z, system = "Pt") ## z = Pt    %*% z
-  z = as.matrix(z)
-  return(mu + z)
-}
-
-
-
-```
 
 
 ```{r plot_output?}
@@ -778,13 +776,13 @@ ggplot(data= as_tibble(p.design.dat)%>% filter(Time>2),aes(x=mig_year ,y=p_fit,c
 # Mark model for comparison
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 dat_out<-select(mark_file_CH,sea_Year_p,LH,stream, #grouping variables
-                McN_J:Bon_J,Est_J,Bon_A,McJ_A:Tum_A) %>% #sites/occasions to include in model
+                McN_J:Bon_J,Est_J,Bon_A,McN_A:Tum_A) %>% #sites/occasions to include in model
   #first year with all stream data through last year where data on all three return ages is available (because it is 2020)
   filter(sea_Year_p>=2007&sea_Year_p<=2016) %>%
   #make grouping variables factors
   #mutate_at(vars(sea_Year_p:stream),~as.factor(as.character(.x)))%>% mutate(McN_J=apply(select(.,McN_J,JDD_J),1,max)) %>% select(-JDD_J) %>% 
   #create multistate capture histories
-  mutate(ch=select(., c(McN_J:Est_J,Bon_A,McJ_A:Tum_A)) %>%  reduce(paste0)) %>%
+  mutate(ch=select(., c(McN_J:Est_J,Bon_A,McN_A:Tum_A)) %>%  reduce(paste0)) %>%
   #mutate(ch=select(., McN_J,Bon_J,Est_J) %>% reduce(paste0)) %>%
   mutate(ch=paste0("1",ch)) 
 

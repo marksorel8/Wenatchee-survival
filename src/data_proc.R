@@ -101,7 +101,7 @@ left_join(lower_mid_col_dams %>%
           select(c(`Tag Code`,`First Year YYYY`)) %>% 
           arrange(desc(`First Year YYYY`)) %>%
           distinct(`Tag Code`,.keep_all=TRUE) %>%
-          rename("McJ_A"="First Year YYYY"),by="Tag Code") %>% 
+          rename("McN_A"="First Year YYYY"),by="Tag Code") %>% 
   
 #Priest Rapids Adult
   left_join(upper_col_dams_tum %>% 
