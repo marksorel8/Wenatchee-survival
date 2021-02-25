@@ -23,7 +23,7 @@ dat_out<- mark_file_CH %>%
 #subset columns needed for analysis
   select(sea_Year_p,LH,age,stream, #grouping variables
                 all_of(sites),length_bin,rel_DOY_bin) %>% 
-  rename(age_class=age) %>% 
+  select(-age) %>% 
   #sites/occasions to include in model
   #first year with all stream data through last year where data on all three return ages is available (because it is 2020)
   filter(sea_Year_p>=start_year & sea_Year_p<=end_year) %>%
@@ -51,7 +51,7 @@ n_states<-3
 trap_dep<-which(sites%in%c("LWe_J", "McN_J"))
 
 #process data using RMark function. Specifies grouping variables for parameters, and type of model and hence parameters. "Multistrate" used S(Phi), p, and psi
-wenatchee.processed<-RMark::process.data(dat_out,model="Multistrata",groups=c("LH","age_class","stream","sea_Year_p",cont_cov,sites[trap_dep]),allgroups=TRUE)
+wenatchee.processed<-RMark::process.data(dat_out,model="Multistrata",groups=c("LH","stream","sea_Year_p",cont_cov,sites[trap_dep]),allgroups=TRUE)
 
 #Make design data using RMark function. Sets up matrices for each parameter where there is a row for each combination of the grouping variables, occasion, age, etc. Specifiying the pim.type can reduce some of the combinations/# of rows. See?RMark::make.design.data() for more info. 
 wenatchee.ddl<-RMark::make.design.data(wenatchee.processed,parameters=list(S=list(pim.type="time"), #survival changes by occasion and potentially stratum(i.e. fish age)
@@ -71,7 +71,7 @@ Phi.design.dat<-wenatchee.ddl$S %>%
          mig_year_num=as.numeric(mig_year)) %>%   #add a column for the actual migration year, which is the seaward year for juveniles and the seaward + stratum for adults
 cbind(.,model.matrix(~time+stream+LH+stratum-1,data=.)) %>% 
  mutate(streamChiwawa=as.numeric(streamNason+streamWhite==0),
-        LHfall=as.numeric(LH=="fall"),age_0=as.numeric(age_class=="sub")) %>% 
+        age_class=as.factor(ifelse(LH!="smolt","sub","yrlng")), LHfall=as.numeric(LH=="fall"),age_0=as.numeric(LH!="smolt")) %>% 
   #make length bin and release DOY numeric
   mutate(across(.cols=all_of(cont_cov),.fns=function(x)scale(as.numeric(as.character(x))))) %>% 
   #make par index a sequence
@@ -95,7 +95,7 @@ p.design.dat<-wenatchee.ddl$p %>%
   mutate(streamChiwawa=as.numeric(streamNason+streamWhite==0)) %>%
   #make length bin and release DOY numeric
   mutate(across(.cols=all_of(cont_cov),.fns=function(x)scale(as.numeric(as.character(x))))) %>% 
-  mutate(age_0=as.numeric(age_class=="sub"),LHfall=as.numeric(LH=="fall"), LWe_new=as.numeric(as.numeric(as.character(sea_Year_p)>2011))) %>% 
+  mutate( age_class=as.factor(ifelse(LH!="smolt","sub","yrlng")), LHfall=as.numeric(LH=="fall"),age_0=as.numeric(LH!="smolt"), LWe_new=as.numeric(as.numeric(as.character(sea_Year_p)>2011))) %>% 
   dplyr::filter( !(as.numeric(as.character(sea_Year_p))%in%(2011:2012) & Time==occ_LWe_J )) %>% 
   #make par index a sequence
   mutate(par.index=(1:nrow(.))-1)
@@ -109,7 +109,7 @@ Psi.design.dat<-wenatchee.ddl$Psi %>%
   filter(stratum==1) %>%  #Can only transition from state 1 (Juvenile entering ocean)
   arrange(tostratum,group) %>%    # sort by stratum and group so the first half of rows represents the alr probs of transitioning to age 2 and the second half of the rows the alr probs of transitioning to state 3. This is neccesary for the way I am coding this in TMB, to take use the two halves of the vectors when doing the backtransformation from alr to simplex. 
   cbind(.,model.matrix(~stream-1+LH-1+tostratum-1,data=.)) %>% 
-  mutate(streamChiwawa=as.numeric(streamNason+streamWhite==0),age_0=as.numeric(age_class=="sub")) %>%
+  mutate(streamChiwawa=as.numeric(streamNason+streamWhite==0), age_class=as.factor(ifelse(LH!="smolt","sub","yrlng")), LHfall=as.numeric(LH=="fall"),age_0=as.numeric(LH!="smolt")) %>%
   rename("mig_year"="sea_Year_p") %>% 
   #make length bin and release DOY numeric
   mutate(across(.cols=all_of(cont_cov),.fns=function(x)scale(as.numeric(as.character(x))))) %>% 
@@ -126,20 +126,20 @@ p_pim<-rep(list(matrix(NA,n_unique_CH,(nOCC-1))),n_states) #dont include last ti
 ####fill in pim matrix for Phi (survival)
 for ( i in 1:(nDS_OCC + 1)){#loop over downstream "times" (e.g. McN_j, Bon_j, Est_j)and ocean
   #fill in matrix for state 1 (only possible state for downstream migration)
-  Phi_pim[[1]][,i]<-match(paste0(dat_out %>% select(LH,age_class,stream,sea_Year_p,all_of(cont_cov),sites[trap_dep]) %>% reduce(paste0),"time",i), #match group (LH,stream, seaward migration year) and occasion (time) for each CH
+  Phi_pim[[1]][,i]<-match(paste0(dat_out %>% select(LH,stream,sea_Year_p,all_of(cont_cov),sites[trap_dep]) %>% reduce(paste0),"time",i), #match group (LH,stream, seaward migration year) and occasion (time) for each CH
                           paste0(Phi.design.dat$group,"time",Phi.design.dat$time))-1 #with corresponding row in design data (which will become corresponding element of parameter vector). subtract 1 becauuse TMB indexing starts at 0
   if(i<=nDS_OCC){
-  p_pim[[1]][,i]<-match(paste0(dat_out %>% select(LH,age_class,stream,sea_Year_p,all_of(cont_cov),sites[trap_dep]) %>% reduce(paste0),"time",i+1), #match group (LH,stream, seaward migration year) and occasion (time) for each CH
+  p_pim[[1]][,i]<-match(paste0(dat_out %>% select(LH,stream,sea_Year_p,all_of(cont_cov),sites[trap_dep]) %>% reduce(paste0),"time",i+1), #match group (LH,stream, seaward migration year) and occasion (time) for each CH
                           paste0(p.design.dat$group,"time",p.design.dat$time))-1 #with corresponding row in design data (which will become corresponding element of parameter vector). subtract 1 becauuse TMB indexing starts at 0
   }
 }
 
 for ( i in (nDS_OCC+2):nOCC){ #loop over upstream "times"/occasions 
   for(j in 1:n_states){ #loop over "states" (i.e. age of fish/years at sea)
-    Phi_pim[[j]][,i]<-match(paste0(dat_out %>% select(LH,age_class,stream,sea_Year_p,all_of(cont_cov),sites[trap_dep]) %>% reduce(paste0),"time",i,"stratum",j), #match group (LH,stream, seaward migration year), occasion (time), and stratum (fish age/return year) for each CH
+    Phi_pim[[j]][,i]<-match(paste0(dat_out %>% select(LH,stream,sea_Year_p,all_of(cont_cov),sites[trap_dep]) %>% reduce(paste0),"time",i,"stratum",j), #match group (LH,stream, seaward migration year), occasion (time), and stratum (fish age/return year) for each CH
                             paste0(Phi.design.dat$group,"time",Phi.design.dat$time,"stratum",Phi.design.dat$stratum))-1#with corresponding row in design data (which will become corresponding element of parameter vector)
 
-  p_pim[[j]][,i-1]<-match(paste0(dat_out %>% select(LH,age_class,stream,sea_Year_p,all_of(cont_cov),sites[trap_dep]) %>% reduce(paste0),"time",i,"stratum",j), #match group (LH,stream, seaward migration year), occasion (time), and stratum (fish age/return year) for each CH
+  p_pim[[j]][,i-1]<-match(paste0(dat_out %>% select(LH,stream,sea_Year_p,all_of(cont_cov),sites[trap_dep]) %>% reduce(paste0),"time",i,"stratum",j), #match group (LH,stream, seaward migration year), occasion (time), and stratum (fish age/return year) for each CH
                           paste0(p.design.dat$group,"time",p.design.dat$time,"stratum",p.design.dat$stratum))-1#with corresponding row in design data (which will become corresponding element of parameter vector)
 
 }
@@ -150,27 +150,27 @@ for ( i in (nDS_OCC+2):nOCC){ #loop over upstream "times"/occasions
 p_pim[[1]][is.na(p_pim[[1]])]<-nrow(p.design.dat)
 
 ##Psi pim. (nCH length vector) for each CH prob of row of ALR prob matrix of transition to states 2 or 3 (columns 1 or 2) corresponding to returning to Bonneville as adults after 2 or 3 years. The design data has been ordered such that the first half is for transition to state 2 and the second hallf for transition to state 3, so I only need the index corrsponding with the transitin to state 2 in the design data matrix
-Psi_pim<-match(paste0(dat_out %>% select(LH,age_class,stream,sea_Year_p,all_of(cont_cov),sites[trap_dep]) %>% reduce(paste0),"tostratum",2),
+Psi_pim<-match(paste0(dat_out %>% select(LH,stream,sea_Year_p,all_of(cont_cov),sites[trap_dep]) %>% reduce(paste0),"tostratum",2),
                paste0(Psi.design.dat$group,"tostratum",Psi.design.dat$tostratum))-1 #subtract 1 becauuse TMB indexing starts at 0
 
 ## *** Make data for simulating capture histories and calculating expected detections
 
 #### number released per year, LH, stream, and continuous covariate bin
-releases<-dat_out %>% group_by(LH,age_class,stream,sea_Year_p,all_of(cont_cov)) %>% summarise(freq =sum(freq))
+releases<-dat_out %>% group_by(LH,stream,sea_Year_p,all_of(cont_cov)) %>% summarise(freq =sum(freq))
 
 
 ### phi pim for simulation
-phi_pim_sim<-inner_join(releases,Phi.design.dat %>% select(par.index,time,stratum,c("LH","age_class","stream","sea_Year_p",cont_cov,sites[trap_dep]))) %>% # combine releases with design data
+phi_pim_sim<-inner_join(releases,Phi.design.dat %>% select(par.index,time,stratum,c("LH","stream","sea_Year_p",cont_cov,sites[trap_dep]))) %>% # combine releases with design data
  pivot_wider(values_from=par.index,names_from=c(time,stratum,sites[trap_dep])) %>% select(1:(5+nOCC+(nOCC-nDS_OCC-1)*2)) %>% ungroup()%>% select(!LH:freq) %>% as.matrix()
 
 ####columns to select for p pim
 p_pim_cols<-1:(5+nOCC+(nOCC-nDS_OCC-1)*2-1)
- try(p_pim_cols<-c(p_pim_cols,((5+nOCC+(nOCC-nDS_OCC-1)*2-1)+which(sites=="LWe_J")+1)))
- try(p_pim_cols<-c(p_pim_cols,((5+(nOCC+(nOCC-nDS_OCC-1)*2-1)*2)+which(sites=="McN_J")+1)))
+ try(p_pim_cols<-c(p_pim_cols,((5+nOCC+(nOCC-nDS_OCC-1)*2-1)+which(sites=="LWe_J"))))
+ try(p_pim_cols<-c(p_pim_cols,((5+(nOCC+(nOCC-nDS_OCC-1)*2-1)*2)+which(sites=="McN_J"))))
 
 
 #### p pim for simulation
-p_pim_sim<-inner_join(releases,p.design.dat %>% select(par.index,time,stratum,c("LH","age_class","stream","sea_Year_p",cont_cov,sites[trap_dep]))) %>% # combine releases with design data
+p_pim_sim<-inner_join(releases,p.design.dat %>% select(par.index,time,stratum,c("LH","stream","sea_Year_p",cont_cov,sites[trap_dep]))) %>% # combine releases with design data
   pivot_wider(values_from=par.index,names_from=c(time,stratum,sites[trap_dep])) %>% select(all_of(p_pim_cols)) %>% 
   #fill in NAs (years to be set to detection of 0) with the correct index
   ungroup() %>%  mutate_all(~replace_na(., nrow(p.design.dat))) %>% select(!LH:freq) %>% as.matrix()
@@ -221,7 +221,7 @@ return(list(dat_out=dat_out,
 }
 
 
-fit_wen_mscjs<-function(x,phi_formula, p_formula, psi_formula,doFit=TRUE,silent=FALSE,sd_rep=TRUE,sim_rand=1){
+fit_wen_mscjs<-function(x,phi_formula, p_formula, psi_formula,doFit=TRUE,silent=FALSE,sd_rep=TRUE,sim_rand=1,REML=FALSE){
 #~~~~
 #glmmTMB objects to get design matrices etc. for each parameter
 ## phi
@@ -291,8 +291,11 @@ par_TMB<-list(
   #compile and load TMB model
   TMB::compile("wen_mscjs_re.cpp")
   dyn.load(dynlib("wen_mscjs_re"))
+  
+  random<-c("b_phi","b_p","b_psi")
+  if(REML){random<-c("beta_phi","beta_p","beta_psi",random)}
 #initialize model
-mod<-TMB::MakeADFun(data=dat_TMB,parameters = par_TMB,random=c("b_phi","b_p","b_psi"),DLL ="wen_mscjs_re", silent = silent)
+mod<-TMB::MakeADFun(data=dat_TMB,parameters = par_TMB,random=random,DLL ="wen_mscjs_re", silent = silent)
 
 if(doFit){
 try(fit<-TMBhelper::fit_tmb(mod,newtonsteps = 1,getsd = sd_rep,getJointPrecision = sd_rep ))

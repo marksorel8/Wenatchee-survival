@@ -365,7 +365,24 @@ mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
                       
                          p_formula= par.index~
                            #fixed effects
-                           -1+ time2+time3+ time4  +time5  +time6,
+                           -1+ time2:LH +time2:streamWhite+time3:age_class+ time4:age_class  +time5  +time6,
+                         
+                         psi_formula= par.index~
+                           #fixed effects
+                           -1+tostratum,
+                         
+                         doFit = TRUE,silent=TRUE,sim_rand = 1
+)
+
+mscjs_fit2<-fit_wen_mscjs(x=mscjs_dat,
+                         phi_formula=par.index~
+                           
+                           #fixed effect
+                           -1+ time1:LH+time1:streamWhite +time2:age_class+time3 +time3:age_class+time4:age_class+time4 +time5+time6,
+                      
+                         p_formula= par.index~
+                           #fixed effects
+                           -1+ time2:LH +time2:White+time3:age_class+ time4:age_class  +time5  +time6,
                          
                          psi_formula= par.index~
                            #fixed effects
@@ -374,7 +391,9 @@ mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
                          doFit = TRUE,silent=TRUE,sim_rand = 0
 )
 
-print_out(mscjs_fit)
+
+
+print_out(mscjs_fit2)
 test<-mscjs_fit$mod$simulate()
 obs<-mscjs_fit$dat_TMB$CH
 obs[obs>0]<-1
@@ -533,40 +552,39 @@ mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
 
 
 #experimental
+gc()
 mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
                          phi_formula=par.index~
                            
                            #fixed effect
-                           -1+ time1:LH+ time1:stream+ # time1:streamWhite +#to lower wenatchee trap
-                           time2:age_class  + #(0+time1|LH:stream)+ #to mcnary
-                           time3:age_class + #time3:LHsmolt +#to Bonneville
-                           time4:age_class + #to Bonn adult
-                           time5:stratum +   #to McNary
-                           time6:stratum +      #to Tumwater
+                           -1+ time1+time1:LHsmolt+time1:LHsummer+ time1:streamWhite+ 
+                           time2 + time2:LHsmolt  + time2:streamNason+ #to mcnary
+                           time3 + #to Bonneville
+                           time4 + time4:LHsmolt + time4:LHsummer+#to Bonn adult
+                           time5 +   #to McNary
+                           time6 + time6:stratum3 +    #to Tumwater
                            #random
-                            (0+time1|mig_year) +  # to trap
-                           (0+time2|mig_year)+ + # (0+time2|mig_year:LH:stream) + #to mcNary
-                           (0+time3|mig_year) +# (0+time3|mig_year:LH:stream) + # to Bonneville
-                           (0+time4|mig_year) + #(0+time4|mig_year:LH:stream) +  #to Bonn adults
-                            (0+time5|mig_year) #+ #+                              # to Mcanry
-                             # (0+time6|mig_year)                               # to Tumwater
+                           (0+time1:LHfall+time1:LHsummer |mig_year) +
+                           (0+time2 |mig_year) +
+                           #diag(0+time1:streamNason|mig_year)+
+                           # (0+time1+time2|mig_year)+
+                           (time4+0|mig_year)  +  diag(0+time4:LHsmolt|mig_year) 
+
                          ,
                       
                          p_formula= par.index~
                            #fixed effects
-                           -1+ time2:LH+ time2:stream+ time2:LWe_new+# lower trap
-                            time3:age_class+     #McNary
+                           -1+ time2+time2:LHsmolt+time2:LHsummer + time2:streamChiwawa+time2:streamWhite+ time2:LWe_new+# lower trap
+                            time3+     #McNary
                            # time3:LWe_J +               #McNary
-                            time4:age_class + #Bonneville
-                           # time4:McN_J +   #Bonneville
-                           time5:stratum +           # Bonn adult
-                           time6:stratum + #:stratum +         #McNary adult
+                            time4+ #Bonneville
+                           time4:McN_J:age_0 +   #Bonneville
+                           time5 +         # Bonn adult
+                           time6 + #:stratum +         #McNary adult
                            #random
-                          (0+time2|mig_year) + #(0+time2|mig_year:LH:stream) +  # lower trap
-                           (0+time3|mig_year)+ 
-                           # +diag(0+time3:age_class|mig_year:stream) +# (0+time3|mig_year:LH:stream) + # McNary
-                           (0+time4|mig_year)#+
-                           # (0+time4:McN_J|mig_year)#+#Bonneville
+                          (0+time2|mig_year) + diag(0+time2:LHfall+time2:LHsummer|mig_year) + # lower trap
+                           (0+time3+time4|mig_year)  # McNary
+                           # (0+time4|mig_year) #Bonneville
                           # (0+time5|mig_year)+
                             # (0+time6|mig_year)
                            
@@ -574,16 +592,67 @@ mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
                          
                          psi_formula= par.index~
                            #fixed effects
-                           -1+tostratum+tostratum:LHsmolt+
+                           -1+tostratum+tostratum:LHsmolt+tostratum:streamChiwawa+
                            #random
                              (0+tostratum|mig_year)
                          ,
                          
-                         doFit = FALSE,silent=TRUE,
-                         sim_rand = 1
+                         doFit = TRUE,silent=TRUE,
+                         sim_rand = 1,REML=FALSE
 )
 
+# fixed 
+gc()
+mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
+                         phi_formula=par.index~
+                           
+                           #fixed effect
+                           -1+ time1 + time1:LHsmolt + time1:LHsummer+ time1:streamWhite+ time1:streamNason+
+                           time2 + time2:LHsmolt+   #to mcnary
+                           time3 + #to Bonneville
+                           time4 + time4:LHsmolt + time4:LHsummer+ #to Bonn adult
+                           time5 +   #to McNary
+                           time6 +    #to Tumwater
+                           #random
+                           # cs(0+time1:LH| mig_year) +
+                           (0+time1|mig_year) +
+                            (0+time2|mig_year) +
+                            (time4+0|mig_year)
+                           # (0|mig_year) +
+                           
+                           #diag(0+time1:streamNason|mig_year)+
+                           # # (0+time1+time2|mig_year)+
+                             # +  diag(0+time4:LHsmolt|mig_year) 
 
+                         ,
+                      
+                         p_formula= par.index~
+                           #fixed effects
+                           -1+ time2+time2:LHsmolt +# lower trap
+                            time3 +  #McNary
+                            time4 +  #Bonneville
+                            time4:McN_J +   #Bonneville
+                           time5 +         # Bonn adult
+                           time6 + #:stratum +         #McNary adult
+                           #random
+                          cs(0+time2:LH|mig_year)+# + #diag(0+time2:LHfall+time2:LHsummer|mig_year) + # lower trap
+                            diag(0+time3+time4|mig_year)  # McNary
+                           # (0+time4|mig_year) #Bonneville
+                          # (0+time5|mig_year)+
+                            # (0+time6|mig_year)
+                           
+                           ,
+                         
+                         psi_formula= par.index~
+                           #fixed effects
+                           -1+tostratum+tostratum:LHsmolt+tostratum:streamChiwawa+
+                           #random
+                             (0+tostratum|mig_year)
+                         ,
+                         
+                         doFit = TRUE,silent=TRUE,
+                         sim_rand = 1,REML=FALSE
+)
 
 
 last_best<-mscjs_fit$mod$env$last.par.best
@@ -602,7 +671,7 @@ obs_dat<-mscjs_dat$dat_out %>%
   #drop unneeded columns 
    select(!length_bin:freq) %>% 
   #sum detection by stream, year, and life history
-  group_by(LH,age_class,stream,sea_Year_p) %>% summarise(across(LWe_J :Tum_A_3, sum)) %>% ungroup()
+  group_by(LH,stream,sea_Year_p) %>% summarise(across(LWe_J :Tum_A_3, sum)) %>% ungroup()
 
 obs_dat_long<- obs_dat%>% pivot_longer(LWe_J :Tum_A_3) 
 
@@ -610,7 +679,7 @@ obs_dat_long<- obs_dat%>% pivot_longer(LWe_J :Tum_A_3)
 sim<-mscjs_fit$mod$simulate(par=last_best)
 exp_det_MLE<-cbind(obs_dat %>% select(LH:sea_Year_p) , sim$det_1,sim$det_2,sim$det_3) %>% `colnames<-`(colnames(obs_dat %>% select(LH  :Tum_A_3))) %>% 
     #sum detection by stream, year, and life history
-  group_by(LH,age_class,stream,sea_Year_p) %>% summarise(across(LWe_J :Tum_A_3, sum)) %>% ungroup() %>% pivot_longer(LWe_J :Tum_A_3) 
+  group_by(LH,stream,sea_Year_p) %>% summarise(across(LWe_J :Tum_A_3, sum)) %>% ungroup() %>% pivot_longer(LWe_J :Tum_A_3) 
 
  
  
@@ -621,7 +690,6 @@ sim_posterior<-rmvnorm_prec(mu=mscjs_fit$mod$env$last.par.best,
 FT_ref_vec<-FT_sim_vec<-numeric(250)
 post_pred<-matrix(NA,nrow=nrow(exp_det_MLE),ncol=250)
 
-test<-numeric(250)
 
 options(dplyr.summarise.inform = FALSE)
 gc()
@@ -631,12 +699,12 @@ for(i in 1:250){
 
   exp_det<-cbind(obs_dat %>% select(LH:sea_Year_p) , sim$det_1,sim$det_2,sim$det_3) %>% `colnames<-`(colnames(obs_dat %>% select(LH  :Tum_A_3))) %>% 
     #sum detection by stream, year, and life history
-  group_by(LH,age_class,stream,sea_Year_p) %>% summarise(across(LWe_J :Tum_A_3, sum)) %>% ungroup() %>% pivot_longer(LWe_J :Tum_A_3) 
+  group_by(LH,stream,sea_Year_p) %>% summarise(across(LWe_J :Tum_A_3, sum)) %>% ungroup() %>% pivot_longer(LWe_J :Tum_A_3) 
 
 # * simulated detection from model *
 sim_obs<-cbind(obs_dat %>% select(LH:sea_Year_p), sim$sim_det_1,sim$sim_det_2,sim$sim_det_3) %>% `colnames<-`(colnames(obs_dat %>% select(LH  :Tum_A_3))) %>% 
     #sum detection by stream, year, and life history
-  group_by(LH,age_class,stream,sea_Year_p) %>% summarise(across(LWe_J :Tum_A_3, sum)) %>% ungroup() %>% pivot_longer(LWe_J :Tum_A_3) 
+  group_by(LH,stream,sea_Year_p) %>% summarise(across(LWe_J :Tum_A_3, sum)) %>% ungroup() %>% pivot_longer(LWe_J :Tum_A_3) 
   
 
 post_pred[,i]<-sim_obs$value
@@ -659,13 +727,13 @@ test %>%  group_by(name) %>% summarise(across(value, sum))
 
 library(DHARMa)
 
-
+gc()
 post_pred<-replicate(250,{
    sim_data<-mscjs_fit$mod$simulate(par=last_best)
    # * simulated detection from model *
 sim_obs<-cbind(obs_dat %>% select(LH:sea_Year_p), sim_data$sim_det_1,sim_data$sim_det_2,sim_data$sim_det_3) %>% `colnames<-`(colnames(obs_dat %>% select(LH  :Tum_A_3))) %>%
     #sum detection by stream, year, and life history
-  group_by(LH,age_class,stream,sea_Year_p) %>% summarise(across(LWe_J :Tum_A_3, sum)) %>% ungroup() %>% pivot_longer(LWe_J :Tum_A_3)
+  group_by(LH,stream,sea_Year_p) %>% summarise(across(LWe_J :Tum_A_3, sum)) %>% ungroup() %>% pivot_longer(LWe_J :Tum_A_3)
    sim_obs$value
 })
 
@@ -674,11 +742,13 @@ dharm_sim<-createDHARMa(simulatedResponse = post_pred,
                         observedResponse = obs_dat_long$value,
                          fittedPredictedResponse = exp_det_MLE$value,
                         integerResponse = TRUE)
-
+dev.new()
 plot(dharm_sim,quantreg=TRUE)
-#testDispersion(dharm_sim)
+testDispersion(dharm_sim)
+testOutliers(dharm_sim,type = "bootstrap")
 
-out_group<-recalculateResiduals(dharm_sim,group=paste(obs_dat_long$name,obs_dat_long$LH))
+rm(obs_dat)
+out_group<-recalculateResiduals(dharm_sim,group=paste(obs_dat_long$name,obs_dat_long$stream,obs_dat_long$LH))
 
 #scaled residuals
 sr<-out_group$scaledResiduals

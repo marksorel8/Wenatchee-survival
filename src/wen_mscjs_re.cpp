@@ -735,7 +735,7 @@ for(int n=0; n<n_released.size(); n++){ // loop over individual release cohorts
       //observation process
       sim_det_1(n,t) = rbinom(Type( not_det_surv), Type(p(p_pim_sim(n,t)) ));  //not detected at previous
       sim_det_1(n,t) += rbinom(Type(det_surv),  Type(p(p_pim_sim(n,TD_i(0)))));     // detected at previous
-    }else{if(t==TD_occ(0)){//if occasion that has trap dependency with detection at McNary (most likely JDD or Bonneville)
+    }else{if(t==TD_occ(1)){//if occasion that has trap dependency with detection at McNary (most likely JDD or Bonneville)
       //survival process
       not_det_surv= rbinom(Type( sim_state_1(n,t)-sim_det_1(n,t-1)),phi(phi_pim_sim(n,t))); //simulated stay alive not detected previously
       det_surv = rbinom(Type( sim_det_1(n,t-1)),phi(phi_pim_sim(n,t))); //simulated stay alive detected previously
