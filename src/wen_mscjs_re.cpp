@@ -665,12 +665,9 @@ int nUS_OCC = n_OCC-nDS_OCC-1; // number of upstream occasions
       if(t==TD_occ(0)){ //if occasion that has trap dependency with detection at Lower Wenatchee (most likely McNary)
         det_1(n,t) = Type(p_hat(p_pim_sim(n,t))*pS(1)*n_released(n)*(Type(1)-p_hat(p_pim_sim(n,t-1)))); //not detected at previous
         det_1(n,t) += Type(p_hat(p_pim_sim(n,TD_i(0)))*pS(1)*n_released(n))*p_hat(p_pim_sim(n,t-1));     // detected at previous
-      }else{if(t==TD_occ(1)){//if occasion that has trap dependency with detection at McNary (most likely JDD or Bonneville)
-        det_1(n,t) = Type(p_hat(p_pim_sim(n,t))*pS(1)*n_released(n)*(Type(1)-p_hat(p_pim_sim(n,t-1)))); //not detected at previous
-        det_1(n,t) += Type(p_hat(p_pim_sim(n,TD_i(1)))*pS(1)*n_released(n)*p_hat(p_pim_sim(n,t-1)));     // detected at previous
       }else{
         det_1(n,t) = Type(p_hat(p_pim_sim(n,t))*pS(1)*n_released(n)); //expected obs        
-      }}
+      }
       
       }
       
@@ -735,20 +732,12 @@ for(int n=0; n<n_released.size(); n++){ // loop over individual release cohorts
       //observation process
       sim_det_1(n,t) = rbinom(Type( not_det_surv), Type(p(p_pim_sim(n,t)) ));  //not detected at previous
       sim_det_1(n,t) += rbinom(Type(det_surv),  Type(p(p_pim_sim(n,TD_i(0)))));     // detected at previous
-    }else{if(t==TD_occ(1)){//if occasion that has trap dependency with detection at McNary (most likely JDD or Bonneville)
-      //survival process
-      not_det_surv= rbinom(Type( sim_state_1(n,t)-sim_det_1(n,t-1)),phi(phi_pim_sim(n,t))); //simulated stay alive not detected previously
-      det_surv = rbinom(Type( sim_det_1(n,t-1)),phi(phi_pim_sim(n,t))); //simulated stay alive detected previously
-      sim_state_1(n,t+1) = det_surv + not_det_surv; //simulated stay alive
-      //observation process
-      sim_det_1(n,t) = rbinom(Type( not_det_surv), Type(p(p_pim_sim(n,t)) ));  //not detected at previous
-      sim_det_1(n,t) += rbinom(Type(det_surv),  Type(p(p_pim_sim(n,TD_i(1)))));     // detected at previous
     }else{
       //survival process
       sim_state_1(n,t+1) = rbinom(Type( sim_state_1(n,t)),phi(phi_pim_sim(n,t))); //simulated stay alive
       //observation process
       sim_det_1(n,t) = rbinom(Type( sim_state_1(n,t+1)),  Type(p(p_pim_sim(n,t)))); //simulated obs        
-    }}
+    }
     
   }
   

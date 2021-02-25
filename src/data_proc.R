@@ -10,6 +10,16 @@ mark_file<-read_csv(here("Data","ptagis","Tagging detail.csv")) %>%
          `Capture Method Code`=="SCREWT"
          )
 
+#Wild or natural origin spring Chinook captured by screw trap in the Lower Wenatchee Trap
+mark_file<-read_csv(here("Data","ptagis","Tagging detail.csv")) %>% 
+  filter(`Rear Type Code`=="W",
+         `Run Name`=="Spring",
+         `Species Name`=="Chinook",
+         `Capture Method Code`=="SCREWT"
+  )
+
+
+
 #code for getting day of year from ptagis date column
 #test<-lower_mid_col_dams %>% mutate(`First Date MMDDYYYY2`=as.Date(`First Date MMDDYYYY`,format="%m/%d/%Y"), doy=lubridate::yday(`First Date MMDDYYYY2`))
 
