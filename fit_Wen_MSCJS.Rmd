@@ -361,7 +361,7 @@ mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
                          phi_formula=par.index~
                            
                            #fixed effect
-                           -1+ time1:LH+time1:streamWhite +time2:age_class+time3 +time3:age_class+time4:age_class+time4 +time5+time6,
+                           -1+ time1:LH+time1:streamWhite +time2+time3 +time3:age_class+time4:age_class+time4 +time5+time6,
                       
                          p_formula= par.index~
                            #fixed effects
