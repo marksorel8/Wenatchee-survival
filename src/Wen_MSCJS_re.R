@@ -71,7 +71,7 @@ Phi.design.dat<-wenatchee.ddl$S %>%
          mig_year_num=as.numeric(mig_year)) %>%   #add a column for the actual migration year, which is the seaward year for juveniles and the seaward + stratum for adults
 cbind(.,model.matrix(~time+stream+LH+stratum-1,data=.)) %>% 
  mutate(streamChiwawa=as.numeric(streamNason+streamWhite==0),
-        age_class=as.factor(ifelse(LH!="smolt","sub","yrlng")), LHfall=as.numeric(LH=="fall"),age_0=as.numeric(LH!="smolt")) %>% 
+        age_class=as.factor(ifelse(LH!="smolt","sub","yrlng")), LHfall=as.numeric(LH=="fall"),age_0=as.numeric(LH!="smolt"), LWe_new=as.numeric(as.numeric(as.character(sea_Year_p)>2011))) %>% 
   #make length bin and release DOY numeric
   mutate(across(.cols=all_of(cont_cov),.fns=function(x)scale(as.numeric(as.character(x))))) %>% 
   #make par index a sequence
