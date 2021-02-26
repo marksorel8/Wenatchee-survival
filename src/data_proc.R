@@ -8,17 +8,18 @@ mark_file<-read_csv(here("Data","ptagis","Tagging detail.csv")) %>%
          `Run Name`=="Spring",
          `Species Name`=="Chinook",
          `Capture Method Code`=="SCREWT"
-         )
+         ) %>% mutate(mark_time=0)
 
 #Wild or natural origin spring Chinook captured by screw trap in the Lower Wenatchee Trap
-mark_file<-read_csv(here("Data","ptagis","Tagging detail.csv")) %>% 
+LWe_mark_file<-read_csv(here("Data","ptagis","Lower Wen Tagging detail.csv")) %>% 
   filter(`Rear Type Code`=="W",
          `Run Name`=="Spring",
          `Species Name`=="Chinook",
          `Capture Method Code`=="SCREWT"
-  )
+  ) %>% mutate(mark_time=1)
 
-
+mark_file<-rbind(mark_file,LWe_mark_file)
+rm(LWe_mark_file)
 
 #code for getting day of year from ptagis date column
 #test<-lower_mid_col_dams %>% mutate(`First Date MMDDYYYY2`=as.Date(`First Date MMDDYYYY`,format="%m/%d/%Y"), doy=lubridate::yday(`First Date MMDDYYYY2`))
@@ -40,6 +41,22 @@ lower_mid_col_dams<-read_csv(here("Data","ptagis","mid_lower_Col_Interrogation_S
 
 #upper Columbia mainstem Dam and Tumwater Dam detections
 upper_col_dams_tum<-read_csv(here("Data","ptagis","upper_Col_Wen_Interrogation_summary.csv"))
+
+#detection data for fish released in lower Wenatchee trap from Dan W. 
+obs_dat_LWe_releases<-read_csv(here("Data","ptagis","ptagis_obs_data_lower_wen_screwt.csv")) %>%
+  mutate(date_det=lubridate::date(lubridate::mdy_hms(obs_date))) %>%
+group_by(tag_id,obs_site) %>% mutate(first_date=min(date_det),last_det=max(date_det)) %>%
+  select(!obs_date:date_det) %>% droplevels() %>%
+ distinct() %>% ungroup() %>%
+  mutate("First Year YYYY"=lubridate::year(first_date),"Last Year YYYY"=lubridate::year(last_det)) %>%
+  mutate("First DOY"=lubridate::yday(first_date),"Last DOY"=lubridate::yday(last_det)) %>%
+  rename("Site Code Value"=obs_site,"Tag Code"=tag_id)
+
+#add rows for detections of fish released at lower wenatchee trap
+lower_mid_col_dams<-bind_rows(lower_mid_col_dams,obs_dat_LWe_releases %>% filter(`Site Code Value`%in% c("MCJ","JDJ","B1J","B2J","BCC","TWX","BO1", "BO2", "BO3", "BO", "MC1", "MC2","JO1", "JO2","TD1", "TD2")))
+
+upper_col_dams_tum<-bind_rows(upper_col_dams_tum,obs_dat_LWe_releases %>% filter(`Site Code Value`%in% c(  "PRA","RIA","TUF")))
+
 
 #load length cutoffs for subyearling/yearling delineation for all days <=179
 load(here("Data","cutoffs_and_props.Rdata"))
@@ -124,7 +141,7 @@ left_join(lower_mid_col_dams %>%
             filter(`Site Code Value` == c("RIA")) %>% 
             select(c(`Tag Code`,`First Year YYYY`)) %>% 
             rename("RIs_A"="First Year YYYY"),by="Tag Code") %>% 
-  
+
 #Tumwater adult #TODO check if juveniles/ ghost tags detected
   left_join(upper_col_dams_tum %>% 
             filter(`Site Code Value` == c("TUF")) %>%
@@ -134,10 +151,11 @@ left_join(lower_mid_col_dams %>%
 #Add juvenile life history
   
 #add age
-  mutate( age = case_when(
+  mutate( age = case_when(mark_time==1~ "Unk",
     (mark_file$`Mark Day Number`>179)~   "sub", #if DOY > 179 then subyearling
    is.na(mark_file$`Length mm`)~       NA_character_,
-   (mark_file$`Length mm`>=cutoffs_and_props[[1]]$y[(mark_file$`Mark Day Number`-49)])~     "YCW",#assign age based on cutoff rule
+   (mark_file$`Length mm`>=cutoffs_and_props[[1]]$y[ifelse((mark_file$`Mark Day Number`-49)>0,
+                                                    (mark_file$`Mark Day Number`-49),1)]) ~     "YCW",#assign age based on cutoff rule
   TRUE~                                 "sub"
   )
   ) %>% 
@@ -149,13 +167,14 @@ left_join(lower_mid_col_dams %>%
 mutate(mark_to_seward=`seaward_year_obs`-`Mark Year YYYY`) %>% # add years between tagging and seaward migration (for those fish detected migrating downstream as juveniles)
 filter(
   is.na(`mark_to_seward`)|(age=="sub"&`mark_to_seward`==1)|
-    (age=="YCW"&`mark_to_seward`==0) 
+    (age=="YCW"&`mark_to_seward`==0)|(age=="Unk"&`mark_to_seward`==0) 
          ) %>%#get rid of fish known to have migrated at an age not consistant with their assigned life history (14/7469 subs, 5/13630 yrlngs) 
   
   
 #assign life history (LH)
   mutate(LH= case_when(
-    age=="YCW" ~ "smolt",
+     age=="Unk" ~ "Unk",
+     age=="YCW" ~ "smolt",
     `Mark Day Number`<= 139 ~"fry",
     `Mark Day Number`<=262 ~"summer",
     TRUE ~"fall",
@@ -167,10 +186,11 @@ filter(
 mutate(stream = case_when(
   `Mark Site Info Code`=="CHIWAT" ~ "Chiwawa",
   `Mark Site Info Code`=="NASONC" ~ "Nason",
-  TRUE ~ "White"
+  `Mark Site Info Code`=="WHITER" ~ "White",
+  TRUE ~ "LWE"
 )) %>% 
 #add predicted seaward migration year
-mutate(sea_Year_p = ifelse(age=="YCW",`Mark Year YYYY`,`Mark Year YYYY`+1)) %>% 
+mutate(sea_Year_p = ifelse(age%in%c("YCW","Unk"),`Mark Year YYYY`,`Mark Year YYYY`+1)) %>% 
 
 #mutate detections to be years between seaward migration year and detection year 
 mutate_at(vars(LWe_J:Tum_A), ~.x-sea_Year_p) %>%  
