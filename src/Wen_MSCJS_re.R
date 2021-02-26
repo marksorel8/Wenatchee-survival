@@ -16,13 +16,13 @@ make_dat<-function(mark_file_CH=mark_file_CH,sites=c("LWe_J","McN_J","JDD_J","Bo
 
 dat_out<- mark_file_CH %>%  
   #add grouped length and release day columns
-  mutate(length_bin=ceiling(`Length mm`/length_bin)*length_bin-(length_bin/2),
-         rel_DOY_bin=ceiling((`Release Day Number`+ifelse(LH=="smolt",365,0))/doy_bin)*doy_bin-(doy_bin/2)) %>% 
-  #subset some very small or large length
-  filter(length_bin>=55 &length_bin<=200 & rel_DOY_bin>10) %>% 
+  # mutate(length_bin=ceiling(`Length mm`/length_bin)*length_bin-(length_bin/2),
+  #        rel_DOY_bin=ceiling((`Release Day Number`+ifelse(LH=="smolt",365,0))/doy_bin)*doy_bin-(doy_bin/2)) %>% 
+  # #subset some very small or large length
+  # filter(length_bin>=55 &length_bin<=200 & rel_DOY_bin>10) %>% 
 #subset columns needed for analysis
   select(sea_Year_p,LH,age,stream, #grouping variables
-                all_of(sites),length_bin,rel_DOY_bin) %>% 
+                all_of(sites),cont_cov) %>% 
   select(-age) %>% 
   #sites/occasions to include in model
   #first year with all stream data through last year where data on all three return ages is available (because it is 2020)
