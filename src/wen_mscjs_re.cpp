@@ -385,13 +385,7 @@ DATA_IVECTOR(psi_pim_sim);  // index of psi parameters for the simulation
 DATA_IVECTOR(TD_occ);       // occasions with trap dependent detection (effect of detection/non-detection at previous occasion)
 DATA_IVECTOR(TD_i);         // p_pim_sim index for detection parameters for fish that were detected at the previous occasion
 DATA_INTEGER(sim_rand);     //flag indicating whether to simulate the random effects in simulations
-// for unknown LH released fish (at lower Wenatchee trap) 
-DATA_IMATRIX(Phi_pim_unk);
-DATA_IMATRIX(p_pim_unk);
-DATA_IVECTOR(Phi_pim_unk_years); 
-DATA_IVECTOR(p_pim_unk_years); 
-
-
+  
   
   //~~~~~~~~~~~~~~~~~~~
   // Parameters
@@ -408,8 +402,7 @@ DATA_IVECTOR(p_pim_unk_years);
   PARAMETER_VECTOR(theta_phi);  //phi
   PARAMETER_VECTOR(theta_p);    //p
   PARAMETER_VECTOR(theta_psi);  //psi
-  //UNknown LH proportions parameters  
-  PARAMETER_VECTOR(logit_p_subs)//logit proportion of unknown LH fish released at LWe that were subyearling emigrants in each year
+  
   //~~~~~~~~~~~~~~~~~~~
   // Variables
   //~~~~~~~~~~~~~~~~~~~
@@ -431,26 +424,10 @@ DATA_IVECTOR(p_pim_unk_years);
    ADREPORT(eta_psi);
 
   // Apply link
-   // ** TO DO ** calculate Unk LH params **
-  vector<Type>phi(n_unk_LH_phi+n_known_LH_phi); 
-  vector<Type> p(n_unk_LH_p+n_known_LH_p+1);
-  phi.head(n_known_LH_phi)=invlogit(eta_phi);
-  p.head(n_known_LH_p)=invlogit(eta_p);
+  vector<Type> phi=invlogit(eta_phi);
+  vector<Type> p(eta_p.size()+1);
+  p.head(eta_p.size())=invlogit(eta_p);
   p.tail(1)=Type(0);
-  //caclcuate unknown LH paramaters (weighted averages of LHs)
-  vector<Type> p_subs=invlogit(logit_p_subs); // annual proportion subyearlings
-  vector<Type> p_yrlngs = 1-p_subs;           // annual proportion yearlings
-  REPORT(p_yrlngs)
-  for(int i = n_known_LH_phi; i<(n_known_LH_phi+n_unk_LH_phi); i ++){ // phi params
-    phi(i) = Type(Type(p_subs(Phi_pim_unk_years(i-n_known_LH_phi))) * Type(phi(int(Phi_pim_unk(i-n_known_LH_phi,0))))) +
-    Type(Type(p_yrlngs(Phi_pim_unk_years(i-n_known_LH_phi))) * Type(phi(int(Phi_pim_unk(i-n_known_LH_phi,1)))));
-  }
-  
-  for(int i = n_known_LH_p; i<(n_known_LH_p+n_unk_LH_p); i ++){ // p params
-    p(i) = Type(Type(p_subs(p_pim_unk_years(i-n_known_LH_p))) * Type(p(int(p_pim_unk(i-n_known_LH_p,0))))) +
-      Type(Type(p_yrlngs(p_pim_unk_years(i-n_known_LH_p))) * Type(p(int(p_pim_unk(i-n_known_LH_p,1)))));
-  }
-  
   REPORT(phi);
   REPORT(p);
   ////phi inverse multinomial logit
@@ -498,7 +475,6 @@ DATA_IVECTOR(p_pim_unk_years);
     pS = pS/u; //normalize probs
     NLL_it  +=log(u);    //accumulate nll
   }
-if(n>=(n_known_CH-1)){ //dont do ocean and adult part for unknown LH CHs
 
   //ocean occasion
   int t = nDS_OCC;  //set occasion to be ocean occasion
@@ -560,8 +536,7 @@ if(n>=(n_known_CH-1)){ //dont do ocean and adult part for unknown LH CHs
   
   //multiply the NLL of an individual CH by the frequency of that CH and subtract from total jnll
   jnll-=(NLL_it*freq(n));
-  }//end after juvenile stuff (not done for unk LH fish)
-  }//end loop over unique CH
+  }
   //end of likelihood
   
   //~~~~~~~~~~~~~~~~~~~
@@ -628,23 +603,8 @@ if(sim_rand){
     eta_psi = X_psi*beta_psi;
 
     ///// Calculate parameters to use to calculate the expectation of the number of detections (random effects at 0)
-    vector<Type>phi_hat(n_unk_LH_phi+n_known_LH_phi); 
-    vector<Type> p_hat(n_unk_LH_p+n_known_LH_p+1);
-    phi_hat.head(n_known_LH_phi)=invlogit(eta_phi);
-    p_hat.head(n_known_LH_p)=invlogit(eta_p);
-    p_hat.tail(1)=Type(0);
-    //calculate unknown LH parameters (weighted averages of LHs)
-    // for(int i = n_known_LH_phi; i<(n_known_LH_phi+n_unk_LH_phi); i ++){ // phi params
-    //   phi_hat(i) = p_subs(Phi_pim_unk_years(i-n_known_LH_phi))*phi_hat(Phi_pim_unk(0,i-n_known_LH_phi)) +
-    //     p_yrlngs*(Phi_pim_unk_years(i-n_known_LH_phi))*phi_hat(Phi_pim_unk(1,i-n_known_LH_phi)) ;
-    // }
-    // 
-    // for(int i = n_known_LH_p; i<(n_known_LH_phi+n_unk_LH_p); i ++){ // p params
-    //   p_hat(i) = p_subs(p_pim_unk_years(i-n_known_LH_p))*p_hat(p_pim_unk(0,i-n_known_LH_p)) +
-    //     p_yrlngs*(p_pim_unk_years(i-n_known_LH_p))*p_hat(p_pim_unk(1,i-n_known_LH_p)) ;
-    // }
-    // 
-    ////psi inverse multinomial logit
+    phi_hat=invlogit(eta_phi);
+    p_hat.head(eta_p.size())=invlogit(eta_p);
     vector<Type> eta_psi_hat= exp(eta_psi);
     denom = eta_psi_hat.segment(0,n_groups)+eta_psi_hat.segment(n_groups,n_groups)+Type(1);
     psi_hat.col(0)= eta_psi_hat.segment(0,n_groups)/denom;        //return after 1 year
@@ -660,19 +620,11 @@ if(sim_rand){
     eta_psi += Z_psi*b_psi;
 
     // Apply link
-    phi.head(n_known_LH_phi)=invlogit(eta_phi);
-    p.head(n_known_LH_p)=invlogit(eta_p);
-    //caclcuate unknown LH paramaters (weighted averages of LHs)
-    // for(int i = n_known_LH_phi; i<(n_known_LH_phi+n_unk_LH_phi); i ++){ // phi params
-    //   phi(i) = p_subs(Phi_pim_unk_years(i-n_known_LH_phi))*phi(Phi_pim_unk(0,i-n_known_LH_phi)) +
-    //     p_yrlngs*(Phi_pim_unk_years(i-n_known_LH_phi))*phi(Phi_pim_unk(1,i-n_known_LH_phi)) ;
-    // }
-    // 
-    // for(int i = n_known_LH_p; i<(n_known_LH_phi+n_unk_LH_p); i ++){ // p params
-    //   p(i) = p_subs(p_pim_unk_years(i-n_known_LH_p))*p(p_pim_unk(0,i-n_known_LH_p)) +
-    //     p_yrlngs*(p_pim_unk_years(i-n_known_LH_p))*p(p_pim_unk(1,i-n_known_LH_p)) ;
-    // }
-    ////psi inverse multinomial logit
+    phi=invlogit(eta_phi);
+    p.head(eta_p.size())=invlogit(eta_p);
+    REPORT(phi);
+    REPORT(p);
+    ////phi inverse multinomial logit
     eta_psi= exp(eta_psi);
     denom = eta_psi.segment(0,n_groups)+eta_psi.segment(n_groups,n_groups)+Type(1);
     psi.col(0)= eta_psi.segment(0,n_groups)/denom;        //return after 1 year
@@ -716,13 +668,16 @@ int nUS_OCC = n_OCC-nDS_OCC-1; // number of upstream occasions
       if(t==TD_occ(0)){ //if occasion that has trap dependency with detection at Lower Wenatchee (most likely McNary)
         det_1(n,t) = Type(p_hat(p_pim_sim(n,t))*pS(1)*n_released(n)*(Type(1)-p_hat(p_pim_sim(n,t-1)))); //not detected at previous
         det_1(n,t) += Type(p_hat(p_pim_sim(n,TD_i(0)))*pS(1)*n_released(n))*p_hat(p_pim_sim(n,t-1));     // detected at previous
+      }else{if(t==TD_occ(1)){//if occasion that has trap dependency with detection at McNary (most likely JDD or Bonneville)
+        det_1(n,t) = Type(p_hat(p_pim_sim(n,t))*pS(1)*n_released(n)*(Type(1)-p_hat(p_pim_sim(n,t-1)))); //not detected at previous
+        det_1(n,t) += Type(p_hat(p_pim_sim(n,TD_i(1)))*pS(1)*n_released(n)*p_hat(p_pim_sim(n,t-1)));     // detected at previous
       }else{
         det_1(n,t) = Type(p_hat(p_pim_sim(n,t))*pS(1)*n_released(n)); //expected obs        
-      }
+      }}
       
       }
       
-      if(n>=(n_known_CH-1)){ //dont do ocean and adult part for unknown LH CHs
+      
 
       //ocean occasion
       int t = nDS_OCC;  //set occasion to be ocean occasion
@@ -759,8 +714,7 @@ int nUS_OCC = n_OCC-nDS_OCC-1; // number of upstream occasions
       det_2(n,n_OCC-nDS_OCC-1) =pS(2)  * n_released(n);
       det_3(n,n_OCC-nDS_OCC-1) =pS(3)  * n_released(n);
 
-      }//end after juvenile stuff (not done for unk LH fish)
-    }//end loop over release cohorts
+    } // end of loop over release cohorts
 
 
 
@@ -784,15 +738,23 @@ for(int n=0; n<n_released.size(); n++){ // loop over individual release cohorts
       //observation process
       sim_det_1(n,t) = rbinom(Type( not_det_surv), Type(p(p_pim_sim(n,t)) ));  //not detected at previous
       sim_det_1(n,t) += rbinom(Type(det_surv),  Type(p(p_pim_sim(n,TD_i(0)))));     // detected at previous
+    }else{if(t==TD_occ(1)){//if occasion that has trap dependency with detection at McNary (most likely JDD or Bonneville)
+      //survival process
+      not_det_surv= rbinom(Type( sim_state_1(n,t)-sim_det_1(n,t-1)),phi(phi_pim_sim(n,t))); //simulated stay alive not detected previously
+      det_surv = rbinom(Type( sim_det_1(n,t-1)),phi(phi_pim_sim(n,t))); //simulated stay alive detected previously
+      sim_state_1(n,t+1) = det_surv + not_det_surv; //simulated stay alive
+      //observation process
+      sim_det_1(n,t) = rbinom(Type( not_det_surv), Type(p(p_pim_sim(n,t)) ));  //not detected at previous
+      sim_det_1(n,t) += rbinom(Type(det_surv),  Type(p(p_pim_sim(n,TD_i(1)))));     // detected at previous
     }else{
       //survival process
       sim_state_1(n,t+1) = rbinom(Type( sim_state_1(n,t)),phi(phi_pim_sim(n,t))); //simulated stay alive
       //observation process
       sim_det_1(n,t) = rbinom(Type( sim_state_1(n,t+1)),  Type(p(p_pim_sim(n,t)))); //simulated obs        
-    }
+    }}
     
   }
-  if(n>=(n_known_CH-1)){ //dont do ocean and adult part for unknown LH CHs
+  
 
   //ocean occasion
   int t = nDS_OCC;  //set occasion to be ocean occasion
@@ -828,9 +790,7 @@ for(int n=0; n<n_released.size(); n++){ // loop over individual release cohorts
   sim_det_1(n,n_OCC-1) =  sim_state_1(n,n_OCC) ;
   sim_det_2(n,n_OCC-nDS_OCC-1) =  sim_state_2(n,n_OCC-nDS_OCC-1);
   sim_det_3(n,n_OCC-nDS_OCC-1) =  sim_state_3(n,n_OCC-nDS_OCC-1);
-  }//end after juvenile stuff (not done for unk LH fish)
-}//end loop over release cohorts
-
+} // end of loop of unique CH
 ////Report simulated data and expectation
     REPORT(det_1);
     REPORT(det_2);
