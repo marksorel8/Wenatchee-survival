@@ -374,6 +374,7 @@ mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
                          doFit = TRUE,silent=TRUE,sim_rand = 0
 )
 
+<<<<<<< Updated upstream
 
 print_out(mscjs_fit)
 
@@ -383,6 +384,10 @@ mscjs_fit$mod$env$last.par.best
 sum(test$phi[c(1,601)]*c((1-0.6818555),0.6818555))
 test$phi[1801]
 
+=======
+print_out(mscjs_fit)
+
+>>>>>>> Stashed changes
 mscjs_fit2<-fit_wen_mscjs(x=mscjs_dat,
                          phi_formula=par.index~
                            
@@ -562,15 +567,25 @@ mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
                          phi_formula=par.index~
                            
                            #fixed effect
+<<<<<<< Updated upstream
                            -1+ time1+time1:LHsmolt+time1:LHsummer+ time1:streamWhite+ time1:streamNason+ time1:LWe_new+ 
                            time2 + time2:LHsmolt  + #time2:streamNason+ #to mcnary
+=======
+                           -1+ time1+time1:LHsmolt+time1:LHsummer+ time1:streamWhite+ 
+                           time2 + #time2:LHsmolt  + time2:streamNason+ #to mcnary
+>>>>>>> Stashed changes
                            time3 + #to Bonneville
                            time4 + time4:LHsmolt + time4:LHsummer+#to Bonn adult
                            time5 +   #to McNary
                            time6 + #time6:stratum3 +    #to Tumwater
                            #random
+<<<<<<< Updated upstream
                             diag(0+time1:LHfall+time1:LHsummer |mig_year) +
                            (0+time2 |mig_year) +
+=======
+                           (0+time1:LHfall+time1:LHsummer |mig_year) +
+                           #(0+time2 |mig_year) +
+>>>>>>> Stashed changes
                            #diag(0+time1:streamNason|mig_year)+
                            # (0+time1+time2|mig_year)+
                            (time4+0|mig_year)  +  diag(0+time4:LHsmolt|mig_year) 
