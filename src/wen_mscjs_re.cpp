@@ -350,12 +350,9 @@ DATA_INTEGER(nDS_OCC);      //number of downstream survival/ reacputure
 DATA_INTEGER(n_states);      //number of possible adult return ages (i.e. statres -3) 
 DATA_INTEGER(n_groups);      //number groups (i.e., unique combos of LH,stream,downstream,year). Used in psi mlogit backtransform
 DATA_INTEGER(n_unique_CH); //number of unique capture occasions
-DATA_INTEGER(n_known_CH); //number of known unique capture occasions
-
-DATA_INTEGER(n_unk_LH_phi);   //number of phi parameters for unknown LH fish
-DATA_INTEGER(n_unk_LH_p);     //number of p parameters for unknown LH fish
-DATA_INTEGER(n_known_LH_phi); //number of phi parameters for known LH fish
-DATA_INTEGER(n_known_LH_p);   //number of p parameters for known LH fish
+// DATA_INTEGER(Est_J_time); // capture occasion of estuary Juvenile
+// DATA_INTEGER(JDD_J_time); // capture occasion of John Day Dam Juvenile
+// DATA_IVECTOR(PRa_RIs_A_times); // capture occasion of Priest Rapids and Rock Island Adult
 
 
 //CH data
