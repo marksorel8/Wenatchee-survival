@@ -15,13 +15,13 @@ make_dat<-function(mark_file_CH=mark_file_CH,sites=c("LWe_J","McN_J","JDD_J","Bo
 
 dat_out<- mark_file_CH %>%  
   #add grouped length and release day columns
-  mutate(length_bin=ceiling(`Length mm`/length_bin)*length_bin-(length_bin/2),
-         rel_DOY_bin=ceiling((`Release Day Number`+ifelse(LH=="smolt",365,0))/doy_bin)*doy_bin-(doy_bin/2)) %>% 
+  # mutate(length_bin=ceiling(`Length mm`/length_bin)*length_bin-(length_bin/2),
+  #        rel_DOY_bin=ceiling((`Release Day Number`+ifelse(LH=="smolt",365,0))/doy_bin)*doy_bin-(doy_bin/2)) %>% 
   #subset some very small or large length
-  filter(length_bin>=55 &length_bin<=200 & rel_DOY_bin>10) %>% 
+  # filter(length_bin>=55 &length_bin<=200 & rel_DOY_bin>10) %>% 
 #subset columns needed for analysis
   select(sea_Year_p,LH,age,stream, #grouping variables
-                all_of(sites),length_bin,rel_DOY_bin) %>% 
+                all_of(sites),cont_cov) %>% 
   select(-age) %>% 
   #sites/occasions to include in model
   #first year with all stream data through last year where data on all three return ages is available (because it is 2020)
@@ -160,7 +160,6 @@ Psi_pim<-match(paste0(dat_out %>% select(LH,stream,sea_Year_p,all_of(cont_cov),s
                paste0(Psi.design.dat$group,"tostratum",Psi.design.dat$tostratum))-1 #subtract 1 because TMB indexing starts at 0
 
 
-
 ## *** Make data for simulating capture histories and calculating expected detections
 
 #### number released per year, LH, stream, and continuous covariate bin
@@ -252,11 +251,14 @@ return(list(dat_out=dat_out,
             n_known_CH=n_known_CH,
             n_states=n_states,
             n_released=releases$freq,
+            f_rel=ifelse(releases$LH=="Unk",1,0),
             phi_pim_sim=phi_pim_sim,
             p_pim_sim=p_pim_sim ,
             psi_pim_sim=psi_pim_sim$par.index,
             TD_occ=TD_occ,
             TD_i= TD_i,
+            Phi.pim_unk_all=Phi.pim_unk, # for checking
+            p.pim_unk_all = p.pim_unk, # for checking
             Phi.pim_unk=Phi.pim_unk %>% select(fall:smolt) %>% as.matrix(),
             p.pim_unk=p.pim_unk %>% select(fall:smolt) %>% as.matrix(),
             Nyears=length(start_year:end_year),
@@ -265,10 +267,14 @@ return(list(dat_out=dat_out,
             n_unk_LH_phi=n_unk_LH_phi,
             n_unk_LH_p=n_unk_LH_p,
             n_known_LH_phi=n_known_LH_phi,
-            n_known_LH_p=n_known_LH_p
+            n_known_LH_p=n_known_LH_p,
+            f=ifelse(dat_out$LH=="Unk",1,0)
             ))
 
 }
+
+
+
 
 
 fit_wen_mscjs<-function(x,phi_formula, p_formula, psi_formula,doFit=TRUE,silent=FALSE,sd_rep=TRUE,sim_rand=1,REML=FALSE){
@@ -313,6 +319,7 @@ dat_TMB<-with(x,list(
   p_terms= p.design.glmmTMB$data.tmb$terms,
   psi_terms= Psi.design.glmmTMB$data.tmb$terms,
   n_released=n_released,
+  f_rel=f_rel,
   phi_pim_sim=phi_pim_sim,
   p_pim_sim=p_pim_sim ,
   psi_pim_sim=psi_pim_sim,
@@ -326,6 +333,10 @@ dat_TMB<-with(x,list(
   n_unk_LH_p=n_unk_LH_p,
   n_known_LH_phi=n_known_LH_phi,
   n_known_LH_p=n_known_LH_p,
+  f=f,
+  hyper_mean=0,
+  hyper_SD=1,
+
   sim_rand = sim_rand #draw random effects from hyperdistribution in simulation rather than sampling from posterior. 
 ))
 
@@ -349,13 +360,13 @@ par_TMB<-list(
   #~~~~
   setwd(here("Src"))
   #compile and load TMB model
-  TMB::compile("wen_mscjs_re.cpp")
-  dyn.load(dynlib("wen_mscjs_re"))
+  TMB::compile("wen_mscjs_re_2.cpp")
+  dyn.load(dynlib("wen_mscjs_re_2"))
   
-  random<-c("b_phi","b_p","b_psi")
+  random<-c("b_phi","b_p","b_psi","logit_p_subs")
   if(REML){random<-c("beta_phi","beta_p","beta_psi",random)}
 #initialize model
-mod<-TMB::MakeADFun(data=dat_TMB,parameters = par_TMB,random=random,DLL ="wen_mscjs_re", silent = silent)
+mod<-TMB::MakeADFun(data=dat_TMB,parameters = par_TMB,random=random,DLL ="wen_mscjs_re_2", silent = silent)
 
 if(doFit){
 try(fit<-TMBhelper::fit_tmb(mod,newtonsteps = 1,getsd = sd_rep,getJointPrecision = sd_rep ))
