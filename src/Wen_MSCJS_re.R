@@ -50,6 +50,7 @@ n_states<-3
 #occasions corresponding to lower wenatchee and mcnary juveniles (for trap dependence)
 trap_dep<-which(sites%in%c("LWe_J", "McN_J"))
 
+
 #process data using RMark function. Specifies grouping variables for parameters, and type of model and hence parameters. "Multistrate" used S(Phi), p, and psi
 wenatchee.processed<-RMark::process.data(dat_out,model="Multistrata",groups=c("LH","stream","sea_Year_p",cont_cov,sites[trap_dep]),allgroups=TRUE)
 
@@ -95,14 +96,19 @@ p.design.dat<-wenatchee.ddl$p %>%
   mutate(streamChiwawa=as.numeric(streamNason+streamWhite==0)) %>%
   #make length bin and release DOY numeric
   mutate(across(.cols=all_of(cont_cov),.fns=function(x)scale(as.numeric(as.character(x))))) %>% 
-  mutate( age_class=as.factor(ifelse(LH!="smolt","sub","yrlng")), LHfall=as.numeric(LH=="fall"),age_0=as.numeric(LH!="smolt"), LWe_new=as.numeric(as.numeric(as.character(sea_Year_p)>2011))) %>% 
-  dplyr::filter( !(as.numeric(as.character(sea_Year_p))%in%(2011:2012) & Time==occ_LWe_J )) %>% 
+
+  mutate( age_class=as.factor(ifelse(LH=="Unk","Unk",ifelse(LH!="smolt","sub","yrlng"))), LHfall=as.numeric(LH=="fall"),age_0=as.numeric(LH!="smolt"), LWe_new=as.numeric(as.numeric(as.character(sea_Year_p)>2011))) %>% 
+  dplyr::filter( !(as.numeric(as.character(sea_Year_p))%in%(2011:2012) & Time==occ_LWe_J )) %>%   
+  
+  filter((LH=="Unk" &stream=="LWE" )|(LH!="Unk" &stream!="LWE")) %>% 
+  filter(!((LH=="Unk" &stream=="LWE")&(as.numeric(as.character(sea_Year_p))%in%(2011:2012)))) %>% #remove years with no releases at lower trap, so don't estimate proportions below
+
   #make par index a sequence
   mutate(par.index=(1:nrow(.))-1)
 
 try(p.design.dat<-p.design.dat %>% mutate(LWe_J=as.numeric(as.character(LWe_J))))
 try(p.design.dat<-p.design.dat %>% mutate(McN_J=as.numeric(as.character(McN_J))))
-
+try(p.design.dat<-p.design.dat %>% mutate(LWe_J=as.numeric(as.character(LWe_J))))
 
 ##Psi transition. 
 Psi.design.dat<-wenatchee.ddl$Psi %>% 
@@ -164,8 +170,8 @@ phi_pim_sim<-inner_join(releases,Phi.design.dat %>% select(par.index,time,stratu
  pivot_wider(values_from=par.index,names_from=c(time,stratum,sites[trap_dep])) %>% select(1:(5+nOCC+(nOCC-nDS_OCC-1)*2)) %>% ungroup()%>% select(!LH:freq) %>% as.matrix()
 
 ####columns to select for p pim
-p_pim_cols<-1:(5+nOCC+(nOCC-nDS_OCC-1)*2-1)
- try(p_pim_cols<-c(p_pim_cols,((5+nOCC+(nOCC-nDS_OCC-1)*2-1)+which(sites=="LWe_J"))))
+p_pim_cols<-1:(5+nOCC+(nOCC-nDS_OCC-1)*2-2)
+try(p_pim_cols<-c(p_pim_cols,((5+nOCC+(nOCC-nDS_OCC-1)*2-1)+which(sites=="LWe_J"))))
  try(p_pim_cols<-c(p_pim_cols,((5+(nOCC+(nOCC-nDS_OCC-1)*2-1)*2)+which(sites=="McN_J"))))
 
 
@@ -178,8 +184,43 @@ p_pim_sim<-inner_join(releases,p.design.dat %>% select(par.index,time,stratum,c(
 #### psi pim for simulation
 psi_pim_sim<-releases %>% rename(mig_year=sea_Year_p  ) %>% left_join(
   Psi.design.dat %>% select(par.index,stratum,tostratum,c("LH","stream","mig_year",cont_cov)) %>% filter(stratum==1&tostratum==2)  %>% distinct(across(stratum:mig_year),.keep_all=TRUE)) %>% ungroup()
-                                     
-                                     
+
+
+
+## *** PIMS for calculating weighted averages for unknown LH fish
+
+
+
+####Subset design data to just unknown LH fish (marked in tributaries)
+Phi.design.dat_unk <- Phi.design.dat %>% filter(LH=="Unk" &stream=="LWE") %>% droplevels()
+#### number of rows or phi design data for known LH parameters
+n_unk_LH_phi<-nrow(Phi.design.dat_unk)
+
+p.design.dat_unk <- p.design.dat %>% filter(LH=="Unk" &stream=="LWE") %>% droplevels()
+#### number of rows or phi design data for known LH parameters
+n_unk_LH_p<-nrow(p.design.dat_unk)
+
+# Psi.design.dat_unk <- Psi.design.dat %>% filter(LH=="Unk" &stream=="LWE") %>% droplevels()
+
+####Subset design data to just known LH fish (marked in tributaries)
+Phi.design.dat <- Phi.design.dat %>% filter(LH!="Unk" &stream!="LWE") %>% droplevels()
+#### number of rows or phi design data for known LH parameters
+n_known_LH_phi<-nrow(Phi.design.dat)
+
+p.design.dat <- p.design.dat %>% filter(LH!="Unk" &stream!="LWE") %>% droplevels()
+#### number of rows or phi design data for known LH parameters
+n_known_LH_p<-nrow(p.design.dat)
+
+# Psi.design.dat <- Psi.design.dat %>% filter(LH!="Unk" &stream!="LWE") %>% droplevels()
+ 
+#### pims
+Phi.pim_unk <- inner_join(Phi.design.dat_unk %>% select(sea_Year_p,time,stratum,LWe_J,McN_J ), Phi.design.dat %>% filter(stream=="Chiwawa"&LH!="summer") %>% select(par.index,sea_Year_p,LH,time,stratum,LWe_J,McN_J ) %>% droplevels(),by=c("sea_Year_p","time","stratum","LWe_J","McN_J")) %>% pivot_wider(values_from=par.index,names_from=c(LH)) 
+
+p.pim_unk <- inner_join(p.design.dat_unk %>% select(sea_Year_p,time,stratum,LWe_J,McN_J ), p.design.dat %>% filter(stream=="Chiwawa"&LH!="summer") %>% select(par.index,sea_Year_p,LH,time,stratum,LWe_J,McN_J ) %>% droplevels(),by=c("sea_Year_p","time","stratum","LWe_J","McN_J")) %>% pivot_wider(values_from=par.index,names_from=c(LH))
+
+# Psi.pim_unk <- inner_join(Psi.design.dat_unk %>% select(mig_year) %>% distinct(), Psi.design.dat %>% filter(stratum==1&tostratum==2&stream=="Chiwawa"&LH!="summer") %>% select(par.index,stratum,tostratum,mig_year,LH )%>% distinct(across(stratum:mig_year),.keep_all=TRUE) %>% droplevels()) %>% pivot_wider(values_from=par.index,names_from=c(LH))
+
+
 
 #number of groups in the psi deisgn matrix
 n_groups<-nrow(Psi.design.dat)/2
@@ -192,7 +233,9 @@ try(TD_occ[2]<-which(sites=="McN_J"))
 # p_pim_sim index for detection parameters for fish that were detected at the previous occasion
     TD_i <-rep(ncol(p_pim_sim)-1,2)
 if(length(trap_dep)==2)
-  TD_i[1]<-TD_i[1]-1
+
+  TD_i[1]<-TD_i[2]-1
+
 
 
 

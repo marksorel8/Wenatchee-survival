@@ -175,5 +175,70 @@ mutate_at(vars(LWe_J:Tum_A), ~.x-sea_Year_p) %>%
                                           .x==3~3,
                                           TRUE ~0)) %>% 
   #drop rows with capture history where only adult detection is at tumwater dam (because of concern about "ghost tags)
-  filter(!( select(., Bon_A:RIs_A)%>% rowSums() ==0& Tum_A !=0))
+  filter(!( select(., Bon_A:RIs_A)%>% rowSums() ==0& Tum_A !=0)) %>% 
+  
+  mutate(LWe_J=if_else(stream=="LWE",1,LWe_J)) 
 
+
+
+# looking at detections on upstream arrays
+# 
+# test<-read.csv(here("Data","ptagis","Interrogation Summary wen trib tag adult array det.csv"))
+# 
+# 
+# 
+# mark_file_CH2<-mark_file_CH %>% mutate(adult_any = select(., Bon_A:RIs_A) %>%  reduce(pmax.int,na.rm=T),ad_year=ifelse(adult_any==0,NA,sea_Year_p+adult_any))
+# 
+# 
+# 
+# test2<-left_join(test,mark_file_CH2 %>% filter(!is.na(ad_year)) %>% select(`Tag Code`,ad_year),by=c("Tag.Code"="Tag Code")) %>% filter(Last.Year.YYYY==ad_year) %>% mutate(last_dat=as.Date(Last.Date.MMDDYYYY,format="%m/%d/%Y"))
+# 
+# 
+# test2<-test2 %>% filter(Site.Code.Value!="CHU") %>%  arrange(desc(last_dat)) %>% 
+#   distinct(Tag.Code,.keep_all=TRUE)
+# 
+# 
+# thing<-test2 %>% filter(Site.Code.Value=="CHU")
+# length((match(thing$Tag.Code,test2 %>%  filter(Site.Code.Value=="CHL") %>% pull(Tag.Code))))
+# 
+# dim(thing)
+# 
+# 
+# sum(is.na(match(test2 %>% filter(Site.Code.Value!="TUF") %>% pull(Tag.Code),test2 %>% filter(Site.Code.Value=="TUF") %>% pull(Tag.Code))))
+# 
+# table(test2$Site.Code.Value,test2$Mark.Site.Info.Code
+#       )
+# 
+# %>% 
+#   left_join(lower_mid_col_dams %>% 
+#               filter(`Site Code Value` %in% c("CHL", "CHU")) %>% 
+#               select(c(`Tag Code`,`Last Year YYYY`)) %>% 
+#               arrange(desc(`Last Year YYYY`)) %>%
+#               distinct(`Tag Code`,.keep_all=TRUE) %>%
+#               rename("Chi_A"="Last Year YYYY"),by="Tag Code") %>% 
+#   
+#   left_join(test %>% 
+#             filter(`Site Code Value` %in% c("PRA")) %>% 
+#             select(c(`Tag Code`,`Last Year YYYY`)) %>% 
+#             rename("Chi_A"="Last Year YYYY"),by="Tag Code") %>% 
+#   
+#   
+#   
+# 
+# thing<-mark_file_CH
+# 
+# test2<-test %>% 
+# 
+# dim(test)
+# table(test$Site.Name)
+
+#test<-lower_mid_col_dams %>% mutate(`First Date MMDDYYYY2`=as.Date(`First Date MMDDYYYY`,format="%m/%d/%Y"), doy=lubridate::yday(`First Date MMDDYYYY2`))
+
+# obs_dat<-read_csv(here("Data","ptagis","ptagis_obs_data_wen_trib_screwt.csv")) %>% 
+#   mutate(date_det=lubridate::date(lubridate::mdy_hms(obs_date))) %>% 
+# group_by(tag_id,obs_site) %>% mutate(first_date=min(date_det),last_det=max(date_det)) %>% 
+#   select(!obs_date:date_det) %>% droplevels() %>% 
+#  distinct() %>% ungroup() %>% 
+#   mutate("First Year YYYY"=lubridate::year(first_date),"Last Year YYYY"=lubridate::year(last_det)) %>% 
+#   mutate("First DOY"=lubridate::yday(first_date),"Last DOY"=lubridate::yday(last_det)) %>% 
+#   rename("Site Code Value"=obs_site,"Tag Code"=tag_id)

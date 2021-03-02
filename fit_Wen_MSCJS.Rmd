@@ -564,7 +564,7 @@ mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
                            time5 +   #to McNary
                            time6 + time6:stratum3 +    #to Tumwater
                            #random
-                           (0+time1:LHfall+time1:LHsummer |mig_year) +
+                           diag(0+time1:LHfall+time1:LHsummer |mig_year) +
                            (0+time2 |mig_year) +
                            #diag(0+time1:streamNason|mig_year)+
                            # (0+time1+time2|mig_year)+
@@ -598,7 +598,7 @@ mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
                          ,
                          
                          doFit = TRUE,silent=TRUE,
-                         sim_rand = 1,REML=FALSE
+                         sim_rand = 0,REML=FALSE
 )
 
 # fixed 
@@ -663,13 +663,13 @@ print_out(mscjs_fit)
 # * observed detections data*
 obs_dat<-mscjs_dat$dat_out %>% 
   #make states their own columns
-  mutate(across(Bon_A :Tum_A,~as.numeric(.==2),.names="{col}_2"),.before="length_bin") %>% 
-    mutate(across(Bon_A :Tum_A,~as.numeric(.==3),.names="{col}_3"),.before="length_bin") %>% 
+  mutate(across(Bon_A :Tum_A,~as.numeric(.==2),.names="{col}_2"),.before="ch") %>% 
+    mutate(across(Bon_A :Tum_A,~as.numeric(.==3),.names="{col}_3"),.before="ch") %>% 
     mutate(across(Bon_A :Tum_A,~as.numeric(.==1))) %>% 
   #multiply CH by frequency
   mutate(across(LWe_J :Tum_A_3,~.*freq)) %>% 
   #drop unneeded columns 
-   select(!length_bin:freq) %>% 
+   select(!ch:freq) %>% 
   #sum detection by stream, year, and life history
   group_by(LH,stream,sea_Year_p) %>% summarise(across(LWe_J :Tum_A_3, sum)) %>% ungroup()
 
