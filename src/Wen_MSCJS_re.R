@@ -1,17 +1,29 @@
 library(here)
 library(tidyverse)
 library(TMB)
-# if(file.exists(here("src","mark_fil_ch_12032020.Rdata"))){
-#   load(here("src","mark_fil_ch_12032020.Rdata"))
-# }else{
+if(file.exists(here("Data","mark_file_CH.csv"))){
+  mark_file_CH<-read.csv(here("Data","mark_file_CH.csv"))
+}else{
 source(here("src","data_proc.r"))
-# }
+}
+
+#load environmental data covariates
+if(file.exists(here("Data","env_dat.csv"))){
+  env_dat<-read.csv(here("Data","env_dat.csv"))
+}else{
+  source(here("src","Env data funcs.r"))
+  env_dat<-get_dat()
+  write.csv(env_dat,file=here("Data","env_dat.csv"))
+}
+
+redds<-read_csv(here("Data","redd_counts.csv")) %>% mutate(mig_year=as.factor(Year+2)) %>% mutate(across(Chiwawa:White,scale)) %>%  pivot_longer(c("Chiwawa","Nason","White"),"stream",values_to="redds")
+
 
 if(file.exists(here("data","all_bio_data.csv"))){
 all_bio_data<-read_csv(here("data","all_bio_data.csv"))
 }
 
-make_dat<-function(mark_file_CH=mark_file_CH,sites=c("LWe_J","McN_J","JDD_J","Bon_J","Est_J","Bon_A","McN_A","PRa_A","RIs_A","Tum_A"),start_year=2007, end_year=2016,cont_cov,length_bin=5,doy_bin=10){
+make_dat<-function(mark_file_CH=mark_file_CH,sites=c("LWe_J","McN_J","JDD_J","Bon_J","Est_J","Bon_A","McN_A","PRa_A","RIs_A","Tum_A"),start_year=2007, end_year=2016,cont_cov=NULL,length_bin=5,doy_bin=10){
 
 dat_out<- mark_file_CH %>%  
   #add grouped length and release day columns
@@ -20,9 +32,8 @@ dat_out<- mark_file_CH %>%
   #subset some very small or large length
   # filter(length_bin>=55 &length_bin<=200 & rel_DOY_bin>10) %>% 
 #subset columns needed for analysis
-  select(sea_Year_p,LH,age,stream, #grouping variables
+  select(sea_Year_p,LH,stream, #grouping variables
                 all_of(sites),cont_cov) %>% 
-  select(-age) %>% 
   #sites/occasions to include in model
   #first year with all stream data through last year where data on all three return ages is available (because it is 2020)
   filter(sea_Year_p>=start_year & sea_Year_p<=end_year) %>%
@@ -50,7 +61,7 @@ n_known_CH<-sum(dat_out$LH!="Unk")
 #number of states
 n_states<-3
 #occasions corresponding to lower wenatchee and mcnary juveniles (for trap dependence)
-trap_dep<-which(sites%in%c( "McN_J"))
+trap_dep<-which(sites%in%c("LWe_J", "McN_J"))
 
 
 #process data using RMark function. Specifies grouping variables for parameters, and type of model and hence parameters. "Multistrate" used S(Phi), p, and psi
@@ -77,7 +88,11 @@ cbind(.,model.matrix(~time+stream+LH+stratum-1,data=.)) %>%
   filter((LH=="Unk" &stream=="LWE")|(LH!="Unk" &stream!="LWE")) %>% 
   filter(!((LH=="Unk" &stream=="LWE")&(as.numeric(as.character(sea_Year_p))%in%(2011:2012)))) %>% #remove years with no releases at lower trap, so don't estimate prorortins below
   #make par index a sequence
-  mutate(par.index=(1:nrow(.))-1)
+  mutate(par.index=(1:nrow(.))-1) %>% 
+  #add environmental covariates
+  left_join(env_dat %>% mutate(mig_year=as.factor(mig_year)),by="mig_year") %>% 
+  mutate(across(sum_flow:transport.win,scale)) %>% 
+  left_join(redds,by=c("mig_year","stream")) %>% replace(is.na(.), 0) 
   
   # add column for first time
 #downstream time
@@ -100,14 +115,14 @@ p.design.dat<-wenatchee.ddl$p %>% arrange(LH) %>% #put Unk LHs laste
   mutate( age_class=as.factor(ifelse(LH=="Unk","Unk",ifelse(LH!="smolt","sub","yrlng"))), LHfall=as.numeric(LH=="fall"),age_0=as.numeric(LH!="smolt"), LWe_new=as.numeric(as.numeric(as.character(sea_Year_p)>2011))) %>% 
   dplyr::filter( !(as.numeric(as.character(sea_Year_p))%in%(2011:2012) & Time==occ_LWe_J )) %>%   
   
-  filter((LH=="Unk" &stream=="LWE")|(LH!="Unk" &stream!="LWE")) %>% 
+  filter((LH=="Unk" &stream=="LWE" )|(LH!="Unk" &stream!="LWE")) %>% 
   filter(!((LH=="Unk" &stream=="LWE")&(as.numeric(as.character(sea_Year_p))%in%(2011:2012)))) %>% #remove years with no releases at lower trap, so don't estimate proportions below
   #make par index a sequence
   mutate(par.index=(1:nrow(.))-1)
 
 # try(p.design.dat<-p.design.dat %>% mutate(LWe_J=as.numeric(as.character(LWe_J))))
 try(p.design.dat<-p.design.dat %>% mutate(McN_J=as.numeric(as.character(McN_J))))
-
+try(p.design.dat<-p.design.dat %>% mutate(LWe_J=as.numeric(as.character(LWe_J))))
 
 ##Psi transition. 
 Psi.design.dat<-wenatchee.ddl$Psi %>% arrange(LH) %>% #put Unk LHs laste
@@ -172,8 +187,8 @@ phi_pim_sim<-inner_join(releases,Phi.design.dat %>% select(par.index,time,stratu
 
 ####columns to select for p pim
 p_pim_cols<-1:(5+nOCC+(nOCC-nDS_OCC-1)*2-2)
-# try(p_pim_cols<-c(p_pim_cols,((5+nOCC+(nOCC-nDS_OCC-1)*2-1)+which(sites=="LWe_J"))))
- try(p_pim_cols<-c(p_pim_cols,((5+(nOCC+(nOCC-nDS_OCC-1)*2-1))+which(sites=="McN_J"))))
+try(p_pim_cols<-c(p_pim_cols,((5+nOCC+(nOCC-nDS_OCC-1)*2-1)+which(sites=="LWe_J"))))
+ try(p_pim_cols<-c(p_pim_cols,((5+(nOCC+(nOCC-nDS_OCC-1)*2-1)*2)+which(sites=="McN_J"))))
 
 
 #### p pim for simulation
@@ -192,7 +207,7 @@ psi_pim_sim<-releases %>% rename(mig_year=sea_Year_p  ) %>% left_join(
 
 
 ####Subset design data to just unknown LH fish (marked in tributaries)
-Phi.design.dat_unk <- Phi.design.dat %>% filter(LH=="Unk" &stream=="LWE") %>% droplevels()
+Phi.design.dat_unk <- Phi.design.dat %>% filter(LH=="Unk" & stream=="LWE") %>% droplevels()
 #### number of rows or phi design data for known LH parameters
 n_unk_LH_phi<-nrow(Phi.design.dat_unk)
 
@@ -212,11 +227,11 @@ p.design.dat <- p.design.dat %>% filter(LH!="Unk" &stream!="LWE") %>% droplevels
 n_known_LH_p<-nrow(p.design.dat)
 
 # Psi.design.dat <- Psi.design.dat %>% filter(LH!="Unk" &stream!="LWE") %>% droplevels()
-
+ 
 #### pims
-Phi.pim_unk <- inner_join(Phi.design.dat_unk %>% select(sea_Year_p,time,stratum,McN_J ), Phi.design.dat %>% filter(stream=="Chiwawa"&LH!="summer") %>% select(par.index,sea_Year_p,LH,time,stratum,McN_J ) %>% droplevels(),by=c("sea_Year_p","time","stratum","McN_J")) %>% pivot_wider(values_from=par.index,names_from=c(LH)) 
+Phi.pim_unk <- inner_join(Phi.design.dat_unk %>% select(sea_Year_p,time,stratum,LWe_J,McN_J ), Phi.design.dat %>% filter(stream=="Chiwawa"&LH!="summer") %>% select(par.index,sea_Year_p,LH,time,stratum,LWe_J,McN_J ) %>% droplevels(),by=c("sea_Year_p","time","stratum","LWe_J","McN_J")) %>% pivot_wider(values_from=par.index,names_from=c(LH)) 
 
-p.pim_unk <- inner_join(p.design.dat_unk %>% select(sea_Year_p,time,stratum,McN_J ), p.design.dat %>% filter(stream=="Chiwawa"&LH!="summer") %>% select(par.index,sea_Year_p,LH,time,stratum,McN_J ) %>% droplevels(),by=c("sea_Year_p","time","stratum","McN_J")) %>% pivot_wider(values_from=par.index,names_from=c(LH))
+p.pim_unk <- inner_join(p.design.dat_unk %>% select(sea_Year_p,time,stratum,LWe_J,McN_J ), p.design.dat %>% filter(stream=="Chiwawa"&LH!="summer") %>% select(par.index,sea_Year_p,LH,time,stratum,LWe_J,McN_J ) %>% droplevels(),by=c("sea_Year_p","time","stratum","LWe_J","McN_J")) %>% pivot_wider(values_from=par.index,names_from=c(LH))
 
 # Psi.pim_unk <- inner_join(Psi.design.dat_unk %>% select(mig_year) %>% distinct(), Psi.design.dat %>% filter(stratum==1&tostratum==2&stream=="Chiwawa"&LH!="summer") %>% select(par.index,stratum,tostratum,mig_year,LH )%>% distinct(across(stratum:mig_year),.keep_all=TRUE) %>% droplevels()) %>% pivot_wider(values_from=par.index,names_from=c(LH))
 
@@ -225,13 +240,14 @@ p.pim_unk <- inner_join(p.design.dat_unk %>% select(sea_Year_p,time,stratum,McN_
 n_groups<-nrow(Psi.design.dat)/2
 
 #occasions with trap dependent detection (effect of detection/non-detection at previous occasion)
-TD_occ <-rep(-1,1)
-try(TD_occ[1]<-which(sites=="McN_J"))
+TD_occ <-rep(-1,2)
+try(TD_occ[1]<-which(sites=="LWe_J"))
+try(TD_occ[2]<-which(sites=="McN_J"))
 
 # p_pim_sim index for detection parameters for fish that were detected at the previous occasion
-    TD_i <-rep(ncol(p_pim_sim)-1,1)
-# if(length(trap_dep)==2)
-#   TD_i[1]<-TD_i[1]-1
+    TD_i <-rep(ncol(p_pim_sim)-1,2)
+if(length(trap_dep)==2)
+  TD_i[1]<-TD_i[2]-1
 
 
 
@@ -361,7 +377,7 @@ par_TMB<-list(
   setwd(here("Src"))
   #compile and load TMB model
   TMB::compile("wen_mscjs_re_2.cpp")
-  dyn.load(dynlib("wen_mscjs_re_2"))
+  dyn.load(TMB::dynlib("wen_mscjs_re_2"))
   
   random<-c("b_phi","b_p","b_psi","logit_p_subs")
   if(REML){random<-c("beta_phi","beta_p","beta_psi",random)}

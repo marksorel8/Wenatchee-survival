@@ -63,138 +63,138 @@ load(here("Data","cutoffs_and_props.Rdata"))
 
 #add capture histories to mark file
 mark_file_CH<-mark_file %>% 
-
-#Lower Wenatchee Juvenile recapture
- left_join(lower_wen_traps_recaps %>%
+  
+  #Lower Wenatchee Juvenile recapture
+  left_join(lower_wen_traps_recaps %>%
               filter(`recap_site` %in% c("WENA4T","WENATT")) %>% #subset McNary juvenile detection sites
               select(c(`Tag Code`,`First Year YYYY`)) %>% #take columns first detection year and pit code
-             # arrange(recap_date) %>% #arrange in order of increasing recap_date
-             distinct(`Tag Code`,.keep_all=TRUE) %>% #remove duplicate detections at multiple "sites" at this trap 
+              # arrange(recap_date) %>% #arrange in order of increasing recap_date
+              distinct(`Tag Code`,.keep_all=TRUE) %>% #remove duplicate detections at multiple "sites" at this trap 
               rename("LWe_J"="First Year YYYY"),by="Tag Code") %>%   #rename to represent site for merging
-
-#McNary Juvenile detection
+  
+  #McNary Juvenile detection
   left_join(lower_mid_col_dams %>% 
-            filter(`Site Code Value` =="MCJ") %>% #subset McNary juvenile detection sites 
-            select(c(`Tag Code`,`First Year YYYY`)) %>% #take columns first detection year and pit code 
-            rename("McN_J"="First Year YYYY"),by="Tag Code") %>%   #rename to represent site for merging
-
-#John Day Juvenle detection
+              filter(`Site Code Value` =="MCJ") %>% #subset McNary juvenile detection sites 
+              select(c(`Tag Code`,`First Year YYYY`)) %>% #take columns first detection year and pit code 
+              rename("McN_J"="First Year YYYY"),by="Tag Code") %>%   #rename to represent site for merging
+  
+  #John Day Juvenle detection
   left_join(lower_mid_col_dams %>% 
               filter(`Site Code Value` =="JDJ") %>% 
               select(c(`Tag Code`,`First Year YYYY`)) %>%
               rename("JDD_J"="First Year YYYY"),by="Tag Code") %>%
-
-#Bonneville Juvenile detection
-  left_join(lower_mid_col_dams %>% 
-            filter(`Site Code Value` %in% c("B1J","B2J","BCC")) %>% 
-            select(c(`Tag Code`,`First Year YYYY`)) %>% 
-            arrange(`First Year YYYY`) %>% #arrange in order of increasing first year
-            distinct(`Tag Code`,.keep_all=TRUE) %>% #remove duplicate detections at multiple "sites" at this dam 
-            rename("Bon_J"="First Year YYYY"),by="Tag Code") %>%   
-
-#estuary towed array
-  left_join(lower_mid_col_dams %>% 
-            filter(`Site Code Value` =="TWX") %>% 
-            select(c(`Tag Code`,`First Year YYYY`)) %>%
-            rename("Est_J"="First Year YYYY"),by="Tag Code") %>% 
-
-#Bonneville Adult
-  left_join(lower_mid_col_dams %>% 
-            filter(`Site Code Value` %in% c("BO1", "BO2",  "BO3", "BO")) %>% 
-            select(c(`Tag Code`,`First Year YYYY`)) %>% 
-            arrange(desc(`First Year YYYY`)) %>% #latest year detected first, so when we take distinct below that is the one we keep
-            distinct(`Tag Code`,.keep_all=TRUE) %>% 
-            rename("Bon_A"="First Year YYYY"),by="Tag Code") %>% 
-
-#The Dalles Adult
-  left_join(lower_mid_col_dams %>% 
-            filter(`Site Code Value` %in% c("TD1", "TD2")) %>% 
-            select(c(`Tag Code`,`First Year YYYY`)) %>%
-            arrange(desc(`First Year YYYY`)) %>%
-            distinct(`Tag Code`,.keep_all=TRUE) %>%
-            rename("TDD_A"="First Year YYYY"),by="Tag Code") %>%
-
-#John Day Adult
-  left_join(lower_mid_col_dams %>% 
-            filter(`Site Code Value` %in% c("JO1", "JO2")) %>% 
-            select(c(`Tag Code`,`First Year YYYY`)) %>%
-            arrange(desc(`First Year YYYY`)) %>%
-            distinct(`Tag Code`,.keep_all=TRUE) %>%
-            rename("JDD_A"="First Year YYYY"),by="Tag Code") %>% 
-
-#McNary Adult
-left_join(lower_mid_col_dams %>% 
-          filter(`Site Code Value` %in% c("MC1", "MC2")) %>% 
-          select(c(`Tag Code`,`First Year YYYY`)) %>% 
-          arrange(desc(`First Year YYYY`)) %>%
-          distinct(`Tag Code`,.keep_all=TRUE) %>%
-          rename("McN_A"="First Year YYYY"),by="Tag Code") %>% 
   
-#Priest Rapids Adult
-  left_join(upper_col_dams_tum %>% 
-            filter(`Site Code Value` == c("PRA")) %>% 
-            select(c(`Tag Code`,`First Year YYYY`)) %>% 
-            rename("PRa_A"="First Year YYYY"),by="Tag Code") %>% 
+  #Bonneville Juvenile detection
+  left_join(lower_mid_col_dams %>% 
+              filter(`Site Code Value` %in% c("B1J","B2J","BCC")) %>% 
+              select(c(`Tag Code`,`First Year YYYY`)) %>% 
+              arrange(`First Year YYYY`) %>% #arrange in order of increasing first year
+              distinct(`Tag Code`,.keep_all=TRUE) %>% #remove duplicate detections at multiple "sites" at this dam 
+              rename("Bon_J"="First Year YYYY"),by="Tag Code") %>%   
   
-#Rock Island Adult
-  left_join(upper_col_dams_tum %>% 
-            filter(`Site Code Value` == c("RIA")) %>% 
-            select(c(`Tag Code`,`First Year YYYY`)) %>% 
-            rename("RIs_A"="First Year YYYY"),by="Tag Code") %>% 
-
-#Tumwater adult #TODO check if juveniles/ ghost tags detected
-  left_join(upper_col_dams_tum %>% 
-            filter(`Site Code Value` == c("TUF")) %>%
-            select(c(`Tag Code`,`First Year YYYY`)) %>%
-            rename("Tum_A"="First Year YYYY"),by="Tag Code") %>% 
-
-#Add juvenile life history
+  #estuary towed array
+  left_join(lower_mid_col_dams %>% 
+              filter(`Site Code Value` =="TWX") %>% 
+              select(c(`Tag Code`,`First Year YYYY`)) %>%
+              rename("Est_J"="First Year YYYY"),by="Tag Code") %>% 
   
-#add age
+  #Bonneville Adult
+  left_join(lower_mid_col_dams %>% 
+              filter(`Site Code Value` %in% c("BO1", "BO2",  "BO3", "BO")) %>% 
+              select(c(`Tag Code`,`First Year YYYY`)) %>% 
+              arrange(desc(`First Year YYYY`)) %>% #latest year detected first, so when we take distinct below that is the one we keep
+              distinct(`Tag Code`,.keep_all=TRUE) %>% 
+              rename("Bon_A"="First Year YYYY"),by="Tag Code") %>% 
+  
+  #The Dalles Adult
+  left_join(lower_mid_col_dams %>% 
+              filter(`Site Code Value` %in% c("TD1", "TD2")) %>% 
+              select(c(`Tag Code`,`First Year YYYY`)) %>%
+              arrange(desc(`First Year YYYY`)) %>%
+              distinct(`Tag Code`,.keep_all=TRUE) %>%
+              rename("TDD_A"="First Year YYYY"),by="Tag Code") %>%
+  
+  #John Day Adult
+  left_join(lower_mid_col_dams %>% 
+              filter(`Site Code Value` %in% c("JO1", "JO2")) %>% 
+              select(c(`Tag Code`,`First Year YYYY`)) %>%
+              arrange(desc(`First Year YYYY`)) %>%
+              distinct(`Tag Code`,.keep_all=TRUE) %>%
+              rename("JDD_A"="First Year YYYY"),by="Tag Code") %>% 
+  
+  #McNary Adult
+  left_join(lower_mid_col_dams %>% 
+              filter(`Site Code Value` %in% c("MC1", "MC2")) %>% 
+              select(c(`Tag Code`,`First Year YYYY`)) %>% 
+              arrange(desc(`First Year YYYY`)) %>%
+              distinct(`Tag Code`,.keep_all=TRUE) %>%
+              rename("McN_A"="First Year YYYY"),by="Tag Code") %>% 
+  
+  #Priest Rapids Adult
+  left_join(upper_col_dams_tum %>% 
+              filter(`Site Code Value` == c("PRA")) %>% 
+              select(c(`Tag Code`,`First Year YYYY`)) %>% 
+              rename("PRa_A"="First Year YYYY"),by="Tag Code") %>% 
+  
+  #Rock Island Adult
+  left_join(upper_col_dams_tum %>% 
+              filter(`Site Code Value` == c("RIA")) %>% 
+              select(c(`Tag Code`,`First Year YYYY`)) %>% 
+              rename("RIs_A"="First Year YYYY"),by="Tag Code") %>% 
+  
+  #Tumwater adult #TODO check if juveniles/ ghost tags detected
+  left_join(upper_col_dams_tum %>% 
+              filter(`Site Code Value` == c("TUF")) %>%
+              select(c(`Tag Code`,`First Year YYYY`)) %>%
+              rename("Tum_A"="First Year YYYY"),by="Tag Code") %>% 
+  
+  #Add juvenile life history
+  
+  #add age
   mutate( age = case_when(mark_time==1~ "Unk",
-    (mark_file$`Mark Day Number`>179)~   "sub", #if DOY > 179 then subyearling
-   is.na(mark_file$`Length mm`)~       NA_character_,
-   (mark_file$`Length mm`>=cutoffs_and_props[[1]]$y[ifelse((mark_file$`Mark Day Number`-49)>0,
-                                                    (mark_file$`Mark Day Number`-49),1)]) ~     "YCW",#assign age based on cutoff rule
-  TRUE~                                 "sub"
+                          (mark_file$`Mark Day Number`>179)~   "sub", #if DOY > 179 then subyearling
+                          is.na(mark_file$`Length mm`)~       NA_character_,
+                          (mark_file$`Length mm`>=cutoffs_and_props[[1]]$y[ifelse((mark_file$`Mark Day Number`-49)>0,
+                                                                                  (mark_file$`Mark Day Number`-49),1)]) ~     "YCW",#assign age based on cutoff rule
+                          TRUE~                                 "sub"
   )
   ) %>% 
   filter(!is.na(age)) %>% # drop 329 fish captured before doy 179 but without length data
   
-
-#get rid of fish whose tag ages are consistent with observed juvenile migration year
- mutate(seaward_year_obs= select(., LWe_J:Est_J) %>% reduce(pmin,na.rm=TRUE)) %>%  # add year of seaward migration
-mutate(mark_to_seward=`seaward_year_obs`-`Mark Year YYYY`) %>% # add years between tagging and seaward migration (for those fish detected migrating downstream as juveniles)
-filter(
-  is.na(`mark_to_seward`)|(age=="sub"&`mark_to_seward`==1)|
-    (age=="YCW"&`mark_to_seward`==0)|(age=="Unk"&`mark_to_seward`==0) 
-         ) %>%#get rid of fish known to have migrated at an age not consistant with their assigned life history (14/7469 subs, 5/13630 yrlngs) 
+  
+  #get rid of fish whose tag ages are consistent with observed juvenile migration year
+  mutate(seaward_year_obs= select(., LWe_J:Est_J) %>% reduce(pmin,na.rm=TRUE)) %>%  # add year of seaward migration
+  mutate(mark_to_seward=`seaward_year_obs`-`Mark Year YYYY`) %>% # add years between tagging and seaward migration (for those fish detected migrating downstream as juveniles)
+  filter(
+    is.na(`mark_to_seward`)|(age=="sub"&`mark_to_seward`==1)|
+      (age=="YCW"&`mark_to_seward`==0)|(age=="Unk"&`mark_to_seward`==0) 
+  ) %>%#get rid of fish known to have migrated at an age not consistant with their assigned life history (14/7469 subs, 5/13630 yrlngs) 
   
   
-#assign life history (LH)
+  #assign life history (LH)
   mutate(LH= case_when(
-     age=="Unk" ~ "Unk",
-     age=="YCW" ~ "smolt",
+    age=="Unk" ~ "Unk",
+    age=="YCW" ~ "smolt",
     `Mark Day Number`<= 139 ~"fry",
     `Mark Day Number`<=262 ~"summer",
     TRUE ~"fall",
     
   )) %>% 
-
-
-# create stream column that is more readable
-mutate(stream = case_when(
-  `Mark Site Info Code`=="CHIWAT" ~ "Chiwawa",
-  `Mark Site Info Code`=="NASONC" ~ "Nason",
-  `Mark Site Info Code`=="WHITER" ~ "White",
-  TRUE ~ "LWE"
-)) %>% 
-#add predicted seaward migration year
-mutate(sea_Year_p = ifelse(age%in%c("YCW","Unk"),`Mark Year YYYY`,`Mark Year YYYY`+1)) %>% 
-
-#mutate detections to be years between seaward migration year and detection year 
-mutate_at(vars(LWe_J:Tum_A), ~.x-sea_Year_p) %>%  
-   #make juvenile detection "A" and non-detections "0"
+  
+  
+  # create stream column that is more readable
+  mutate(stream = case_when(
+    `Mark Site Info Code`=="CHIWAT" ~ "Chiwawa",
+    `Mark Site Info Code`=="NASONC" ~ "Nason",
+    `Mark Site Info Code`=="WHITER" ~ "White",
+    TRUE ~ "LWE"
+  )) %>% 
+  #add predicted seaward migration year
+  mutate(sea_Year_p = ifelse(age%in%c("YCW","Unk"),`Mark Year YYYY`,`Mark Year YYYY`+1)) %>% 
+  
+  #mutate detections to be years between seaward migration year and detection year 
+  mutate_at(vars(LWe_J:Tum_A), ~.x-sea_Year_p) %>%  
+  #make juvenile detection "A" and non-detections "0"
   mutate_at(vars(LWe_J:Est_J), ~case_when(is.na(.x)~ 0,
                                           .x==0~1)) %>%
   # #make adult detections after 1 year "1", after 2 year "2" after three years "3" otherwise "0"
@@ -205,5 +205,71 @@ mutate_at(vars(LWe_J:Tum_A), ~.x-sea_Year_p) %>%
                                           .x==3~3,
                                           TRUE ~0)) %>% 
   #drop rows with capture history where only adult detection is at tumwater dam (because of concern about "ghost tags)
-  filter(!( select(., Bon_A:RIs_A)%>% rowSums() ==0& Tum_A !=0))
+  filter(!( select(., Bon_A:RIs_A)%>% rowSums() ==0& Tum_A !=0)) %>% 
+  
+  mutate(LWe_J=if_else(stream=="LWE",1,LWe_J)) %>%
+  select(sea_Year_p,LH,stream,LWe_J:Tum_A,`Length mm`,`Release Day Number`)
 
+
+write.csv(mark_file_CH,file=here("Data","mark_file_CH.csv"))
+# looking at detections on upstream arrays
+# 
+# test<-read.csv(here("Data","ptagis","Interrogation Summary wen trib tag adult array det.csv"))
+# 
+# 
+# 
+# mark_file_CH2<-mark_file_CH %>% mutate(adult_any = select(., Bon_A:RIs_A) %>%  reduce(pmax.int,na.rm=T),ad_year=ifelse(adult_any==0,NA,sea_Year_p+adult_any))
+# 
+# 
+# 
+# test2<-left_join(test,mark_file_CH2 %>% filter(!is.na(ad_year)) %>% select(`Tag Code`,ad_year),by=c("Tag.Code"="Tag Code")) %>% filter(Last.Year.YYYY==ad_year) %>% mutate(last_dat=as.Date(Last.Date.MMDDYYYY,format="%m/%d/%Y"))
+# 
+# 
+# test2<-test2 %>% filter(Site.Code.Value!="CHU") %>%  arrange(desc(last_dat)) %>% 
+#   distinct(Tag.Code,.keep_all=TRUE)
+# 
+# 
+# thing<-test2 %>% filter(Site.Code.Value=="CHU")
+# length((match(thing$Tag.Code,test2 %>%  filter(Site.Code.Value=="CHL") %>% pull(Tag.Code))))
+# 
+# dim(thing)
+# 
+# 
+# sum(is.na(match(test2 %>% filter(Site.Code.Value!="TUF") %>% pull(Tag.Code),test2 %>% filter(Site.Code.Value=="TUF") %>% pull(Tag.Code))))
+# 
+# table(test2$Site.Code.Value,test2$Mark.Site.Info.Code
+#       )
+# 
+# %>% 
+#   left_join(lower_mid_col_dams %>% 
+#               filter(`Site Code Value` %in% c("CHL", "CHU")) %>% 
+#               select(c(`Tag Code`,`Last Year YYYY`)) %>% 
+#               arrange(desc(`Last Year YYYY`)) %>%
+#               distinct(`Tag Code`,.keep_all=TRUE) %>%
+#               rename("Chi_A"="Last Year YYYY"),by="Tag Code") %>% 
+#   
+#   left_join(test %>% 
+#             filter(`Site Code Value` %in% c("PRA")) %>% 
+#             select(c(`Tag Code`,`Last Year YYYY`)) %>% 
+#             rename("Chi_A"="Last Year YYYY"),by="Tag Code") %>% 
+#   
+#   
+#   
+# 
+# thing<-mark_file_CH
+# 
+# test2<-test %>% 
+# 
+# dim(test)
+# table(test$Site.Name)
+
+#test<-lower_mid_col_dams %>% mutate(`First Date MMDDYYYY2`=as.Date(`First Date MMDDYYYY`,format="%m/%d/%Y"), doy=lubridate::yday(`First Date MMDDYYYY2`))
+
+# obs_dat<-read_csv(here("Data","ptagis","ptagis_obs_data_wen_trib_screwt.csv")) %>% 
+#   mutate(date_det=lubridate::date(lubridate::mdy_hms(obs_date))) %>% 
+# group_by(tag_id,obs_site) %>% mutate(first_date=min(date_det),last_det=max(date_det)) %>% 
+#   select(!obs_date:date_det) %>% droplevels() %>% 
+#  distinct() %>% ungroup() %>% 
+#   mutate("First Year YYYY"=lubridate::year(first_date),"Last Year YYYY"=lubridate::year(last_det)) %>% 
+#   mutate("First DOY"=lubridate::yday(first_date),"Last DOY"=lubridate::yday(last_det)) %>% 
+#   rename("Site Code Value"=obs_site,"Tag Code"=tag_id)
