@@ -45,12 +45,23 @@ Dis<-discharge_func()
 
 # *download mainstem discharge and temperature data  *
 library(vroom)
-#temp(WGM) and discharge at Bonneville, McNary, and Rock Island
+#temp(WGM), discharge, spill at McNary, and Rock Island
 path<-"http://www.cbr.washington.edu/dart/cs/php/rpt/mg.php?sc=1&mgconfig=river&outputFormat=csvSingle&year%5B%5D=2020&year%5B%5D=2019&year%5B%5D=2018&year%5B%5D=2017&year%5B%5D=2016&year%5B%5D=2015&year%5B%5D=2014&year%5B%5D=2013&year%5B%5D=2012&year%5B%5D=2011&year%5B%5D=2010&year%5B%5D=2009&year%5B%5D=2008&year%5B%5D=2007&year%5B%5D=2006&loc%5B%5D=BON&loc%5B%5D=MCN&loc%5B%5D=RIS&data%5B%5D=Outflow&data%5B%5D=Temp+%28WQM%29&startdate=1%2F1&enddate=12%2F31&avgyear=0&consolidate=1&grid=1&y1min=0&y1max=&y2min=&y2max=&size=medium"
 
 mainstem_flow_temp<-vroom(path) %>% mutate(date2=lubridate::mdy(paste0(`mm-dd`,"-",year)),
                                            month=lubridate::month(date2),doy=lubridate::yday(date2)) %>% rename(y=value)  
 
+
+path<-"http://www.cbr.washington.edu/dart/cs/php/rpt/mg.php?sc=1&mgconfig=river&outputFormat=csvSingle&year%5B%5D=2021&year%5B%5D=2020&year%5B%5D=2019&year%5B%5D=2018&year%5B%5D=2017&year%5B%5D=2016&year%5B%5D=2015&year%5B%5D=2014&year%5B%5D=2013&year%5B%5D=2012&year%5B%5D=2011&year%5B%5D=2010&year%5B%5D=2009&year%5B%5D=2008&year%5B%5D=2007&year%5B%5D=2006&year%5B%5D=2005&loc%5B%5D=PRD&loc%5B%5D=RIS&loc%5B%5D=WAN&data%5B%5D=Spill&data%5B%5D=Spill+Percent&startdate=1%2F1&enddate=12%2F31&avgyear=0&consolidate=1&grid=1&y1min=0&y1max=&y2min=&y2max=&size=medium"
+
+UC_spill <-vroom(path) %>% mutate(date2=lubridate::mdy(paste0(`mm-dd`,"-",year)),
+                                          month=lubridate::month(date2),doy=lubridate::yday(date2)) %>% rename(y=value) 
+
+
+path<-"http://www.cbr.washington.edu/dart/cs/php/rpt/mg.php?sc=1&mgconfig=river&outputFormat=csvSingle&year%5B%5D=2021&year%5B%5D=2020&year%5B%5D=2019&year%5B%5D=2018&year%5B%5D=2017&year%5B%5D=2016&year%5B%5D=2015&year%5B%5D=2014&year%5B%5D=2013&year%5B%5D=2012&year%5B%5D=2011&year%5B%5D=2010&year%5B%5D=2009&year%5B%5D=2008&year%5B%5D=2007&year%5B%5D=2006&year%5B%5D=2005&loc%5B%5D=BON&loc%5B%5D=JDA&loc%5B%5D=MCN&loc%5B%5D=TDA&data%5B%5D=Spill&data%5B%5D=Spill+Percent&startdate=1%2F1&enddate=12%2F31&avgyear=0&consolidate=1&grid=1&y1min=0&y1max=&y2min=&y2max=&size=medium"
+
+MC_spill <-vroom(path) %>% mutate(date2=lubridate::mdy(paste0(`mm-dd`,"-",year)),
+                                  month=lubridate::month(date2),doy=lubridate::yday(date2)) %>% rename(y=value) 
 
 #functions to calculat winter maximum flow and summer minimum flow, code copied from M. Sheuerell. https://github.com/mdscheuerell/skagit_sthd/blob/master/analysis/App_1_Retrieve_covariates.pdf
 
@@ -112,21 +123,24 @@ full_join(spring_mean_func(as.data.frame(Dis)%>%rename(year=Year),3,4) %>% renam
 ####juvenile
   full_join(spring_mean_func(mainstem_flow_temp %>% filter(location=="RIS",parameter=="outflow"),first_month = 4,last_month = 5) %>% rename(RIS_flow_juv=y)) %>% 
   full_join(spring_mean_func(mainstem_flow_temp %>% filter(location=="RIS",parameter=="tempc"),first_month = 4,last_month = 5) %>% rename(RIS_temp_juv=y)) %>% 
+## upper columbia spill %
+  full_join(spring_mean_func(UC_spill %>% filter(location%in%c("PRD","RIS","WAN"),parameter=="spillpct") %>% select(-location) ,first_month = 4,last_month = 5) %>% rename(UC_spill_pct_juv=y)) %>% 
 #### adult
   full_join(spring_mean_func(mainstem_flow_temp %>% filter(location=="RIS",parameter=="outflow"),first_month = 5,last_month = 6) %>% rename(RIS_flow_ad=y)) %>% 
   full_join(spring_mean_func(mainstem_flow_temp %>% filter(location=="RIS",parameter=="tempc"),first_month = 5,last_month = 6) %>% rename(RIS_temp_ad=y)) %>% 
 ##McNary
   full_join(spring_mean_func(mainstem_flow_temp %>% filter(location=="MCN",parameter=="outflow"),first_month = 5,last_month = 6) %>% rename(McN_flow=y)) %>% 
   full_join(spring_mean_func(mainstem_flow_temp %>% filter(location=="MCN",parameter=="tempc"),first_month = 5,last_month = 6) %>% rename(McN_temp=y)) %>% 
-  filter(mig_year>=2006&mig_year<=2019)
-
-
+  ## mid columbia spill %
+  full_join(spring_mean_func(MC_spill %>% filter(location%in%c("Bon","JDA","TDA","MCN" ), parameter=="spillpct") %>% select(-location) ,first_month = 4,last_month = 5) %>% rename(MC_spill_pct_juv=y)) %>% 
+  filter(mig_year>=2006&mig_year<=2020) 
+  
 # Covariates that I recieved from Brian Burke for SAR model
 envDir<-here("Data","LCM environmental data")
 
 envFiles<-list.files(path=envDir,pattern="*.csv")
 
-envdata<-tibble(year=2006:2019)
+envdata<-tibble(year=2006:2020)
 
 for ( i in envFiles){y<-read.csv(paste(envDir,i,sep="/"))
 envdata<-envdata %>% left_join(y)}

@@ -23,14 +23,47 @@ if(file.exists(here("data","all_bio_data.csv"))){
 all_bio_data<-read_csv(here("data","all_bio_data.csv"))
 }
 
-make_dat<-function(mark_file_CH=mark_file_CH,sites=c("LWe_J","McN_J","JDD_J","Bon_J","Est_J","Bon_A","McN_A","PRa_A","RIs_A","Tum_A"),start_year=2007, end_year=2016,cont_cov=NULL,length_bin=5,doy_bin=10){
-
-dat_out<- mark_file_CH %>%  
-  #add grouped length and release day columns
-  # mutate(length_bin=ceiling(`Length mm`/length_bin)*length_bin-(length_bin/2),
-  #        rel_DOY_bin=ceiling((`Release Day Number`+ifelse(LH=="smolt",365,0))/doy_bin)*doy_bin-(doy_bin/2)) %>% 
-  #subset some very small or large length
-  # filter(length_bin>=55 &length_bin<=200 & rel_DOY_bin>10) %>% 
+make_dat<-function(mark_file_CH=mark_file_CH, sites=c("LWe_J","McN_J","JDD_J","Bon_J","Est_J","Bon_A","McN_A","PRa_A","RIs_A","Tum_A"), start_year=2007, end_year=2016, cont_cov=NULL, length_bin=5, doy_bin=10){
+  browser()
+  #included continuous covariates only if needed
+  if(is.null(cont_cov)){
+    dat_out<- mark_file_CH %>%  
+      #subset columns needed for analysis
+      select(sea_Year_p,LH,stream, #grouping variables
+             all_of(sites))
+  }else{if(length(cont_cov)==2){
+    dat_out<- mark_file_CH %>%  
+      #add grouped length and release day columns
+      mutate(length_bin=ceiling(Length.mm/length_bin)*length_bin-(length_bin/2),
+             rel_DOY_bin=ceiling((Release.Day.Number+ifelse(LH=="smolt",365,0))/doy_bin)*doy_bin-(doy_bin/2),
+             rel_DOY_bin=ifelse(LH=="Unk",0,rel_DOY_bin)) %>%
+        #subset some very small or large length
+      filter(length_bin>=55 &length_bin<=200 & rel_DOY_bin>10) %>%
+      #subset columns needed for analysis
+      select(sea_Year_p,LH,stream, #grouping variables
+             all_of(sites),cont_cov)
+  }else{if(cont_cov=="rel_DOY_bin"){dat_out<- mark_file_CH %>%  
+    #add grouped length and release day columns
+    mutate(rel_DOY_bin=ceiling((Release.Day.Number+ifelse(LH=="smolt",365,0))/doy_bin)*doy_bin-(doy_bin/2),
+                      rel_DOY_bin=ifelse(LH=="Unk",0,rel_DOY_bin)) %>%
+    #subset some very small or large length
+    filter(rel_DOY_bin>10) %>%
+    #subset columns needed for analysis
+    select(sea_Year_p,LH,stream, #grouping variables
+           all_of(sites),cont_cov)
+    
+  }else{
+    dat_out<- mark_file_CH %>%  
+      #add grouped length and release day columns
+      mutate(length_bin=ceiling(Length.mm/length_bin)*length_bin-(length_bin/2),
+             ) %>%
+      #subset some very small or large length
+      filter(length_bin>=55 &length_bin<=200 ) %>%
+      #subset columns needed for analysis
+      select(sea_Year_p,LH,stream, #grouping variables
+             all_of(sites),cont_cov)
+  }}}
+dat_out<- dat_out %>%  
 #subset columns needed for analysis
   select(sea_Year_p,LH,stream, #grouping variables
                 all_of(sites),cont_cov) %>% 
@@ -65,7 +98,7 @@ trap_dep<-which(sites%in%c("LWe_J", "McN_J"))
 
 
 #process data using RMark function. Specifies grouping variables for parameters, and type of model and hence parameters. "Multistrate" used S(Phi), p, and psi
-wenatchee.processed<-RMark::process.data(dat_out,model="Multistrata",groups=c("LH","stream","sea_Year_p",cont_cov,sites[trap_dep]),allgroups=TRUE)
+wenatchee.processed<-RMark::process.data(dat_out,model="Multistrata",groups=c("LH","stream","sea_Year_p",cont_cov,sites[trap_dep]),allgroups=FALSE)
 
 #Make design data using RMark function. Sets up matrices for each parameter where there is a row for each combination of the grouping variables, occasion, age, etc. Specifiying the pim.type can reduce some of the combinations/# of rows. See?RMark::make.design.data() for more info. 
 wenatchee.ddl<-RMark::make.design.data(wenatchee.processed,parameters=list(S=list(pim.type="time"), #survival changes by occasion and potentially stratum(i.e. fish age)
@@ -183,6 +216,7 @@ releases<-dat_out %>% group_by(LH,stream,sea_Year_p,all_of(cont_cov)) %>% summar
 
 ### phi pim for simulation
 phi_pim_sim<-inner_join(releases,Phi.design.dat %>% select(par.index,time,stratum,c("LH","stream","sea_Year_p",cont_cov,sites[trap_dep]))) %>% # combine releases with design data
+  mutate(LWe_J=ifelse(LH=="Unk",1,LWe_J)) %>% #change LWe release fish so that they get indices insted of NAs
  pivot_wider(values_from=par.index,names_from=c(time,stratum,sites[trap_dep])) %>% select(1:(5+nOCC+(nOCC-nDS_OCC))) %>% ungroup()%>% select(!LH:freq) %>% as.matrix()
 
 ####columns to select for p pim
@@ -193,7 +227,8 @@ try(p_pim_cols<-c(p_pim_cols,((5+nOCC+(nOCC-nDS_OCC-1)*2-1)+which(sites=="LWe_J"
 
 #### p pim for simulation
 p_pim_sim<-inner_join(releases,p.design.dat %>% select(par.index,time,stratum,c("LH","stream","sea_Year_p",cont_cov,sites[trap_dep]))) %>% # combine releases with design data
-  pivot_wider(values_from=par.index,names_from=c(time,stratum,sites[trap_dep])) %>% select(all_of(p_pim_cols)) %>%
+  mutate(LWe_J=ifelse(LH=="Unk",1,LWe_J)) %>% #change LWe release fish so that they get indices insted of NAs
+    pivot_wider(values_from=par.index,names_from=c(time,stratum,sites[trap_dep])) %>% select(all_of(p_pim_cols)) %>%
   #fill in NAs (years to be set to detection of 0) with the correct index
   ungroup() %>%  mutate_all(~replace_na(., nrow(p.design.dat))) %>% select(!LH:freq) %>% as.matrix()
 
@@ -227,11 +262,11 @@ p.design.dat <- p.design.dat %>% filter(LH!="Unk" &stream!="LWE") %>% droplevels
 n_known_LH_p<-nrow(p.design.dat)
 
 # Psi.design.dat <- Psi.design.dat %>% filter(LH!="Unk" &stream!="LWE") %>% droplevels()
- 
-#### pims
-Phi.pim_unk <- inner_join(Phi.design.dat_unk %>% select(sea_Year_p,time,stratum,LWe_J,McN_J ), Phi.design.dat %>% filter(stream=="Chiwawa"&LH!="summer") %>% select(par.index,sea_Year_p,LH,time,stratum,LWe_J,McN_J ) %>% droplevels(),by=c("sea_Year_p","time","stratum","LWe_J","McN_J")) %>% pivot_wider(values_from=par.index,names_from=c(LH)) 
 
-p.pim_unk <- inner_join(p.design.dat_unk %>% select(sea_Year_p,time,stratum,LWe_J,McN_J ), p.design.dat %>% filter(stream=="Chiwawa"&LH!="summer") %>% select(par.index,sea_Year_p,LH,time,stratum,LWe_J,McN_J ) %>% droplevels(),by=c("sea_Year_p","time","stratum","LWe_J","McN_J")) %>% pivot_wider(values_from=par.index,names_from=c(LH))
+#### pims
+Phi.pim_unk <- inner_join(Phi.design.dat_unk %>% select(sea_Year_p,time,stratum,LWe_J,McN_J,all_of(cont_cov )), Phi.design.dat %>% filter(stream=="Chiwawa"&LH!="summer") %>% select(par.index,sea_Year_p,LH,time,stratum,LWe_J,McN_J,all_of(cont_cov)) %>% droplevels(),by=c("sea_Year_p","time","stratum","LWe_J","McN_J",cont_cov)) %>% pivot_wider(values_from=par.index,names_from=c(LH)) 
+
+p.pim_unk <- inner_join(p.design.dat_unk %>% select(sea_Year_p,time,stratum,LWe_J,McN_J,all_of(cont_cov) ), p.design.dat %>% filter(stream=="Chiwawa"&LH!="summer") %>% select(par.index,sea_Year_p,LH,time,stratum,LWe_J,McN_J, all_of(cont_cov)) %>% droplevels(),by=c("sea_Year_p","time","stratum","LWe_J","McN_J",cont_cov)) %>% pivot_wider(values_from=par.index,names_from=c(LH))
 
 # Psi.pim_unk <- inner_join(Psi.design.dat_unk %>% select(mig_year) %>% distinct(), Psi.design.dat %>% filter(stratum==1&tostratum==2&stream=="Chiwawa"&LH!="summer") %>% select(par.index,stratum,tostratum,mig_year,LH )%>% distinct(across(stratum:mig_year),.keep_all=TRUE) %>% droplevels()) %>% pivot_wider(values_from=par.index,names_from=c(LH))
 
