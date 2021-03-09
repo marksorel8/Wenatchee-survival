@@ -24,7 +24,7 @@ all_bio_data<-read_csv(here("data","all_bio_data.csv"))
 }
 
 make_dat<-function(mark_file_CH=mark_file_CH, sites=c("LWe_J","McN_J","JDD_J","Bon_J","Est_J","Bon_A","McN_A","PRa_A","RIs_A","Tum_A"), start_year=2007, end_year=2016, cont_cov=NULL, length_bin=5, doy_bin=10){
-  browser()
+
   #included continuous covariates only if needed
   if(is.null(cont_cov)){
     dat_out<- mark_file_CH %>%  
@@ -98,7 +98,7 @@ trap_dep<-which(sites%in%c("LWe_J", "McN_J"))
 
 
 #process data using RMark function. Specifies grouping variables for parameters, and type of model and hence parameters. "Multistrate" used S(Phi), p, and psi
-wenatchee.processed<-RMark::process.data(dat_out,model="Multistrata",groups=c("LH","stream","sea_Year_p",cont_cov,sites[trap_dep]),allgroups=FALSE)
+wenatchee.processed<-RMark::process.data(dat_out,model="Multistrata",groups=c("LH","stream","sea_Year_p",cont_cov,sites[trap_dep]),allgroups=TRUE)
 
 #Make design data using RMark function. Sets up matrices for each parameter where there is a row for each combination of the grouping variables, occasion, age, etc. Specifiying the pim.type can reduce some of the combinations/# of rows. See?RMark::make.design.data() for more info. 
 wenatchee.ddl<-RMark::make.design.data(wenatchee.processed,parameters=list(S=list(pim.type="time"), #survival changes by occasion and potentially stratum(i.e. fish age)
@@ -216,7 +216,7 @@ releases<-dat_out %>% group_by(LH,stream,sea_Year_p,all_of(cont_cov)) %>% summar
 
 ### phi pim for simulation
 phi_pim_sim<-inner_join(releases,Phi.design.dat %>% select(par.index,time,stratum,c("LH","stream","sea_Year_p",cont_cov,sites[trap_dep]))) %>% # combine releases with design data
-  mutate(LWe_J=ifelse(LH=="Unk",1,LWe_J)) %>% #change LWe release fish so that they get indices insted of NAs
+  # mutate(LWe_J=ifelse(LH=="Unk",1,LWe_J)) %>% #change LWe release fish so that they get indices insted of NAs
  pivot_wider(values_from=par.index,names_from=c(time,stratum,sites[trap_dep])) %>% select(1:(5+nOCC+(nOCC-nDS_OCC))) %>% ungroup()%>% select(!LH:freq) %>% as.matrix()
 
 ####columns to select for p pim
@@ -227,7 +227,7 @@ try(p_pim_cols<-c(p_pim_cols,((5+nOCC+(nOCC-nDS_OCC-1)*2-1)+which(sites=="LWe_J"
 
 #### p pim for simulation
 p_pim_sim<-inner_join(releases,p.design.dat %>% select(par.index,time,stratum,c("LH","stream","sea_Year_p",cont_cov,sites[trap_dep]))) %>% # combine releases with design data
-  mutate(LWe_J=ifelse(LH=="Unk",1,LWe_J)) %>% #change LWe release fish so that they get indices insted of NAs
+  # mutate(LWe_J=ifelse(LH=="Unk",1,LWe_J)) %>% #change LWe release fish so that they get indices insted of NAs
     pivot_wider(values_from=par.index,names_from=c(time,stratum,sites[trap_dep])) %>% select(all_of(p_pim_cols)) %>%
   #fill in NAs (years to be set to detection of 0) with the correct index
   ungroup() %>%  mutate_all(~replace_na(., nrow(p.design.dat))) %>% select(!LH:freq) %>% as.matrix()
