@@ -139,7 +139,7 @@ Type termwise_nll(array<Type> &U, vector<Type> theta, per_term_info<Type>& term,
     Type corr_transf = theta(n);
     vector<Type> sd = exp(logsd);
     Type a = Type(1) / (Type(n) - Type(1));
-    Type rho = invlogit(corr_transf) * (Type(1) + a) - a;
+    Type rho = pnorm(corr_transf) * (Type(1) + a) - a;
     matrix<Type> corr(n,n);
     for(int i=0; i<n; i++)
       for(int j=0; j<n; j++)
@@ -421,9 +421,9 @@ DATA_INTEGER(sim_rand);     //flag indicating whether to simulate the random eff
    ADREPORT(eta_psi);
 
   // Apply link
-  vector<Type> phi=invlogit(eta_phi);
+  vector<Type> phi=pnorm(eta_phi);
   vector<Type> p(eta_p.size()+1);
-  p.head(eta_p.size())=invlogit(eta_p);
+  p.head(eta_p.size())=pnorm(eta_p);
   p.tail(1)=Type(0);
   REPORT(phi);
   REPORT(p);
@@ -600,8 +600,8 @@ if(sim_rand){
     eta_psi = X_psi*beta_psi;
 
     ///// Calculate parameters to use to calculate the expectation of the number of detections (random effects at 0)
-    phi_hat=invlogit(eta_phi);
-    p_hat.head(eta_p.size())=invlogit(eta_p);
+    phi_hat=pnorm(eta_phi);
+    p_hat.head(eta_p.size())=pnorm(eta_p);
     vector<Type> eta_psi_hat= exp(eta_psi);
     denom = eta_psi_hat.segment(0,n_groups)+eta_psi_hat.segment(n_groups,n_groups)+Type(1);
     psi_hat.col(0)= eta_psi_hat.segment(0,n_groups)/denom;        //return after 1 year
@@ -617,8 +617,8 @@ if(sim_rand){
     eta_psi += Z_psi*b_psi;
 
     // Apply link
-    phi=invlogit(eta_phi);
-    p.head(eta_p.size())=invlogit(eta_p);
+    phi=pnorm(eta_phi);
+    p.head(eta_p.size())=pnorm(eta_p);
     REPORT(phi);
     REPORT(p);
     ////phi inverse multinomial logit

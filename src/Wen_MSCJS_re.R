@@ -11,19 +11,29 @@ if(file.exists(here("data","all_bio_data.csv"))){
 all_bio_data<-read_csv(here("data","all_bio_data.csv"))
 }
 
+
+#load environmental data covariates
+if(file.exists(here("Data","env_dat.csv"))){
+  env_dat<-read.csv(here("Data","env_dat.csv"))
+}else{
+  source(here("src","Env data funcs.r"))
+  env_dat<-get_dat()
+  write.csv(env_dat,file=here("Data","env_dat.csv"))
+}
+
+
 make_dat<-function(mark_file_CH=mark_file_CH,sites=c("LWe_J","McN_J","JDD_J","Bon_J","Est_J","Bon_A","McN_A","PRa_A","RIs_A","Tum_A"),start_year=2007, end_year=2016,cont_cov,length_bin=5,doy_bin=10){
 
 
 dat_out<- mark_file_CH %>%  
   #add grouped length and release day columns
-  # mutate(length_bin=ceiling(`Length mm`/length_bin)*length_bin-(length_bin/2),
-  #        rel_DOY_bin=ceiling((`Release Day Number`+ifelse(LH=="smolt",365,0))/doy_bin)*doy_bin-(doy_bin/2)) %>% 
+  mutate(length_bin=ceiling(`Length mm`/length_bin)*length_bin-(length_bin/2),
+         rel_DOY_bin=ceiling((`Release Day Number`+ifelse(LH=="smolt",365,0))/doy_bin)*doy_bin-(doy_bin/2)) %>%
   # #subset some very small or large length
-  # filter(length_bin>=55 &length_bin<=200 & rel_DOY_bin>10) %>% 
+  filter(length_bin>=55 &length_bin<=200 & rel_DOY_bin>10) %>%
 #subset columns needed for analysis
-  select(sea_Year_p,LH,age,stream, #grouping variables
+  select(sea_Year_p,LH,stream, #grouping variables
                 all_of(sites),cont_cov) %>% 
-  select(-age) %>% 
   #sites/occasions to include in model
   #first year with all stream data through last year where data on all three return ages is available (because it is 2020)
   filter(sea_Year_p>=start_year & sea_Year_p<=end_year) %>%
@@ -76,7 +86,11 @@ cbind(.,model.matrix(~time+stream+LH+stratum-1,data=.)) %>%
   #make length bin and release DOY numeric
   mutate(across(.cols=all_of(cont_cov),.fns=function(x)scale(as.numeric(as.character(x))))) %>% 
   #make par index a sequence
-  mutate(par.index=(1:nrow(.))-1)
+  mutate(par.index=(1:nrow(.))-1) %>% 
+  #add environmental covariates
+  left_join(env_dat %>% mutate(mig_year=as.factor(mig_year)),by="mig_year") %>% 
+  mutate(across(sum_flow:transport.win,scale)) %>% 
+ replace(is.na(.), 0) 
   
   # add column for first time
 #downstream time
