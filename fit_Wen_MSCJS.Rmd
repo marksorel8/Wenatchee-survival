@@ -250,16 +250,16 @@ time1:streamWhite:LH+# time1:LHsmolt:spr_air+
                       
                          p_formula= par.index~
                            #fixed effects
-                           -1+ time2+#time2:LHsmolt+time2:LHsummer+time2:streamWhite+#lower trap
+                           -1+ time2:age_class+#time2:LHsmolt+time2:LHsummer+time2:streamWhite+#lower trap
                             time3+  #McNary
-                            # time3:LWe_J:LHfall +               #McNary
+                             # time3:LWe_J +               #McNary
                             time4+#Bonneville
                            time4:McN_J:age_0 +   #Bonneville
                            time5 +         # Bonn adult
                            time6 +#:stratum +         #McNary adult
                            #random
                            (0+time2|mig_year) +
-                           diag(0+time2:LHfall+time2:LHsummer|mig_year) + # lower trap
+                           # diag(0+time2:age_0|mig_year) + # lower trap
                            (0+time3+time4|mig_year)+# McNary
                            diag(0+time5|mig_year) #Bonneville
                              # (0+time6|mig_year)
@@ -273,8 +273,8 @@ time1:streamWhite:LH+# time1:LHsmolt:spr_air+
                              (0+tostratum|mig_year)
                          ,
                          
-                         doFit = FALSE,silent=TRUE,
-                         sim_rand =1,REML=FALSE
+                         doFit = TRUE,silent=TRUE,
+                         sim_rand =1,REML=FALSE,hypersd=3
 )
 
 

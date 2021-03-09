@@ -328,7 +328,7 @@ return(list(dat_out=dat_out,
 
 
 
-fit_wen_mscjs<-function(x,phi_formula, p_formula, psi_formula,doFit=TRUE,silent=FALSE,sd_rep=TRUE,sim_rand=1,REML=FALSE){
+fit_wen_mscjs<-function(x,phi_formula, p_formula, psi_formula,doFit=TRUE,silent=FALSE,sd_rep=TRUE,sim_rand=1,REML=FALSE,hypersd=0){
 #~~~~
 #glmmTMB objects to get design matrices etc. for each parameter
 ## phi
@@ -386,7 +386,7 @@ dat_TMB<-with(x,list(
   n_known_LH_p=n_known_LH_p,
   f=f,
   hyper_mean=0,
-  hyper_SD=1,
+  hyper_SD=hypersd,
 
   sim_rand = sim_rand #draw random effects from hyperdistribution in simulation rather than sampling from posterior. 
 ))
