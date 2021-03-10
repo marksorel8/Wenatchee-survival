@@ -279,6 +279,9 @@ time1:streamWhite:LH+# time1:LHsmolt:spr_air+
 
 
 #test
+#experimental
+# gc()
+# colnames(mscjs_dat$Phi.design.dat)
 mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
                          phi_formula=par.index~
                            
@@ -324,10 +327,11 @@ time1:streamWhite:LHsmolt+time1:streamWhite:LHfall+
                          ,
                          
                          doFit = TRUE,silent=TRUE,
-                         sim_rand =0,REML=FALSE,hypersd = 2
+                         sim_rand =0,REML=FALSE
 )
 
 print_out(mscjs_fit)
+dev.new()
 plot_func()
 ```
 
@@ -541,7 +545,7 @@ head(mscjs_fit$Phi.design.glmmTMB$data.tmb$X)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Mark model for comparison
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-dat_out<-select(mark_file_CH %>% filter(LH=="Unk",stream!="White"),sea_Year_p, #grouping variables
+dat_out<-select(mark_file_CH %>% filter(LH=="smolt",stream!="White"),sea_Year_p, #grouping variables
                LWe_J, McN_J,Bon_J) %>% #sites/occasions to include in model
   #first year with all stream data through last year where data on all three return ages is available (because it is 2020)
   filter(sea_Year_p>=2007&sea_Year_p<=2016&!sea_Year_p%in%c(2011:2012)) %>%
@@ -551,17 +555,17 @@ dat_out<-select(mark_file_CH %>% filter(LH=="Unk",stream!="White"),sea_Year_p, #
   mutate(ch=select(., c(LWe_J,McN_J,Bon_J)) %>%  reduce(paste0)) %>%
   #mutate(ch=select(., McN_J,Bon_J,Est_J) %>% reduce(paste0)) %>%
   mutate(ch=paste0("1",ch)) 
-
-dat_out<-select(mark_file_CH %>% filter(LH=="Unk"),sea_Year_p, #grouping variables
-                McN_J,Bon_J) %>% #sites/occasions to include in model
-  #first year with all stream data through last year where data on all three return ages is available (because it is 2020)
-  filter(sea_Year_p>=2007&sea_Year_p<=2016&!sea_Year_p%in%c(2011:2012)) %>%
-  #make grouping variables factors
-  #mutate_at(vars(sea_Year_p:stream),~as.factor(as.character(.x)))%>% mutate(McN_J=apply(select(.,McN_J,JDD_J),1,max)) %>% select(-JDD_J) %>% 
-  #create multistate capture histories
-  mutate(ch=select(., c(McN_J,Bon_J)) %>%  reduce(paste0)) %>%
-  #mutate(ch=select(., McN_J,Bon_J,Est_J) %>% reduce(paste0)) %>%
-  mutate(ch=paste0("1",ch)) 
+# 
+# dat_out<-select(mark_file_CH %>% filter(LH=="Unk"),sea_Year_p, #grouping variables
+#                 McN_J,Bon_J) %>% #sites/occasions to include in model
+#   #first year with all stream data through last year where data on all three return ages is available (because it is 2020)
+#   filter(sea_Year_p>=2007&sea_Year_p<=2016&!sea_Year_p%in%c(2011:2012)) %>%
+#   #make grouping variables factors
+#   #mutate_at(vars(sea_Year_p:stream),~as.factor(as.character(.x)))%>% mutate(McN_J=apply(select(.,McN_J,JDD_J),1,max)) %>% select(-JDD_J) %>% 
+#   #create multistate capture histories
+#   mutate(ch=select(., c(McN_J,Bon_J)) %>%  reduce(paste0)) %>%
+#   #mutate(ch=select(., McN_J,Bon_J,Est_J) %>% reduce(paste0)) %>%
+#   mutate(ch=paste0("1",ch)) 
 
 
 library(RMark)

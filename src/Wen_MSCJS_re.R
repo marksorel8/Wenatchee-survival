@@ -422,7 +422,7 @@ return(list(dat_out=dat_out,
 
 
 
-fit_wen_mscjs<-function(x,phi_formula, p_formula, psi_formula,doFit=TRUE,silent=FALSE,sd_rep=TRUE,sim_rand=1,REML=FALSE,hypersd=0){
+fit_wen_mscjs<-function(x,phi_formula, p_formula, psi_formula,doFit=TRUE,silent=FALSE,sd_rep=TRUE,sim_rand=1,REML=FALSE,hypersd=1){
 #~~~~
 #glmmTMB objects to get design matrices etc. for each parameter
 ## phi
@@ -481,7 +481,7 @@ dat_TMB<-with(x,list(
   n_known_LH_p=n_known_LH_p,
   f=f,
   hyper_mean=0,
-  hyper_SD=hypersd,
+   hyper_SD=hypersd,
 
   sim_rand = sim_rand #draw random effects from hyperdistribution in simulation rather than sampling from posterior. 
 ))
@@ -498,7 +498,9 @@ par_TMB<-list(
   theta_phi=Phi.design.glmmTMB$parameters$theta,
   theta_p=p.design.glmmTMB$parameters$theta,
   theta_psi=Psi.design.glmmTMB$parameters$theta,
-  logit_p_subs=rep(0,(x$Nyears-2))
+  logit_p_subs=rep(0,(x$Nyears-2)),
+                   hyper_SD=hypersd,
+  hyper_mean=0
 )  
   fit<-NA
   mod<-NA

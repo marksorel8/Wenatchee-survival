@@ -412,8 +412,8 @@ DATA_IVECTOR(f);  //release occasion
   PARAMETER_VECTOR(theta_psi);  //psi
   //Unknown LH proportions parameters  
   PARAMETER_VECTOR(logit_p_subs);//logit proportion of unknown LH fish released at LWe that were subyearling emigrants in each year
-  DATA_SCALAR(hyper_mean);
-  DATA_SCALAR(hyper_SD);
+  PARAMETER(hyper_mean);
+  PARAMETER(hyper_SD);
   //~~~~~~~~~~~~~~~~~~~
   // Variables
   //~~~~~~~~~~~~~~~~~~~
@@ -442,7 +442,7 @@ DATA_IVECTOR(f);  //release occasion
    p.head(n_known_LH_p)=invlogit(eta_p);
   p.tail(1)=Type(0);
   // calculate unknown LH parameters (weighted averages of LHs)
-  jnll-=dnorm(logit_p_subs,hyper_mean,hyper_SD,true).sum(); // random effect probs (LH proportions)
+  jnll-=dnorm(logit_p_subs,hyper_mean,exp(hyper_SD),true).sum(); // random effect probs (LH proportions)
   vector<Type> p_subs=invlogit(logit_p_subs); // annual proportion subyearlings
   vector<Type> p_yrlngs = 1-p_subs;           // annual proportion yearlings
   REPORT(p_yrlngs)
