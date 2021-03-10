@@ -428,16 +428,16 @@ time1:streamWhite:LHsmolt+time1:streamWhite:LHfall+
                       
                          p_formula= par.index~
                            #fixed effects
-                           -1+ time2++#time2:LHsmolt+time2:LHsummer+time2:streamWhite+#lower trap
+                           -1+ time2:LH+#time2:LHsmolt:length_bin#time2:LHsmolt+time2:LHsummer+time2:streamWhite+#lower trap
                             time3+  #McNary
                             # time3:LWe_J:LHfall +               #McNary
                             time4+#Bonneville
-                           # time4:McN_J:age_0 +  #Bonneville
+                           time4:McN_J:age_0 +  #Bonneville
                            time5 +         # Bonn adult
                            time6 +#:stratum +         #McNary adult
                            #random
                            (0+time2|mig_year) +
-                           # diag(0+time2:LHfall+time2:LHsummer|mig_year) + # lower trap
+                           diag(0+time2:LHfall+time2:LHsummer|mig_year) + # lower trap
                            (0+time3+time4|mig_year)+# McNary
                            (0+time5|mig_year) #Bonneville
                              # (0+time6|mig_year)
@@ -452,7 +452,7 @@ time1:streamWhite:LHsmolt+time1:streamWhite:LHfall+
                          ,
                          
                          doFit = TRUE,silent=TRUE,
-                         sim_rand =1,REML=FALSE
+                         sim_rand =0,REML=FALSE
 )
 
 print_out(mscjs_fit)
@@ -488,7 +488,7 @@ exp_det_MLE<-cbind(obs_dat %>% select(LH:sea_Year_p) , sim$det_1,sim$det_2,sim$d
     #sum detection by stream, year, and life history
   group_by(LH,stream,sea_Year_p) %>% summarise(across(LWe_J :Tum_A_3, sum)) %>% ungroup() %>% pivot_longer(LWe_J :Tum_A_3) 
 
- 
+# plot(obs_dat_long$value,exp_det_MLE$value) 
  
 # * posterior predictions *
 sim_posterior<-rmvnorm_prec(mu=mscjs_fit$mod$env$last.par.best, 

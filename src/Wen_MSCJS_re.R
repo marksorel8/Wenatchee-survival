@@ -1,16 +1,12 @@
 library(here)
 library(tidyverse)
 library(TMB)
-# if(file.exists(here("src","mark_fil_ch_12032020.Rdata"))){
-#   load(here("src","mark_fil_ch_12032020.Rdata"))
-# }else{
-source(here("src","data_proc.r"))
-# }
 
-if(file.exists(here("data","all_bio_data.csv"))){
-all_bio_data<-read_csv(here("data","all_bio_data.csv"))
+if(file.exists(here("Data","mark_file_CH.csv"))){
+  mark_file_CH<-read.csv(here("Data","mark_file_CH.csv"))
+}else{
+  source(here("src","data_proc.r"))
 }
-
 
 #load environmental data covariates
 if(file.exists(here("Data","env_dat.csv"))){
@@ -21,31 +17,76 @@ if(file.exists(here("Data","env_dat.csv"))){
   write.csv(env_dat,file=here("Data","env_dat.csv"))
 }
 
+# redds<-read_csv(here("Data","redd_counts.csv")) %>% mutate(mig_year=as.factor(Year+2)) %>% mutate(across(Chiwawa:White,scale)) %>%  pivot_longer(c("Chiwawa","Nason","White"),"stream",values_to="redds")
 
-make_dat<-function(mark_file_CH=mark_file_CH,sites=c("LWe_J","McN_J","JDD_J","Bon_J","Est_J","Bon_A","McN_A","PRa_A","RIs_A","Tum_A"),start_year=2007, end_year=2016,cont_cov,length_bin=5,doy_bin=10){
 
+if(file.exists(here("data","all_bio_data.csv"))){
+  all_bio_data<-read_csv(here("data","all_bio_data.csv"))
+}
 
-dat_out<- mark_file_CH %>%  
-  #add grouped length and release day columns
-  mutate(length_bin=ceiling(`Length mm`/length_bin)*length_bin-(length_bin/2),
-         rel_DOY_bin=ceiling((`Release Day Number`+ifelse(LH=="smolt",365,0))/doy_bin)*doy_bin-(doy_bin/2)) %>%
-  # #subset some very small or large length
-  filter(length_bin>=55 &length_bin<=200 & rel_DOY_bin>10) %>%
-#subset columns needed for analysis
-  select(sea_Year_p,LH,stream, #grouping variables
-                all_of(sites),cont_cov) %>% 
-  #sites/occasions to include in model
-  #first year with all stream data through last year where data on all three return ages is available (because it is 2020)
-  filter(sea_Year_p>=start_year & sea_Year_p<=end_year) %>%
-  #make grouping variables factors
-  mutate_at(vars(sea_Year_p:stream),~as.factor(as.character(.x))) %>% 
-  #create multistate capture histories
-  mutate(ch=select(., sites[1]: sites[length(sites)]) %>%  reduce(paste0)) %>%
-  #mutate(ch=select(., McN_J,Bon_J,Est_J) %>% reduce(paste0)) %>%
-  mutate(ch=paste0("1",ch)) %>% 
-  #reduce data to unqiue capture history/ groups combos and counts
-  group_by_all() %>% summarise(freq=n()) %>% as.data.frame()
+make_dat<-function(mark_file_CH=mark_file_CH,sites=c("LWe_J","McN_J","JDD_J","Bon_J","Est_J","Bon_A","McN_A","PRa_A","RIs_A","Tum_A"),start_year=2006, end_year=2017,cont_cov,length_bin=5,doy_bin=10){
 
+  
+   # sites=c("LWe_J","McN_J","Bon_J","Bon_A","McN_A","Tum_A");start_year=2006; end_year=2017;cont_cov="rel_DOY_bin";length_bin=5;doy_bin=10
+
+  if(is.null(all_of(cont_cov))){
+    dat_out<- mark_file_CH %>%  
+      #subset columns needed for analysis
+      select(sea_Year_p,LH,stream, #grouping variables
+             all_of(sites))
+  }else{if(length(all_of(cont_cov))==2){
+    dat_out<- mark_file_CH %>%  
+      #add grouped length and release day columns
+      mutate(length_bin=ceiling(Length.mm/length_bin)*length_bin-(length_bin/2),
+             rel_DOY_bin=ceiling((Release.Day.Number+ifelse(LH=="smolt",365,0))/doy_bin)*doy_bin-(doy_bin/2) ,
+             rel_DOY_bin=ifelse(LH=="Unk",0,rel_DOY_bin)) %>%
+      #subset some very small or large length
+      filter(length_bin>=55 &length_bin<=200 & rel_DOY_bin>10) %>%
+      mutate(across(c(length_bin,rel_DOY_bin),scale)) %>% 
+      #subset columns needed for analysis
+      select(sea_Year_p,LH,stream, #grouping variables
+             all_of(sites),all_of(cont_cov))
+  }else{if(all_of(cont_cov)=="rel_DOY_bin"){
+    dat_out<- mark_file_CH %>%  
+    #add grouped length and release day columns
+    mutate(rel_DOY_bin=ceiling((Release.Day.Number+ifelse(LH=="smolt",365,0))/doy_bin)*doy_bin-(doy_bin/2),
+           rel_DOY_bin=ifelse(LH=="Unk",0,rel_DOY_bin)) %>%
+    #subset some very small or large length
+    filter(rel_DOY_bin>10) %>%
+      mutate(across(c(rel_DOY_bin),scale)) %>% 
+    #subset columns needed for analysis
+    select(sea_Year_p,LH,stream, #grouping variables
+           all_of(sites),all_of(cont_cov))
+  
+  }else{
+    dat_out<- mark_file_CH %>%  
+      #add grouped length and release day columns
+      mutate(length_bin=ceiling(Length.mm/length_bin)*length_bin-(length_bin/2),
+      ) %>%
+      #subset some very small or large length
+      filter(length_bin>=55 &length_bin<=200 ) %>%
+      mutate(across(c(length_bin,rel_DOY_bin),scale)) %>% 
+      #subset columns needed for analysis
+      select(sea_Year_p,LH,stream, #grouping variables
+             all_of(sites),all_of(cont_cov))
+  }}}
+  dat_out<- dat_out %>%  
+    #subset columns needed for analysis
+    select(sea_Year_p,LH,stream, #grouping variables
+           all_of(sites),cont_cov) %>% 
+    #sites/occasions to include in model
+    #first year with all stream data through last year where data on all three return ages is available (because it is 2020)
+    filter(sea_Year_p>=start_year & sea_Year_p<=end_year) %>%
+    #make grouping variables factors
+    mutate_at(vars(sea_Year_p:stream),~as.factor(as.character(.x))) %>% 
+    #create multistate capture histories
+    mutate(ch=select(., sites[1]: sites[length(sites)]) %>%  reduce(paste0)) %>%
+    #mutate(ch=select(., McN_J,Bon_J,Est_J) %>% reduce(paste0)) %>%
+    mutate(ch=paste0("1",ch)) %>% 
+    #reduce data to unqiue capture history/ groups combos and counts
+    group_by_all() %>% summarise(freq=n()) %>% as.data.frame() %>% 
+    arrange(LH) # arrange so unknown LH (marked at lower wenatchee trap) comes last
+  
 
 #Occasion sites
 occasion_sites<-colnames(select(dat_out,sites[1]: sites[length(sites)]))
@@ -62,18 +103,70 @@ trap_dep<-which(sites%in%c("LWe_J", "McN_J"))
 
 
 #process data using RMark function. Specifies grouping variables for parameters, and type of model and hence parameters. "Multistrate" used S(Phi), p, and psi
-wenatchee.processed<-RMark::process.data(dat_out,model="Multistrata",groups=c("LH","stream","sea_Year_p",cont_cov,sites[trap_dep]),allgroups=TRUE)
+# wenatchee.processed<-RMark::process.data(dat_out,model="Multistrata",groups=c("LH","stream","sea_Year_p",cont_cov,sites[trap_dep]))
 
 #Make design data using RMark function. Sets up matrices for each parameter where there is a row for each combination of the grouping variables, occasion, age, etc. Specifiying the pim.type can reduce some of the combinations/# of rows. See?RMark::make.design.data() for more info. 
-wenatchee.ddl<-RMark::make.design.data(wenatchee.processed,parameters=list(S=list(pim.type="time"), #survival changes by occasion and potentially stratum(i.e. fish age)
-                                                                           p=list(pim.type="time"),#detection changes by occasion and potentially stratum(i.e. fish age)
-                                                                           Psi=list(pim.type="constant")), # state (age at return) transitions only occur at one time period.
-                                       remove.unused = FALSE)
+# wenatchee.ddl<-RMark::make.design.data(wenatchee.processed,parameters=list(S=list(pim.type="time"), #survival changes by occasion and potentially stratum(i.e. fish age)
+#                                                                            p=list(pim.type="time"),#detection changes by occasion and potentially stratum(i.e. fish age)
+#                                                                            Psi=list(pim.type="constant")), # state (age at return) transitions only occur at one time period.
+#                                        remove.unused = FALSE)
+
+
+#potentially more efficient way f reducing calculations
+# test<-dat_out %>% 
+#   #release group
+#   select(sea_Year_p:stream,all_of(cont_cov)) %>% distinct() %>% 
+#   #add time
+#   full_join(tibble(time=2:length(sites)),by=character()) %>% mutate(Time=time-2) %>% 
+#   #add trap dependency
+#   full_join(tibble(time=which(sites=="LWe_J")+2,LWe_J=0:1),by="time") %>% 
+#   full_join(tibble(time=which(sites=="McN_J")+2,McN_J=0:1,LWe),by="time") %>% 
+#   mutate(across(LWe_J:McN_J,~replace(., is.na(.), 0))) %>% 
+#   #add stratum
+#   full_join(tibble(time=rep(((nDS_OCC+1):(nOCC-1))+1,3),stratum=rep(1:3,each=nOCC-nDS_OCC-1)),by="time") %>% 
+#   mutate(stratum=as.factor(replace(stratum, is.na(stratum), 1))) %>% 
+#   #make time a factor variable
+#   mutate(time=as.factor(time)) %>% 
+#   #make group column
+#   mutate(group=select(., LH,stream,sea_Year_p,all_of(cont_cov),LWe_J,McN_J) %>%  reduce(paste0))
+  
+  
+# test<-dat_out %>% 
+#   #release group
+#   select(sea_Year_p:stream,all_of(cont_cov)) %>% distinct() %>% 
+#   #add trap dependency
+#   full_join(tibble(LWe_J=0:1),by=character()) %>% 
+#   full_join(tibble(McN_J=0:1),by=character()) %>% 
+#   #add stratum
+#   full_join(tibble(stratum=1),by=character()) %>% 
+#   full_join(tibble(tostratum=as.factor(2:3)),by=character()) %>% 
+#   #make group column
+#   mutate(group=select(., LH,stream,sea_Year_p,all_of(cont_cov),LWe_J,McN_J) %>%  reduce(paste0)) %>% 
+#   mutate(par.index=1:nrow(.))
+
+
+
+
 
 #~~~~
 #extract the individual design data for each parameter
 ##phi/s survival
-Phi.design.dat<-wenatchee.ddl$S %>% 
+Phi.design.dat<-
+  dat_out %>% 
+  #release group
+  select(sea_Year_p:stream,all_of(cont_cov)) %>% distinct() %>% 
+  #add time
+  full_join(tibble(time=1:length(sites)),by=character()) %>% mutate(Time=time-1) %>% 
+  #add trap dependency
+  full_join(tibble(LWe_J=0:1),by=character()) %>% 
+  full_join(tibble(McN_J=0:1),by=character()) %>% 
+  #add stratum
+  full_join(tibble(stratum=1:3),by=character()) %>% 
+  #make time and stratum factor variables
+  mutate(time=as.factor(time),stratum=as.factor(stratum)) %>% 
+  #make group column
+  mutate(group=select(., LH,stream,sea_Year_p,all_of(cont_cov),LWe_J,McN_J) %>%  reduce(paste0)) %>% 
+  mutate(par.index=1:nrow(.)) %>% 
   filter(Time>(nDS_OCC)|stratum==1) %>%  #cant be in strata (fish age) other than 1 on downstream, or ocean for survival. Note "Time" column indexing starts at 0, so occasion/Time (nDS_OCC-1) is the last juvenile detection occasion
   # filter(!Time%in%(c(JDD_J_time,Est_J_time,PRa_RIs_A_times)-1)) %>% 
    # filter(!Time%in%(c(JDD_J_time,Est_J_time)-1)) %>% 
@@ -84,7 +177,7 @@ cbind(.,model.matrix(~time+stream+LH+stratum-1,data=.)) %>%
  mutate(streamChiwawa=as.numeric(streamNason+streamWhite==0),
         age_class=as.factor(ifelse(LH!="smolt","sub","yrlng")), LHfall=as.numeric(LH=="fall"),age_0=as.numeric(LH!="smolt"), LWe_new=as.numeric(as.numeric(as.character(sea_Year_p)>2011))) %>% 
   #make length bin and release DOY numeric
-  mutate(across(.cols=all_of(cont_cov),.fns=function(x)scale(as.numeric(as.character(x))))) %>% 
+  # mutate(across(.cols=all_of(cont_cov),.fns=function(x)scale(as.numeric(as.character(x))))) %>% 
   #make par index a sequence
   mutate(par.index=(1:nrow(.))-1) %>% 
   #add environmental covariates
@@ -102,14 +195,29 @@ cbind(.,model.matrix(~time+stream+LH+stratum-1,data=.)) %>%
 occ_LWe_J<-which(sites=="LWe_J")-1; if(length(occ_LWe_J)==0){occ_LWe_J<- -5}
 
 ##p detection, same as Phi
-p.design.dat<-wenatchee.ddl$p %>% 
+p.design.dat<-
+  dat_out %>% 
+  #release group
+  select(sea_Year_p:stream,all_of(cont_cov)) %>% distinct() %>% 
+  #add time
+  full_join(tibble(time=2:length(sites)),by=character()) %>% mutate(Time=time-2) %>% 
+  #add trap dependency
+  full_join(tibble(LWe_J=0:1),by=character()) %>% 
+  full_join(tibble(McN_J=0:1),by=character()) %>% 
+  #add stratum
+  full_join(tibble(stratum=1:3),by=character()) %>% 
+  #make time and stratum factor variables
+  mutate(time=as.factor(time),stratum=as.factor(stratum)) %>% 
+  #make group column
+  mutate(group=select(., LH,stream,sea_Year_p,all_of(cont_cov),LWe_J,McN_J) %>%  reduce(paste0)) %>% 
+  mutate(par.index=1:nrow(.)) %>% 
   filter(Time>(nDS_OCC-1)|stratum==1) %>% # can be in multiple state for detection at time (nDS_OCC) but nor for survival.
   filter(Time<(nOCC-1)) %>%  # assuming detection at last time is 1, so not including this time in the detection design data
   mutate(mig_year=as.factor(ifelse(Time<=(nDS_OCC-1),as.numeric(as.character(sea_Year_p)) ,as.numeric(as.character(sea_Year_p)) +as.numeric(as.character(stratum))))) %>%   #add a column for the actual migration year, which is the seaward year for juveniles and the seaward + stratum for adults
   cbind(.,model.matrix(~time+stream+LH+stratum-1,data=.)) %>% 
-  mutate(streamChiwawa=as.numeric(streamNason+streamWhite==0)) %>%
+  mutate(streamChiwawa=as.numeric(stream=="Chiwawa")) %>%
   #make length bin and release DOY numeric
-  mutate(across(.cols=all_of(cont_cov),.fns=function(x)scale(as.numeric(as.character(x))))) %>% 
+  # mutate(across(.cols=all_of(cont_cov),.fns=function(x)scale(as.numeric(as.character(x))))) %>% 
 
   mutate( age_class=as.factor(ifelse(LH=="Unk","Unk",ifelse(LH!="smolt","sub","yrlng"))), LHfall=as.numeric(LH=="fall"),age_0=as.numeric(LH!="smolt"), LWe_new=as.numeric(as.numeric(as.character(sea_Year_p)>2011))) %>% 
   dplyr::filter( !(as.numeric(as.character(sea_Year_p))%in%(2011:2012) & Time==occ_LWe_J )) %>%   
@@ -125,14 +233,26 @@ try(p.design.dat<-p.design.dat %>% mutate(McN_J=as.numeric(as.character(McN_J)))
 try(p.design.dat<-p.design.dat %>% mutate(LWe_J=as.numeric(as.character(LWe_J))))
 
 ##Psi transition. 
-Psi.design.dat<-wenatchee.ddl$Psi %>% 
+Psi.design.dat<-
+  dat_out %>% 
+  #release group
+  select(sea_Year_p:stream,all_of(cont_cov)) %>% distinct() %>% 
+  #add trap dependency
+  full_join(tibble(LWe_J=0:1),by=character()) %>% 
+  full_join(tibble(McN_J=0:1),by=character()) %>% 
+  #add stratum
+  full_join(tibble(stratum=1),by=character()) %>% 
+  full_join(tibble(tostratum=as.factor(2:3)),by=character()) %>% 
+  #make group column
+  mutate(group=select(., LH,stream,sea_Year_p,all_of(cont_cov),LWe_J,McN_J) %>%  reduce(paste0)) %>% 
+  mutate(par.index=1:nrow(.)) %>% 
   filter(stratum==1) %>%  #Can only transition from state 1 (Juvenile entering ocean)
   arrange(tostratum,group) %>%    # sort by stratum and group so the first half of rows represents the alr probs of transitioning to age 2 and the second half of the rows the alr probs of transitioning to state 3. This is neccesary for the way I am coding this in TMB, to take use the two halves of the vectors when doing the backtransformation from alr to simplex. 
   cbind(.,model.matrix(~stream-1+LH-1+tostratum-1,data=.)) %>% 
   mutate(streamChiwawa=as.numeric(streamNason+streamWhite==0), age_class=as.factor(ifelse(LH!="smolt","sub","yrlng")), LHfall=as.numeric(LH=="fall"),age_0=as.numeric(LH!="smolt")) %>%
   rename("mig_year"="sea_Year_p") %>% 
   #make length bin and release DOY numeric
-  mutate(across(.cols=all_of(cont_cov),.fns=function(x)scale(as.numeric(as.character(x))))) %>% 
+  # mutate(across(.cols=all_of(cont_cov),.fns=function(x)scale(as.numeric(as.character(x))))) %>% 
   #make par index a sequence
   mutate(par.index=(1:nrow(.))-1)
 
@@ -176,34 +296,36 @@ Psi_pim<-match(paste0(dat_out %>% select(LH,stream,sea_Year_p,all_of(cont_cov),s
 ## *** Make data for simulating capture histories and calculating expected detections
 
 #### number released per year, LH, stream, and continuous covariate bin
-releases<-dat_out %>% group_by(LH,stream,sea_Year_p,all_of(cont_cov)) %>% summarise(freq =sum(freq))
+releases<-dat_out %>% select(LH,stream,(cont_cov),sea_Year_p,freq) %>% group_by(across(LH:sea_Year_p))%>% summarise(freq =sum(freq))
 
 
 ### phi pim for simulation
-phi_pim_sim<-inner_join(releases,Phi.design.dat %>% select(par.index,time,stratum,c("LH","stream","sea_Year_p",cont_cov,sites[trap_dep]))) %>% # combine releases with design data
- pivot_wider(values_from=par.index,names_from=c(time,stratum,sites[trap_dep])) %>% select(1:(5+nOCC+(nOCC-nDS_OCC-1)*2)) %>% ungroup()%>% select(!LH:freq) %>% as.matrix()
+phi_pim_sim<-inner_join(releases,Phi.design.dat %>% select(par.index,time,stratum,c("LH","stream","sea_Year_p",cont_cov,sites[trap_dep]))) %>% arrange(time,stratum,LWe_J,McN_J) %>% # combine releases with design data
+  pivot_wider(values_from=par.index,names_from=c(time,stratum,sites[trap_dep])) %>% ungroup()%>% select(paste(1:length(sites),1,0,0,sep="_"),paste((nOCC-nDS_OCC+2) :length(sites),2,0,0,sep="_"),paste((nOCC-nDS_OCC+2):length(sites),3,0,0,sep="_")) %>% as.matrix()
+
+
 
 ####columns to select for p pim
-p_pim_cols<-1:(5+nOCC+(nOCC-nDS_OCC-1)*2-2)
-try(p_pim_cols<-c(p_pim_cols,((5+nOCC+(nOCC-nDS_OCC-1)*2-1)+which(sites=="LWe_J"))))
- try(p_pim_cols<-c(p_pim_cols,((5+(nOCC+(nOCC-nDS_OCC-1)*2-1)*2)+which(sites=="McN_J"))))
+# p_pim_cols<-1:(5+nOCC+(nOCC-nDS_OCC-1)*2-2)
+# try(p_pim_cols<-c(p_pim_cols,((5+nOCC+(nOCC-nDS_OCC-1)*2-1)+which(sites=="LWe_J"))))
+#  try(p_pim_cols<-c(p_pim_cols,((5+(nOCC+(nOCC-nDS_OCC-1)*2-1)*2)+which(sites=="McN_J"))))
 
 
 #### p pim for simulation
 p_pim_sim<-inner_join(releases,p.design.dat %>% select(par.index,time,stratum,c("LH","stream","sea_Year_p",cont_cov,sites[trap_dep]))) %>% # combine releases with design data
-  pivot_wider(values_from=par.index,names_from=c(time,stratum,sites[trap_dep])) %>% select(all_of(p_pim_cols)) %>% 
+  pivot_wider(values_from=par.index,names_from=c(time,stratum,sites[trap_dep])) %>% ungroup() %>%  select(paste(2:length(sites),1,0,0,sep="_"), paste((nOCC-nDS_OCC+2) :length(sites),2,0,0,sep="_"), paste((nOCC-nDS_OCC+2):length(sites),3,0,0,sep="_"),  paste(which(sites=="LWe_J")+2,1,1,0,sep="_"), paste(which(sites=="McN_J")+2,1,0,1,sep="_")) %>%
   #fill in NAs (years to be set to detection of 0) with the correct index
-  ungroup() %>%  mutate_all(~replace_na(., nrow(p.design.dat))) %>% select(!LH:freq) %>% as.matrix()
+  replace(is.na(.), nrow(p.design.dat)) %>%  as.matrix()
+
 
 #### psi pim for simulation
-psi_pim_sim<-releases %>% rename(mig_year=sea_Year_p  ) %>% left_join(
-  Psi.design.dat %>% select(par.index,stratum,tostratum,c("LH","stream","mig_year",cont_cov)) %>% filter(stratum==1&tostratum==2)  %>% distinct(across(stratum:mig_year),.keep_all=TRUE)) %>% ungroup()
+psi_pim_sim<-left_join(releases %>% rename(mig_year=sea_Year_p)   %>% ungroup(),
+  Psi.design.dat %>% select(par.index,stratum,tostratum,c("LH","stream",cont_cov,"mig_year",)) %>% filter(stratum==1&tostratum==2) %>% as_tibble() %>% distinct(across(stratum:mig_year),.keep_all=TRUE) )
+
 
 
 
 ## *** PIMS for calculating weighted averages for unknown LH fish
-
-
 
 ####Subset design data to just unknown LH fish (marked in tributaries)
 Phi.design.dat_unk <- Phi.design.dat %>% filter(LH=="Unk" &stream=="LWE") %>% droplevels()

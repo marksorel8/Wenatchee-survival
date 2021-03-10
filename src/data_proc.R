@@ -177,10 +177,11 @@ mutate_at(vars(LWe_J:Tum_A), ~.x-sea_Year_p) %>%
   #drop rows with capture history where only adult detection is at tumwater dam (because of concern about "ghost tags)
   filter(!( select(., Bon_A:RIs_A)%>% rowSums() ==0& Tum_A !=0)) %>% 
   
-  mutate(LWe_J=if_else(stream=="LWE",1,LWe_J)) 
+  mutate(LWe_J=if_else(stream=="LWE",1,LWe_J)) %>%
+  select(sea_Year_p,LH,stream,LWe_J:Tum_A,`Length mm`,`Release Day Number`)
 
 
-
+write.csv(mark_file_CH,file=here("Data","mark_file_CH.csv"))
 # looking at detections on upstream arrays
 # 
 # test<-read.csv(here("Data","ptagis","Interrogation Summary wen trib tag adult array det.csv"))
