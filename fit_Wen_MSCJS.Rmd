@@ -278,10 +278,57 @@ time1:streamWhite:LH+# time1:LHsmolt:spr_air+
 )
 
 
-
+#test
+mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
+                         phi_formula=par.index~
+                           
+                           #fixed effect
+                           -1+ time1:LH + #time1:LHsummer:streamChiwawa + time1:LHsmolt:streamNason+
+time1:streamWhite:LHsmolt+time1:streamWhite:LHfall+ 
+                         +time1:sum_flow:LHsummer+time1:win_air:age_0 + 
+                           time2 +  time2:LHsmolt  +#time2:RIS_temp_juv +  #time2:streamNason+ #to mcnary
+                           time3 + #time3:McN_flow +#to Bonneville
+                           time4 + time4:LHsmolt + time4:LHsummer+ 
+                           time4:ersstWAcoast.sum + #to Bonn adult
+                           time5 +#to McNary
+                           time6 +#time6:stratum3 +    #to Tumwater
+                           #random
+                           diag(0+time1+time2 |mig_year)+
+                          (0+time4 |mig_year)#+
+                            # diag(0+time1:LHsmolt|mig_year)
+                         ,
+                      
+                         p_formula= par.index~
+                           #fixed effects
+                           -1+ time2:LH+#time2:LHsmolt:length_bin#time2:LHsmolt+time2:LHsummer+time2:streamWhite+#lower trap
+                            time3+  #McNary
+                            # time3:LWe_J:LHfall +               #McNary
+                            time4+#Bonneville
+                           time4:McN_J:age_0 +  #Bonneville
+                           time5 +         # Bonn adult
+                           time6 +#:stratum +         #McNary adult
+                           #random
+                           (0+time2|mig_year) +
+                           diag(0+time2:LHfall+time2:LHsummer|mig_year) + # lower trap
+                           (0+time3+time4|mig_year)+# McNary
+                           (0+time5|mig_year) #Bonneville
+                             # (0+time6|mig_year)
+                           
+                           ,
+                         
+                         psi_formula= par.index~
+                           #fixed effects
+                           -1+tostratum+tostratum:LHsmolt+tostratum3:streamChiwawa+
+                           #random
+                             (0+tostratum|mig_year)
+                         ,
+                         
+                         doFit = TRUE,silent=TRUE,
+                         sim_rand =0,REML=FALSE,hypersd = 2
+)
 
 print_out(mscjs_fit)
-
+plot_func()
 ```
 
 Estimated annual proportions of fish tagged in lower Wenatchee trap that were yearling emigrants from natal streams  
@@ -296,6 +343,7 @@ test$p_yrlngs %>% `names<-`(c(2006:2010,2013:2017)) %>% round(2)
 ## Figures. Survival and maturation age probs
 
 ```{r plot_output, echo=FALSE, fig.width=8,fig.height=7}
+plot_func<-function(){
 sd_rep<-mscjs_fit$fit$SD
 mod_rep<-mscjs_fit$mod$report()
 
@@ -321,6 +369,7 @@ Psi.design.dat<-mscjs_dat$Psi.design.dat %>% filter(tostratum==2) %>% select(LH,
 #downstream  survival
  # dev.new()
 ggplot(data= as_tibble(Phi.design.dat2) %>% filter(Time<=2),aes(x=(mig_year) ,y=phi_fit,color=stream)) +scale_x_discrete(guide = guide_axis(check.overlap = TRUE))+geom_linerange(aes(ymin=lcl_phi,ymax=ucl_phi),position=position_dodge(width = .75))+facet_grid(rows=vars(time),cols=vars(LH),labeller =  labeller(time=c(`1`="Release to Lower Wenatchee",`2`="Lower Wenatchee to McNary", `3` = "McNary to Bonneville ")),scales = "free")+ylim(0,1)+xlab("Smolt year")+ylab("Survival") + geom_point(position=position_dodge(width = .75))
+}
 ```
 
 \newpage
@@ -492,7 +541,7 @@ head(mscjs_fit$Phi.design.glmmTMB$data.tmb$X)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Mark model for comparison
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-dat_out<-select(mark_file_CH %>% filter(LH=="smolt",stream!="White"),sea_Year_p, #grouping variables
+dat_out<-select(mark_file_CH %>% filter(LH=="Unk",stream!="White"),sea_Year_p, #grouping variables
                LWe_J, McN_J,Bon_J) %>% #sites/occasions to include in model
   #first year with all stream data through last year where data on all three return ages is available (because it is 2020)
   filter(sea_Year_p>=2007&sea_Year_p<=2016&!sea_Year_p%in%c(2011:2012)) %>%
@@ -502,6 +551,18 @@ dat_out<-select(mark_file_CH %>% filter(LH=="smolt",stream!="White"),sea_Year_p,
   mutate(ch=select(., c(LWe_J,McN_J,Bon_J)) %>%  reduce(paste0)) %>%
   #mutate(ch=select(., McN_J,Bon_J,Est_J) %>% reduce(paste0)) %>%
   mutate(ch=paste0("1",ch)) 
+
+dat_out<-select(mark_file_CH %>% filter(LH=="Unk"),sea_Year_p, #grouping variables
+                McN_J,Bon_J) %>% #sites/occasions to include in model
+  #first year with all stream data through last year where data on all three return ages is available (because it is 2020)
+  filter(sea_Year_p>=2007&sea_Year_p<=2016&!sea_Year_p%in%c(2011:2012)) %>%
+  #make grouping variables factors
+  #mutate_at(vars(sea_Year_p:stream),~as.factor(as.character(.x)))%>% mutate(McN_J=apply(select(.,McN_J,JDD_J),1,max)) %>% select(-JDD_J) %>% 
+  #create multistate capture histories
+  mutate(ch=select(., c(McN_J,Bon_J)) %>%  reduce(paste0)) %>%
+  #mutate(ch=select(., McN_J,Bon_J,Est_J) %>% reduce(paste0)) %>%
+  mutate(ch=paste0("1",ch)) 
+
 
 library(RMark)
 wenatchee.processed=process.data(dat_out,model="CJS",groups=c("sea_Year_p"))
@@ -587,7 +648,7 @@ S.stratumxtime=list(formula=~-1+time+time_1:Yrlng)
 
 
 test<-RMark::mark(wenatchee.processed,wenatchee.ddl,
-                  model.parameters=list(Phi=list(formula=~-1+time:sea_Year_p),p= list(formula=~-1+time:sea_Year_p)),run=TRUE)
+                  model.parameters=list(Phi=list(formula=~-1+time),p= list(formula=~-1+time)),run=TRUE)
 
 real_test<-get.real(test,par="Phi")
 
