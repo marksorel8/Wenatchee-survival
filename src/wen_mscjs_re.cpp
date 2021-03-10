@@ -139,7 +139,7 @@ Type termwise_nll(array<Type> &U, vector<Type> theta, per_term_info<Type>& term,
     Type corr_transf = theta(n);
     vector<Type> sd = exp(logsd);
     Type a = Type(1) / (Type(n) - Type(1));
-    Type rho = pnorm(corr_transf) * (Type(1) + a) - a;
+    Type rho = invlogit(corr_transf) * (Type(1) + a) - a;
     matrix<Type> corr(n,n);
     for(int i=0; i<n; i++)
       for(int j=0; j<n; j++)
@@ -669,12 +669,12 @@ int nUS_OCC = n_OCC-nDS_OCC-1; // number of upstream occasions
         det_1(n,t) = Type(p_hat(p_pim_sim(n,t))*pS(1)*n_released(n)*(Type(1)-p_hat(p_pim_sim(n,t-1)))); //not detected at previous
         det_1(n,t) += Type(p_hat(p_pim_sim(n,TD_i(1)))*pS(1)*n_released(n)*p_hat(p_pim_sim(n,t-1)));     // detected at previous
       }else{
-        det_1(n,t) = Type(p_hat(p_pim_sim(n,t))*pS(1)*n_released(n)); //expected obs        
+        det_1(n,t) = Type(p_hat(p_pim_sim(n,t))*pS(1)*n_released(n)); //expected obs
       }}
-      
+
       }
-      
-      
+
+
 
       //ocean occasion
       int t = nDS_OCC;  //set occasion to be ocean occasion
@@ -723,10 +723,10 @@ for(int n=0; n<n_released.size(); n++){ // loop over individual release cohorts
   pS.setZero(); //initialize at 0,1,0,0 (conditioning at capture)
   pS(1)=Type(1);
   sim_state_1(n,0)=Type(n_released(n));    //initialize with number released for each CH at time 1
-  
+
   //downstream migration
   for(int t=0; t<nDS_OCC; t++){       //loop over downstream occasions (excluding capture occasion)
-   
+
     if(t==TD_occ(0)){ //if occasion that has trap dependency with detection at Lower Wenatchee (most likely McNary)
       //survival process
       not_det_surv= rbinom(Type( sim_state_1(n,t)-sim_det_1(n,t-1)),phi(phi_pim_sim(n,t))); //simulated stay alive not detected previously
@@ -747,11 +747,11 @@ for(int n=0; n<n_released.size(); n++){ // loop over individual release cohorts
       //survival process
       sim_state_1(n,t+1) = rbinom(Type( sim_state_1(n,t)),phi(phi_pim_sim(n,t))); //simulated stay alive
       //observation process
-      sim_det_1(n,t) = rbinom(Type( sim_state_1(n,t+1)),  Type(p(p_pim_sim(n,t)))); //simulated obs        
+      sim_det_1(n,t) = rbinom(Type( sim_state_1(n,t+1)),  Type(p(p_pim_sim(n,t)))); //simulated obs
     }}
-    
+
   }
-  
+
 
   //ocean occasion
   int t = nDS_OCC;  //set occasion to be ocean occasion
@@ -763,7 +763,7 @@ for(int n=0; n<n_released.size(); n++){ // loop over individual release cohorts
   sim_state_2(n,0) = rbinom(Type(temp-sim_state_1(n,t+1)),
               Type(psi(psi_pim_sim(n),1)/(Type(1)-Type(psi(psi_pim_sim(n),0))))); //simulated return after 2 year
   sim_state_3(n,0) = temp-sim_state_1(n,t+1)-sim_state_2(n,0);        //simulated return after 1 year
-  
+
 
   for(int t=(nDS_OCC+1); t<n_OCC; t++){       //loop over upstream occasions
 
