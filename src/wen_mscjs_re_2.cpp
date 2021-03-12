@@ -47,7 +47,8 @@ enum valid_covStruct {
   exp_covstruct = 5,
   gau_covstruct = 6,
   mat_covstruct = 7,
-  toep_covstruct = 8
+  toep_covstruct = 8,
+  pc_covstruct=9
 };
 
 //defines elements of list data structure
@@ -109,6 +110,18 @@ Type termwise_nll(array<Type> &U, vector<Type> theta, per_term_info<Type>& term,
     vector<Type> sd = exp(theta);
     for(int i = 0; i < term.blockReps; i++){
       ans -= dnorm(vector<Type>(U.col(i)), Type(0), sd, true).sum();
+      if (do_simulate) {
+        U.col(i) = rnorm(Type(0), sd);
+      }
+    }
+    term.sd = sd; // For report
+  }
+  else if (term.blockCode == pc_covstruct){
+    // case: diag_covstruct
+    vector<Type> sd = exp(theta);
+    for(int i = 0; i < term.blockReps; i++){
+      ans -= dnorm(vector<Type>(U.col(i)), Type(0), sd, true).sum();
+      ans -= (dexp(sd,Type(1),true).sum() +theta.sum()); //penaliuze complexity
       if (do_simulate) {
         U.col(i) = rnorm(Type(0), sd);
       }

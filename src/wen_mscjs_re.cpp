@@ -47,7 +47,8 @@ enum valid_covStruct {
   exp_covstruct = 5,
   gau_covstruct = 6,
   mat_covstruct = 7,
-  toep_covstruct = 8
+  toep_covstruct = 8,
+  pc_covstruct = 9
 };
 
 //defines elements of list data structure
@@ -109,6 +110,18 @@ Type termwise_nll(array<Type> &U, vector<Type> theta, per_term_info<Type>& term,
     vector<Type> sd = exp(theta);
     for(int i = 0; i < term.blockReps; i++){
       ans -= dnorm(vector<Type>(U.col(i)), Type(0), sd, true).sum();
+      if (do_simulate) {
+        U.col(i) = rnorm(Type(0), sd);
+      }
+    }
+    term.sd = sd; // For report
+  }
+  else if (term.blockCode == pc_covstruct){
+    // case: diag_covstruct
+    vector<Type> sd = exp(theta);
+    for(int i = 0; i < term.blockReps; i++){
+      ans -= dnorm(vector<Type>(U.col(i)), Type(0), sd, true).sum();
+      ans -= (dexp(sd,Type(1),true).sum() +theta.sum()); //penaliuze complexity
       if (do_simulate) {
         U.col(i) = rnorm(Type(0), sd);
       }
@@ -421,9 +434,9 @@ DATA_INTEGER(sim_rand);     //flag indicating whether to simulate the random eff
    ADREPORT(eta_psi);
 
   // Apply link
-  vector<Type> phi=pnorm(eta_phi);
+  vector<Type> phi=invlogit(eta_phi);
   vector<Type> p(eta_p.size()+1);
-  p.head(eta_p.size())=pnorm(eta_p);
+  p.head(eta_p.size())=invlogit(eta_p);
   p.tail(1)=Type(0);
   REPORT(phi);
   REPORT(p);
@@ -600,8 +613,8 @@ if(sim_rand){
     eta_psi = X_psi*beta_psi;
 
     ///// Calculate parameters to use to calculate the expectation of the number of detections (random effects at 0)
-    phi_hat=pnorm(eta_phi);
-    p_hat.head(eta_p.size())=pnorm(eta_p);
+    phi_hat=invlogit(eta_phi);
+    p_hat.head(eta_p.size())=invlogit(eta_p);
     vector<Type> eta_psi_hat= exp(eta_psi);
     denom = eta_psi_hat.segment(0,n_groups)+eta_psi_hat.segment(n_groups,n_groups)+Type(1);
     psi_hat.col(0)= eta_psi_hat.segment(0,n_groups)/denom;        //return after 1 year
@@ -617,8 +630,8 @@ if(sim_rand){
     eta_psi += Z_psi*b_psi;
 
     // Apply link
-    phi=pnorm(eta_phi);
-    p.head(eta_p.size())=pnorm(eta_p);
+    phi=invlogit(eta_phi);
+    p.head(eta_p.size())=invlogit(eta_p);
     REPORT(phi);
     REPORT(p);
     ////phi inverse multinomial logit
