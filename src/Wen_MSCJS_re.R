@@ -183,8 +183,9 @@ cbind(.,model.matrix(~time+stream+LH+stratum-1,data=.)) %>%
   #add environmental covariates
   left_join(env_dat %>% mutate(mig_year=as.factor(mig_year)),by="mig_year") %>% 
   mutate(across(sum_flow:transport.win,scale)) %>% 
- replace(is.na(.), 0) 
-  
+ replace(is.na(.), 0) %>% 
+  #add a column of 1's to use as a goruping variable when specifying penalized cemplexity priors
+  mutate(one="1")
   # add column for first time
 #downstream time
 #ocean time
@@ -226,7 +227,9 @@ p.design.dat<-
   filter(!((LH=="Unk" &stream=="LWE")&(as.numeric(as.character(sea_Year_p))%in%(2011:2012)))) %>% #remove years with no releases at lower trap, so don't estimate proportions below
 
   #make par index a sequence
-  mutate(par.index=(1:nrow(.))-1)
+  mutate(par.index=(1:nrow(.))-1)%>% 
+  #add a column of 1's to use as a goruping variable when specifying penalized cemplexity priors
+  mutate(one="1")
 
 try(p.design.dat<-p.design.dat %>% mutate(LWe_J=as.numeric(as.character(LWe_J))))
 try(p.design.dat<-p.design.dat %>% mutate(McN_J=as.numeric(as.character(McN_J))))
@@ -254,7 +257,9 @@ Psi.design.dat<-
   #make length bin and release DOY numeric
   # mutate(across(.cols=all_of(cont_cov),.fns=function(x)scale(as.numeric(as.character(x))))) %>% 
   #make par index a sequence
-  mutate(par.index=(1:nrow(.))-1)
+  mutate(par.index=(1:nrow(.))-1)%>% 
+  #add a column of 1's to use as a goruping variable when specifying penalized cemplexity priors
+  mutate(one="1")
 
 
 #~~~~
@@ -404,13 +409,13 @@ fit_wen_mscjs<-function(x,phi_formula, p_formula, psi_formula,doFit=TRUE,silent=
 #~~~~
 #glmmTMB objects to get design matrices etc. for each parameter
 ## phi
-Phi.design.glmmTMB<-glmmTMB::glmmTMB(formula(phi_formula), data=x$Phi.design.dat,dispformula = ~0,doFit=FALSE)
+Phi.design.glmmTMB<-glmmTMB.mod::glmmTMB(formula(phi_formula), data=x$Phi.design.dat,dispformula = ~0,doFit=FALSE)
 #time+time:LH+time:stream+diag(0+time|stream:LH:mig_year)
 ## p
-p.design.glmmTMB<-glmmTMB::glmmTMB(formula(p_formula), data=x$p.design.dat,dispformula = ~0,doFit=FALSE)
+p.design.glmmTMB<-glmmTMB.mod::glmmTMB(formula(p_formula), data=x$p.design.dat,dispformula = ~0,doFit=FALSE)
 #par.index~time+time:LH+time:stream
 ## psi
-Psi.design.glmmTMB<-glmmTMB::glmmTMB(formula(psi_formula), data=x$Psi.design.dat,dispformula = ~0,doFit=FALSE)
+Psi.design.glmmTMB<-glmmTMB.mod::glmmTMB(formula(psi_formula), data=x$Psi.design.dat,dispformula = ~0,doFit=FALSE)
 #par.index~tostratum+tostratum:LH,
 
 #+diag(0+time|stream:LH:mig_year)

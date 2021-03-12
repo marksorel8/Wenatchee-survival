@@ -47,7 +47,8 @@ enum valid_covStruct {
   exp_covstruct = 5,
   gau_covstruct = 6,
   mat_covstruct = 7,
-  toep_covstruct = 8
+  toep_covstruct = 8,
+  pc_covstruct = 9
 };
 
 //defines elements of list data structure
@@ -109,6 +110,18 @@ Type termwise_nll(array<Type> &U, vector<Type> theta, per_term_info<Type>& term,
     vector<Type> sd = exp(theta);
     for(int i = 0; i < term.blockReps; i++){
       ans -= dnorm(vector<Type>(U.col(i)), Type(0), sd, true).sum();
+      if (do_simulate) {
+        U.col(i) = rnorm(Type(0), sd);
+      }
+    }
+    term.sd = sd; // For report
+  }
+  else if (term.blockCode == pc_covstruct){
+    // case: diag_covstruct
+    vector<Type> sd = exp(theta);
+    for(int i = 0; i < term.blockReps; i++){
+      ans -= dnorm(vector<Type>(U.col(i)), Type(0), sd, true).sum();
+      ans -= (dexp(sd,Type(1),true).sum() +theta.sum()); //penaliuze complexity
       if (do_simulate) {
         U.col(i) = rnorm(Type(0), sd);
       }
@@ -421,9 +434,9 @@ DATA_INTEGER(sim_rand);     //flag indicating whether to simulate the random eff
    ADREPORT(eta_psi);
 
   // Apply link
-  vector<Type> phi=pnorm(eta_phi);
+  vector<Type> phi=invlogit(eta_phi);
   vector<Type> p(eta_p.size()+1);
-  p.head(eta_p.size())=pnorm(eta_p);
+  p.head(eta_p.size())=invlogit(eta_p);
   p.tail(1)=Type(0);
   REPORT(phi);
   REPORT(p);
@@ -600,8 +613,8 @@ if(sim_rand){
     eta_psi = X_psi*beta_psi;
 
     ///// Calculate parameters to use to calculate the expectation of the number of detections (random effects at 0)
-    phi_hat=pnorm(eta_phi);
-    p_hat.head(eta_p.size())=pnorm(eta_p);
+    phi_hat=invlogit(eta_phi);
+    p_hat.head(eta_p.size())=invlogit(eta_p);
     vector<Type> eta_psi_hat= exp(eta_psi);
     denom = eta_psi_hat.segment(0,n_groups)+eta_psi_hat.segment(n_groups,n_groups)+Type(1);
     psi_hat.col(0)= eta_psi_hat.segment(0,n_groups)/denom;        //return after 1 year
@@ -617,8 +630,8 @@ if(sim_rand){
     eta_psi += Z_psi*b_psi;
 
     // Apply link
-    phi=pnorm(eta_phi);
-    p.head(eta_p.size())=pnorm(eta_p);
+    phi=invlogit(eta_phi);
+    p.head(eta_p.size())=invlogit(eta_p);
     REPORT(phi);
     REPORT(p);
     ////phi inverse multinomial logit
@@ -669,12 +682,12 @@ int nUS_OCC = n_OCC-nDS_OCC-1; // number of upstream occasions
         det_1(n,t) = Type(p_hat(p_pim_sim(n,t))*pS(1)*n_released(n)*(Type(1)-p_hat(p_pim_sim(n,t-1)))); //not detected at previous
         det_1(n,t) += Type(p_hat(p_pim_sim(n,TD_i(1)))*pS(1)*n_released(n)*p_hat(p_pim_sim(n,t-1)));     // detected at previous
       }else{
-        det_1(n,t) = Type(p_hat(p_pim_sim(n,t))*pS(1)*n_released(n)); //expected obs
+        det_1(n,t) = Type(p_hat(p_pim_sim(n,t))*pS(1)*n_released(n)); //expected obs        
       }}
-
+      
       }
-
-
+      
+      
 
       //ocean occasion
       int t = nDS_OCC;  //set occasion to be ocean occasion
@@ -723,10 +736,10 @@ for(int n=0; n<n_released.size(); n++){ // loop over individual release cohorts
   pS.setZero(); //initialize at 0,1,0,0 (conditioning at capture)
   pS(1)=Type(1);
   sim_state_1(n,0)=Type(n_released(n));    //initialize with number released for each CH at time 1
-
+  
   //downstream migration
   for(int t=0; t<nDS_OCC; t++){       //loop over downstream occasions (excluding capture occasion)
-
+   
     if(t==TD_occ(0)){ //if occasion that has trap dependency with detection at Lower Wenatchee (most likely McNary)
       //survival process
       not_det_surv= rbinom(Type( sim_state_1(n,t)-sim_det_1(n,t-1)),phi(phi_pim_sim(n,t))); //simulated stay alive not detected previously
@@ -747,11 +760,11 @@ for(int n=0; n<n_released.size(); n++){ // loop over individual release cohorts
       //survival process
       sim_state_1(n,t+1) = rbinom(Type( sim_state_1(n,t)),phi(phi_pim_sim(n,t))); //simulated stay alive
       //observation process
-      sim_det_1(n,t) = rbinom(Type( sim_state_1(n,t+1)),  Type(p(p_pim_sim(n,t)))); //simulated obs
+      sim_det_1(n,t) = rbinom(Type( sim_state_1(n,t+1)),  Type(p(p_pim_sim(n,t)))); //simulated obs        
     }}
-
+    
   }
-
+  
 
   //ocean occasion
   int t = nDS_OCC;  //set occasion to be ocean occasion
@@ -763,7 +776,7 @@ for(int n=0; n<n_released.size(); n++){ // loop over individual release cohorts
   sim_state_2(n,0) = rbinom(Type(temp-sim_state_1(n,t+1)),
               Type(psi(psi_pim_sim(n),1)/(Type(1)-Type(psi(psi_pim_sim(n),0))))); //simulated return after 2 year
   sim_state_3(n,0) = temp-sim_state_1(n,t+1)-sim_state_2(n,0);        //simulated return after 1 year
-
+  
 
   for(int t=(nDS_OCC+1); t<n_OCC; t++){       //loop over upstream occasions
 

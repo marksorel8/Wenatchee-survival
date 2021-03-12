@@ -194,150 +194,6 @@ Takeaway: there is definitely a bias toward larger and later fish during summer 
 
 
 
-Use R2ucare to evaluate the presence of trap dependency and overdispersion in the data
-
-```{r}
-library(R2ucare)
-
-dat_out<-select(mark_file_CH,sea_Year_p,LH,stream, #grouping variables
-                LWe_J:Est_J,Bon_A,McN_A:Tum_A) %>%
-  #sites/occasions to include in model
-  #first year with all stream data through last year where data on all three return ages is available (because it is 2020)
-  mutate(adult_all = select(., Bon_A:Tum_A) %>%  reduce(pmax)) %>% #,
-         # adult_all=as.numeric(adult_all>0)) %>%  # add a columnb for whether detected as an adult at all
-  #make grouping variables factors
-  #mutate_at(vars(sea_Year_p:stream),~as.factor(as.character(.x)))%>% mutate(McN_J=apply(select(.,McN_J,JDD_J),1,max)) %>% select(-JDD_J) %>% 
-  #create multistate capture histories
-  # mutate(ch=select(., McN_J:Tum_A) %>%  reduce(paste0)) %>%
-  mutate(ch=select(., LWe_J,McN_J,Bon_J,adult_all) %>% reduce(paste0)) %>%
-  mutate(ch=paste0("1",ch)) %>% filter(LH=="summer")
-
-
-dat_out_group<-dat_out  %>% mutate(mark=1) %>% 
-   # select(mark,McN_J:Tum_A,ch) %>% group_by(ch) %>% mutate(freq=n()) %>% distinct() %>% ungroup()
- select(mark,LWe_J,McN_J,Bon_J,adult_all,ch) %>% group_by(ch) %>% mutate(freq=n()) %>% distinct() %>% ungroup()
-
-ch<-dat_out_group %>% select(mark,LWe_J,McN_J,Bon_J,adult_all) %>% as.matrix()
-# ch<-dat_out_group %>% select(mark:Tum_A) %>% as.matrix()
-
-overall_CJS(ch,dat_out_group$freq) #overall
-
-test2ct(ch,dat_out_group$freq) #presence of trap dependence
-#positive signed test indicates immediate "trap shyness" 
-
-test3sr(ch,dat_out_group$freq) #present of transients
-#positive signed test indicates an excess of never seen again among the newly marked
-
-test3sm(ch,dat_out_group$freq) #overdispersion
-
-test2cl(ch,dat_out_group$freq) #overdispersion
-
-
-#multistate test
-
-overall_JMV(ch,dat_out_group$freq)
-
-# past encounter history should not matter (memory and transience)
-test3Gsr(ch,dat_out_group$freq) #transients
-test3Gsm(ch,dat_out_group$freq) #complementary composite
-test3Gwbwa(ch,dat_out_group$freq) # memory
-
-testMitec(ch,dat_out_group$freq) # local trap hapiness
-testMltec(ch,dat_out_group$freq)
-
-
-
-
-
-
-
-mar_test<-R2ucare::marray(dat_out_group %>% select(mark:Tum_A) %>% as.matrix(),dat_out_group$freq)
-
-mar_test$R
-mar_test$m
-mar_test$never
-
-test2ct(dat_out_group %>% select(mark:adult_all) %>% as.matrix(),dat_out_group$freq)
-
-test2cl(dat_out_group %>% select(mark:adult_all) %>% as.matrix(),dat_out_group$freq)
-
-# Frequency of capture histories
- sort(tapply(mscjs_dat$dat_out$freq,mscjs_dat$dat_out$ch,sum))
-
-
-```
-
-Run time-dependent model in JAGS 
-
-```{r}
-
-sink("cjs-mnl.jags")
-cat("
-model {
-# Priors and constraints
-for (t in 1:(n.occasions-1)){
-   phi[t] ~ dunif(0, 1)         # Priors for survival
-   p[t] ~ dunif(0, 1)           # Priors for recapture
-   }
-# Define the multinomial likelihood
-for (t in 1:(n.occasions-1)){
-   marr[t,1:n.occasions] ~ dmulti(pr[t, ], rel[t])
-   }
-# Define the cell probabilities of the m-array
-# Main diagonal
-for (t in 1:(n.occasions-1)){
-   q[t] <- 1-p[t]                # Probability of non-recapture
-   pr[t,t] <- phi[t]*p[t]
-   # Above main diagonal
-   for (j in (t+1):(n.occasions-1)){
-      pr[t,j] <- prod(phi[t:j])*prod(q[t:(j-1)])*p[j]
-      } #j
-   # Below main diagonal
-   for (j in 1:(t-1)){
-      pr[t,j] <- 0
-      } #j
-   } #t
-# Last column: probability of non-recapture
-for (t in 1:(n.occasions-1)){
-   pr[t,n.occasions] <- 1-sum(pr[t,1:(n.occasions-1)])
-   } #t
-
-}
-",fill = TRUE)
-sink()
-
-# Create the m-array from the capture-histories
-marr <- cbind(mar_test$m[,,1],mar_test$never)
-
-# Bundle data
-jags.data <- list(marr = marr, n.occasions = dim(marr)[2], rel = rowSums(marr))
-
-# Initial values
-inits <- function(){list(phi = runif(dim(marr)[2]-1, 0, 1), p = runif(dim(marr)[2]-1, 0, 1))}  
-
-# Parameters monitored
-parameters <- c("phi", "p")
-
-# MCMC settings
-ni <- 10000
-nt <- 3
-nb <- 5000
-nc <- 3
-
-# Call JAGS from R 
-library(R2jags)
-
-cjs <- jags(jags.data, inits, parameters, "cjs-mnl.jags", n.chains = nc, n.thin = nt, n.iter = ni, n.burnin = nb, working.directory = getwd())
-
-print(cjs, digits = 3) 
-
-
-
-
-
-```
-
-
 
 ```{r, process_dat,echo=FALSE}
 mscjs_dat<- make_dat(mark_file_CH,sites=c( "LWe_J",
@@ -407,12 +263,19 @@ mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
 #experimental
 # gc()
 # colnames(mscjs_dat$Phi.design.dat)
+
+
+test<-glmmTMB.mod::glmmTMB(formula(par.index~1+ pc(0+time1 |mig_year)), data=mscjs_dat$Phi.design.dat,dispformula = ~0,doFit=FALSE)
+
+test$data.tmb$terms$`0 + time1 | mig_year`
+
+
 mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
                          phi_formula=par.index~
                            
                            #fixed effect
                            -1+ time1:LH + #time1:LHsummer:streamChiwawa + time1:LHsmolt:streamNason+
-time1:streamWhite:LHsmolt+time1:streamWhite:LHfall+ 
+
                          +time1:sum_flow:LHsummer+time1:win_air:age_0 + 
                            time2 +  time2:LHsmolt  +#time2:RIS_temp_juv +  #time2:streamNason+ #to mcnary
                            time3 + #time3:McN_flow +#to Bonneville
@@ -422,7 +285,7 @@ time1:streamWhite:LHsmolt+time1:streamWhite:LHfall+
                            time6 +#time6:stratum3 +    #to Tumwater
                            #random
                            diag(0+time1+time2 |mig_year)+
-                          (0+time4 |mig_year)#+
+                          (0+time4 |mig_year) + pc(0+time1:LHfall:streamWhite+ time1:streamWhite:LHsmolt |one_group)+pc(0time1:streamWhite:LHsmolt |one_group)#+
                             # diag(0+time1:LHsmolt|mig_year)
                          ,
                       
@@ -454,13 +317,65 @@ time1:streamWhite:LHsmolt+time1:streamWhite:LHfall+
                          doFit = TRUE,silent=TRUE,
                          sim_rand =0,REML=FALSE
 )
-
+dev.new()
 print_out(mscjs_fit)
 plot_func()
 
 ```
 
-```{r}
+
+
+```{r full_model}
+
+mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
+                         phi_formula=par.index~
+                           
+                            ## to Bonneville
+                           -1+ time1:LH + pc(0+time1|stream )+ pc(0+time1|stream:LH )+   pc(0+time1:sum_flow:LHsummer+time1:win_air:age_0|one) + diag(0+time1|mig_year)+
+                            ## to McNary
+                            time2+ pc(0+time2|LH) + diag(0+time2 |mig_year)+
+                            ##to Bonneville
+                            time3 + pc(0+time3|LH) + diag(0+time3|mig_year)+
+                            ## SAR to Bonneville adult
+                            time4 + pc(0+time4|LH) + diag(0+time4|mig_year)+ 
+                            pc(0+ersstWAcoast.sum|one) + 
+                            ## to McNary Adult
+                            time5 + diag(0+time5|mig_year)+  pc(0+time5|stratum ) +                  
+                            ## to Tumwater Adults
+                            time6 + diag(0+time6|mig_year) + pc(0+time6|stratum )
+                            ,
+                            p_formula= par.index~
+                            ## Lower Wenatchee Trap
+                            -1+ time2:LH + pc(0+time2|stream )+ pc(0+time2|stream:LH )+ diag(0+time2|mig_year)+  
+                            ## McNary Juveniles
+                            time3+ pc(0+time3|LH) + diag(0+time3 |mig_year)+
+                            # Bonneville Juvenile
+                            time4+ pc(0+time4|LH) +pc(0+time4:McN_J:LH|one) + diag(0+time4 |mig_year) + 
+                            # Bonn adult
+                            time5 + diag(0+time5 |mig_year)+ pc(0+time5|stratum ) +
+                            #McNary adult
+                            time6 + diag(0+time6 |mig_year)+ pc(0+time6|stratum )
+                         ,
+                         
+                            psi_formula= par.index~
+                            #fixed effects
+                            -1+tostratum + pc(0+tostratum|LH)+pc(0+tostratum|stream)+
+                            #random
+                            (0+tostratum|mig_year)
+                           ,
+                            doFit = TRUE,silent=TRUE,
+                            sim_rand =0,REML=FALSE
+)
+
+mscjs_fit$Phi.design.glmmTMB$data.tmb$terms$`0 + time1 | stream:LH`
+dev.new()
+print_out(mscjs_fit)
+plot_func()
+```
+
+
+
+```{r GOF}
 
 last_best<-mscjs_fit$mod$env$last.par.best
 #mscjs_fit$Phi.design.glmmTMB$data.tmb$terms
@@ -596,8 +511,8 @@ mod_rep<-mscjs_fit$mod$report()
 Phi.design.dat2 <- mscjs_dat$Phi.design.dat%>% mutate(phi_fit=mod_rep$phi,
                                             eta_phi= sd_rep$value[names(sd_rep$value)=="eta_phi"],
                                             eta_phi_sd=sd_rep$sd[names(sd_rep$value)=="eta_phi"],
-                                            lcl_phi=pnorm(qnorm(.025,eta_phi,eta_phi_sd)),
-                                            ucl_phi=pnorm(qnorm(.975,eta_phi,eta_phi_sd))) %>% 
+                                            lcl_phi=plogis(qnorm(.025,eta_phi,eta_phi_sd)),
+                                            ucl_phi=plogis(qnorm(.975,eta_phi,eta_phi_sd))) %>% 
   mutate(LH=fct_relevel(LH,"summer","fall","smolt"))
 
 # Phi.design.dat2<-Phi.design.dat2 %>% select(time ,stratum , LH , stream ,mig_year, phi_fit)
@@ -605,8 +520,8 @@ Phi.design.dat2 <- mscjs_dat$Phi.design.dat%>% mutate(phi_fit=mod_rep$phi,
 p.design.dat <- mscjs_dat$p.design.dat %>% mutate(p_fit=mod_rep$p[-length(mod_rep$p)],
                                             eta_p=sd_rep$value[names(sd_rep$value)=="eta_p"],
                                             eta_p_sd=sd_rep$sd[names(sd_rep$value)=="eta_p"],
-                                            lcl_p=pnorm(qnorm(.025,eta_p,eta_p_sd)),
-                                            ucl_p=pnorm(qnorm(.975,eta_p,eta_p_sd)))
+                                            lcl_p=plogis(qnorm(.025,eta_p,eta_p_sd)),
+                                            ucl_p=plogis(qnorm(.975,eta_p,eta_p_sd)))
 
 
 Psi.design.dat<-mscjs_dat$Psi.design.dat %>% filter(tostratum==2) %>% select(LH,mig_year,stream,LWe_J,McN_J) %>% cbind(mod_rep$psi) %>% filter(LH!="summer",stream=="Chiwawa",McN_J==0,LWe_J==0) %>% pivot_longer(`1`:`3`,names_to="years",values_to="prop") %>% mutate(LH=ifelse(LH=="fall","Subyearling","Smolt"))
