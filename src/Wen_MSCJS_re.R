@@ -184,7 +184,9 @@ make_dat<-function(mark_file_CH=mark_file_CH, sites=c("LWe_J","McN_J","JDD_J","B
     #add environmental covariates
     left_join(env_dat %>% mutate(mig_year=as.factor(mig_year)),by="mig_year") %>% 
     mutate(across(sum_flow:transport.win,scale)) %>% 
-    replace(is.na(.), 0) 
+    replace(is.na(.), 0) %>% 
+    #add a column of 1's to use as a goruping variable when specifying penalized cemplexity priors
+    mutate(one="1")
   
   # add column for first time
   #downstream time
@@ -225,9 +227,10 @@ make_dat<-function(mark_file_CH=mark_file_CH, sites=c("LWe_J","McN_J","JDD_J","B
     
     filter((LH=="Unk" &stream=="LWE" )|(LH!="Unk" &stream!="LWE")) %>% 
     filter(!((LH=="Unk" &stream=="LWE")&(as.numeric(as.character(sea_Year_p))%in%(2011:2012)))) %>% #remove years with no releases at lower trap, so don't estimate proportions below
-    
     #make par index a sequence
-    mutate(par.index=(1:nrow(.))-1)
+    mutate(par.index=(1:nrow(.))-1)%>% 
+    #add a column of 1's to use as a goruping variable when specifying penalized cemplexity priors
+    mutate(one="1")
   
   try(p.design.dat<-p.design.dat %>% mutate(LWe_J=as.numeric(as.character(LWe_J))))
   try(p.design.dat<-p.design.dat %>% mutate(McN_J=as.numeric(as.character(McN_J))))
@@ -255,7 +258,9 @@ make_dat<-function(mark_file_CH=mark_file_CH, sites=c("LWe_J","McN_J","JDD_J","B
     #make length bin and release DOY numeric
     # mutate(across(.cols=all_of(cont_cov),.fns=function(x)scale(as.numeric(as.character(x))))) %>% 
     #make par index a sequence
-    mutate(par.index=(1:nrow(.))-1)
+    mutate(par.index=(1:nrow(.))-1)%>% 
+    #add a column of 1's to use as a goruping variable when specifying penalized cemplexity priors
+    mutate(one="1")
   
   
   #~~~~
@@ -422,17 +427,17 @@ return(list(dat_out=dat_out,
 
 
 
-fit_wen_mscjs<-function(x,phi_formula, p_formula, psi_formula,doFit=TRUE,silent=FALSE,sd_rep=TRUE,sim_rand=1,REML=FALSE,hypersd=1){
+fit_wen_mscjs<-function(x,phi_formula, p_formula, psi_formula,doFit=TRUE,silent=FALSE,sd_rep=TRUE,sim_rand=1,REML=FALSE,hypersd=1,map_hypers=c(FALSE,FALSE)){
 #~~~~
 #glmmTMB objects to get design matrices etc. for each parameter
 ## phi
-Phi.design.glmmTMB<-glmmTMB::glmmTMB(formula(phi_formula), data=x$Phi.design.dat,dispformula = ~0,doFit=FALSE)
+Phi.design.glmmTMB<-glmmTMB.mod::glmmTMB(formula(phi_formula), data=x$Phi.design.dat,dispformula = ~0,doFit=FALSE)
 #time+time:LH+time:stream+diag(0+time|stream:LH:mig_year)
 ## p
-p.design.glmmTMB<-glmmTMB::glmmTMB(formula(p_formula), data=x$p.design.dat,dispformula = ~0,doFit=FALSE)
+p.design.glmmTMB<-glmmTMB.mod::glmmTMB(formula(p_formula), data=x$p.design.dat,dispformula = ~0,doFit=FALSE)
 #par.index~time+time:LH+time:stream
 ## psi
-Psi.design.glmmTMB<-glmmTMB::glmmTMB(formula(psi_formula), data=x$Psi.design.dat,dispformula = ~0,doFit=FALSE)
+Psi.design.glmmTMB<-glmmTMB.mod::glmmTMB(formula(psi_formula), data=x$Psi.design.dat,dispformula = ~0,doFit=FALSE)
 #par.index~tostratum+tostratum:LH,
 
 #+diag(0+time|stream:LH:mig_year)
@@ -513,8 +518,14 @@ par_TMB<-list(
   
   random<-c("b_phi","b_p","b_psi","logit_p_subs")
   if(REML){random<-c("beta_phi","beta_p","beta_psi",random)}
-#initialize model
-mod<-TMB::MakeADFun(data=dat_TMB,parameters = par_TMB,random=random,DLL ="wen_mscjs_re_2", silent = silent)
+
+  # set hyper paramaters of distribution of proportionf os subyearlings at trap as fixed.
+  map<-list()
+  if(map_hypers[1]){map$hyper_mean=factor(NA)}
+  if(map_hypers[2]){map$hyper_SD=factor(NA)}
+  
+  #initialize model
+mod<-TMB::MakeADFun(data=dat_TMB,parameters = par_TMB,random=random,map=map,DLL ="wen_mscjs_re_2", silent = silent)
 
 if(doFit){
 try(fit<-TMBhelper::fit_tmb(mod,newtonsteps = 1,getsd = sd_rep,getJointPrecision = sd_rep ))
