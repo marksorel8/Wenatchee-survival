@@ -103,7 +103,7 @@ struct terms_t : vector<per_term_info<Type> > {
 //function that calculates the probability of random effects for many different random effects structures.
 //Returns negative log prob of random effects for a given random effect compnenet e.g. (LH|year)
 template <class Type>
-Type termwise_nll(array<Type> &U, vector<Type> theta, per_term_info<Type>& term, bool do_simulate = false) {
+Type termwise_nll(array<Type> &U, vector<Type> theta, per_term_info<Type>& term, bool do_simulate = false, Type pen = 1) {
   Type ans = 0;
   if (term.blockCode == diag_covstruct){
     // case: diag_covstruct
@@ -121,7 +121,7 @@ Type termwise_nll(array<Type> &U, vector<Type> theta, per_term_info<Type>& term,
     vector<Type> sd = exp(theta);
     for(int i = 0; i < term.blockReps; i++){
       ans -= dnorm(vector<Type>(U.col(i)), Type(0), sd, true).sum();
-      ans -= (dexp(sd,Type(1),true).sum() +theta.sum()); //penaliuze complexity
+      ans -= (dexp(sd,pen,true).sum() +theta.sum()); //penaliuze complexity
       if (do_simulate) {
         U.col(i) = rnorm(Type(0), sd);
       }
@@ -314,7 +314,7 @@ Type termwise_nll(array<Type> &U, vector<Type> theta, per_term_info<Type>& term,
 template <class Type>
 Type allterms_nll(vector<Type> &u, vector<Type> theta,
                   vector<per_term_info<Type> >& terms,
-                  bool do_simulate = false) {
+                  bool do_simulate = false, Type pen = 1) {
   Type ans = 0;
   int upointer = 0;
   int tpointer = 0;
@@ -329,7 +329,7 @@ Type allterms_nll(vector<Type> &u, vector<Type> theta,
     dim << terms(i).blockSize, terms(i).blockReps;
     array<Type> useg( &u(upointer), dim);
     vector<Type> tseg = theta.segment(tpointer + offset, np);
-    ans += termwise_nll(useg, tseg, terms(i), do_simulate);
+    ans += termwise_nll(useg, tseg, terms(i), do_simulate,pen);
     upointer += nr;
     tpointer += terms(i).blockNumTheta;
   }
@@ -395,7 +395,9 @@ DATA_IVECTOR(psi_pim_sim);  // index of psi parameters for the simulation
 DATA_IVECTOR(TD_occ);       // occasions with trap dependent detection (effect of detection/non-detection at previous occasion)
 DATA_IVECTOR(TD_i);         // p_pim_sim index for detection parameters for fish that were detected at the previous occasion
 DATA_INTEGER(sim_rand);     //flag indicating whether to simulate the random effects in simulations
-  
+
+//penality parameter for PC prior
+DATA_SCALAR(pen);
   
   //~~~~~~~~~~~~~~~~~~~
   // Parameters
@@ -419,6 +421,12 @@ DATA_INTEGER(sim_rand);     //flag indicating whether to simulate the random eff
   
   // Joint negative log-likelihood
   parallel_accumulator<Type> jnll(this);
+  
+  //L2 regularizations
+  // jnll+= (vector<Type>(beta_phi*beta_phi).sum() +
+  //         vector<Type>(beta_p*beta_p).sum()+
+  //         vector<Type>(beta_psi*beta_psi).sum())*pen;
+
 // Type jnll = 0;
   // Linear predictors
   //// Fixed component
@@ -454,9 +462,9 @@ DATA_INTEGER(sim_rand);     //flag indicating whether to simulate the random eff
   //~~~~~~~~~~~~~~~~~~~
   
   // Random effects
-  jnll += allterms_nll(b_phi, theta_phi, phi_terms, this->do_simulate);//phi
-  jnll += allterms_nll(b_p, theta_p, p_terms, this->do_simulate);//p
-  jnll += allterms_nll(b_psi, theta_psi, psi_terms, this->do_simulate);//psi
+  jnll += allterms_nll(b_phi, theta_phi, phi_terms, this->do_simulate, pen);//phi
+  jnll += allterms_nll(b_p, theta_p, p_terms, this->do_simulate, pen);//p
+  jnll += allterms_nll(b_psi, theta_psi, psi_terms, this->do_simulate, pen);//psi
   
   
 

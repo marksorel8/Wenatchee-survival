@@ -74,52 +74,52 @@ mark_file_CH<-mark_file %>%
 #Bonneville Adult
   left_join(lower_mid_col_dams %>% 
             filter(`Site Code Value` %in% c("BO1", "BO2",  "BO3", "BO")) %>% 
-            select(c(`Tag Code`,`First Year YYYY`)) %>% 
-            arrange(desc(`First Year YYYY`)) %>% #latest year detected first, so when we take distinct below that is the one we keep
+            select(c(`Tag Code`,`Last Year YYYY`)) %>% 
+            arrange(desc(`Last Year YYYY`)) %>% #latest year detected first, so when we take distinct below that is the one we keep
             distinct(`Tag Code`,.keep_all=TRUE) %>% 
-            rename("Bon_A"="First Year YYYY"),by="Tag Code") %>% 
+            rename("Bon_A"="Last Year YYYY"),by="Tag Code") %>% 
 
 #The Dalles Adult
   left_join(lower_mid_col_dams %>% 
             filter(`Site Code Value` %in% c("TD1", "TD2")) %>% 
-            select(c(`Tag Code`,`First Year YYYY`)) %>%
-            arrange(desc(`First Year YYYY`)) %>%
+            select(c(`Tag Code`,`Last Year YYYY`)) %>%
+            arrange(desc(`Last Year YYYY`)) %>%
             distinct(`Tag Code`,.keep_all=TRUE) %>%
-            rename("TDD_A"="First Year YYYY"),by="Tag Code") %>%
+            rename("TDD_A"="Last Year YYYY"),by="Tag Code") %>%
 
 #John Day Adult
   left_join(lower_mid_col_dams %>% 
             filter(`Site Code Value` %in% c("JO1", "JO2")) %>% 
-            select(c(`Tag Code`,`First Year YYYY`)) %>%
-            arrange(desc(`First Year YYYY`)) %>%
+            select(c(`Tag Code`,`Last Year YYYY`)) %>%
+            arrange(desc(`Last Year YYYY`)) %>%
             distinct(`Tag Code`,.keep_all=TRUE) %>%
-            rename("JDD_A"="First Year YYYY"),by="Tag Code") %>% 
+            rename("JDD_A"="Last Year YYYY"),by="Tag Code") %>% 
 
 #McNary Adult
 left_join(lower_mid_col_dams %>% 
           filter(`Site Code Value` %in% c("MC1", "MC2")) %>% 
-          select(c(`Tag Code`,`First Year YYYY`)) %>% 
-          arrange(desc(`First Year YYYY`)) %>%
+          select(c(`Tag Code`,`Last Year YYYY`)) %>% 
+          arrange(desc(`Last Year YYYY`)) %>%
           distinct(`Tag Code`,.keep_all=TRUE) %>%
-          rename("McN_A"="First Year YYYY"),by="Tag Code") %>% 
+          rename("McN_A"="Last Year YYYY"),by="Tag Code") %>% 
   
 #Priest Rapids Adult
   left_join(upper_col_dams_tum %>% 
             filter(`Site Code Value` == c("PRA")) %>% 
-            select(c(`Tag Code`,`First Year YYYY`)) %>% 
-            rename("PRa_A"="First Year YYYY"),by="Tag Code") %>% 
+            select(c(`Tag Code`,`Last Year YYYY`)) %>% 
+            rename("PRa_A"="Last Year YYYY"),by="Tag Code") %>% 
   
 #Rock Island Adult
   left_join(upper_col_dams_tum %>% 
             filter(`Site Code Value` == c("RIA")) %>% 
-            select(c(`Tag Code`,`First Year YYYY`)) %>% 
-            rename("RIs_A"="First Year YYYY"),by="Tag Code") %>% 
+            select(c(`Tag Code`,`Last Year YYYY`)) %>% 
+            rename("RIs_A"="Last Year YYYY"),by="Tag Code") %>% 
   
 #Tumwater adult #TODO check if juveniles/ ghost tags detected
   left_join(upper_col_dams_tum %>% 
             filter(`Site Code Value` == c("TUF")) %>%
-            select(c(`Tag Code`,`First Year YYYY`)) %>%
-            rename("Tum_A"="First Year YYYY"),by="Tag Code") %>% 
+            select(c(`Tag Code`,`Last Year YYYY`)) %>%
+            rename("Tum_A"="Last Year YYYY"),by="Tag Code") %>% 
 
 #Add juvenile life history
   

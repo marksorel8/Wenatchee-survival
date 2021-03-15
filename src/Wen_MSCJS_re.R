@@ -65,7 +65,7 @@ make_dat<-function(mark_file_CH=mark_file_CH,sites=c("LWe_J","McN_J","JDD_J","Bo
       ) %>%
       #subset some very small or large length
       filter(length_bin>=55 &length_bin<=200 ) %>%
-      mutate(across(c(length_bin,rel_DOY_bin),scale)) %>% 
+      mutate(across(c(length_bin),scale)) %>% 
       #subset columns needed for analysis
       select(sea_Year_p,LH,stream, #grouping variables
              all_of(sites),all_of(cont_cov))
@@ -377,8 +377,10 @@ if(length(trap_dep)==2)
 
   TD_i[1]<-TD_i[2]-1
 
-
-
+#add number of fish in each group (freq) to design data for calculating averages
+Phi.design.dat<-left_join(Phi.design.dat,releases) 
+p.design.dat<-left_join(p.design.dat,releases)
+Psi.design.dat<-left_join(Psi.design.dat,releases %>% rename(mig_year=sea_Year_p)   %>% ungroup())
 
 return(list(dat_out=dat_out,
             sites=sites,
@@ -394,6 +396,7 @@ return(list(dat_out=dat_out,
             nDS_OCC=nDS_OCC,
             n_unique_CH=n_unique_CH,
             n_states=n_states,
+            releases=releases,
             n_released=releases$freq,
             phi_pim_sim=phi_pim_sim,
             p_pim_sim=p_pim_sim ,
@@ -405,7 +408,7 @@ return(list(dat_out=dat_out,
 }
 
 
-fit_wen_mscjs<-function(x,phi_formula, p_formula, psi_formula,doFit=TRUE,silent=FALSE,sd_rep=TRUE,sim_rand=1,REML=FALSE){
+fit_wen_mscjs<-function(x,phi_formula, p_formula, psi_formula,doFit=TRUE,silent=FALSE,sd_rep=TRUE,sim_rand=1,REML=FALSE,pen=1){
 #~~~~
 #glmmTMB objects to get design matrices etc. for each parameter
 ## phi
@@ -451,6 +454,7 @@ dat_TMB<-with(x,list(
   psi_pim_sim=psi_pim_sim,
   TD_occ=TD_occ,
   TD_i= TD_i,
+  pen=pen,
   sim_rand = sim_rand #draw random effects from hyperdistribution in simulation rather than sampling from posterior. 
 ))
 
