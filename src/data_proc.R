@@ -10,6 +10,17 @@ mark_file<-read_csv(here("Data","ptagis","Tagging detail.csv")) %>%
          `Capture Method Code`=="SCREWT"
          )
 
+#Wild or natural origin spring Chinook captured by screw trap in the Lower Wenatchee Trap
+LWe_mark_file<-read_csv(here("Data","ptagis","Lower Wen Tagging detail.csv")) %>% 
+  filter(`Rear Type Code`=="W",
+         `Run Name`=="Spring",
+         `Species Name`=="Chinook",
+         `Capture Method Code`=="SCREWT"
+  ) %>% mutate(mark_time=1)
+
+mark_file<-rbind(mark_file,LWe_mark_file)
+rm(LWe_mark_file)
+
 #code for getting day of year from ptagis date column
 #test<-lower_mid_col_dams %>% mutate(`First Date MMDDYYYY2`=as.Date(`First Date MMDDYYYY`,format="%m/%d/%Y"), doy=lubridate::yday(`First Date MMDDYYYY2`))
 
@@ -33,6 +44,16 @@ upper_col_dams_tum<-read_csv(here("Data","ptagis","upper_Col_Wen_Interrogation_s
 
 #load length cutoffs for subyearling/yearling delineation for all days <=179
 load(here("Data","cutoffs_and_props.Rdata"))
+
+#detection data for fish released in lower Wenatchee trap from Dan W. 
+obs_dat_LWe_releases<-read_csv(here("Data","ptagis","ptagis_obs_data_lower_wen_screwt.csv")) %>%
+  mutate(date_det=lubridate::date(lubridate::mdy_hms(obs_date))) %>%
+  group_by(tag_id,obs_site) %>% mutate(first_date=min(date_det),last_det=max(date_det)) %>%
+  select(!obs_date:date_det) %>% droplevels() %>%
+  distinct() %>% ungroup() %>%
+  mutate("First Year YYYY"=lubridate::year(first_date),"Last Year YYYY"=lubridate::year(last_det)) %>%
+  mutate("First DOY"=lubridate::yday(first_date),"Last DOY"=lubridate::yday(last_det)) %>%
+  rename("Site Code Value"=obs_site,"Tag Code"=tag_id)
 
 #add capture histories to mark file
 mark_file_CH<-mark_file %>% 
@@ -145,6 +166,7 @@ filter(
   
 #assign life history (LH)
   mutate(LH= case_when(
+    age=="Unk" ~ "Unk",
     age=="YCW" ~ "smolt",
     `Mark Day Number`<= 139 ~"fry",
     `Mark Day Number`<=262 ~"summer",
@@ -160,7 +182,7 @@ mutate(stream = case_when(
   TRUE ~ "White"
 )) %>% 
 #add predicted seaward migration year
-mutate(sea_Year_p = ifelse(age=="YCW",`Mark Year YYYY`,`Mark Year YYYY`+1)) %>% 
+mutate(sea_Year_p = ifelse(age%in%c("YCW","Unk"),`Mark Year YYYY`,`Mark Year YYYY`+1)) %>% 
 
 #mutate detections to be years between seaward migration year and detection year 
 mutate_at(vars(LWe_J:Tum_A), ~.x-sea_Year_p) %>%  
