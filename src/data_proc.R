@@ -34,16 +34,13 @@ rm(LWe_mark_file)
 #   rename("Site Code Value"=obs_site,"Tag Code"=tag_id)
 
 #recaptures in lower Wenatchee dams
-lower_wen_traps_recaps<-read_csv(here("Data","ptagis","ptagis_recap_data_wen_trib_screwt.csv")) %>% mutate(recap_date=lubridate::mdy_hms(recap_date),"First Year YYYY"=lubridate::year(recap_date)) %>% rename("Tag Code" = tag_id ) %>% arrange(recap_date)
+lower_wen_traps_recaps<-read_csv(here("Data","ptagis","ptagis_recap_data_wen_trib_screwt.csv")) %>% mutate(recap_date=lubridate::mdy_hms(recap_date),"First Year YYYY"=lubridate::year(recap_date),"First Day Num"=lubridate::yday(recap_date)) %>% rename("Tag Code" = tag_id ) %>% arrange(recap_date)
 
 #Lower and mid Columbia mainstem dam detections
 lower_mid_col_dams<-read_csv(here("Data","ptagis","mid_lower_Col_Interrogation_Summary.csv"))
 
 #upper Columbia mainstem Dam and Tumwater Dam detections
 upper_col_dams_tum<-read_csv(here("Data","ptagis","upper_Col_Wen_Interrogation_summary.csv"))
-
-#load length cutoffs for subyearling/yearling delineation for all days <=179
-load(here("Data","cutoffs_and_props.Rdata"))
 
 #detection data for fish released in lower Wenatchee trap from Dan W. 
 obs_dat_LWe_releases<-read_csv(here("Data","ptagis","ptagis_obs_data_lower_wen_screwt.csv")) %>%
@@ -52,8 +49,18 @@ obs_dat_LWe_releases<-read_csv(here("Data","ptagis","ptagis_obs_data_lower_wen_s
   select(!obs_date:date_det) %>% droplevels() %>%
   distinct() %>% ungroup() %>%
   mutate("First Year YYYY"=lubridate::year(first_date),"Last Year YYYY"=lubridate::year(last_det)) %>%
-  mutate("First DOY"=lubridate::yday(first_date),"Last DOY"=lubridate::yday(last_det)) %>%
+  mutate("First Day Num"=lubridate::yday(first_date),"Last DOY"=lubridate::yday(last_det)) %>%
   rename("Site Code Value"=obs_site,"Tag Code"=tag_id)
+
+#add rows for detections of fish released at lower wenatchee trap
+lower_mid_col_dams<-bind_rows(lower_mid_col_dams,obs_dat_LWe_releases %>% filter(`Site Code Value`%in% c("MCJ","JDJ","B1J","B2J","BCC","TWX","BO1", "BO2", "BO3", "BO", "MC1", "MC2","JO1", "JO2","TD1", "TD2")))
+
+upper_col_dams_tum<-bind_rows(upper_col_dams_tum,obs_dat_LWe_releases %>% filter(`Site Code Value`%in% c(  "PRA","RIA","TUF")))
+
+
+#load length cutoffs for subyearling/yearling delineation for all days <=179
+load(here("Data","cutoffs_and_props.Rdata"))
+
 
 #add capture histories to mark file
 mark_file_CH<-mark_file %>% 
@@ -61,87 +68,100 @@ mark_file_CH<-mark_file %>%
 #Lower Wenatchee Juvenile recapture
  left_join(lower_wen_traps_recaps %>%
               filter(`recap_site` %in% c("WENA4T","WENATT")) %>% #subset McNary juvenile detection sites
-              select(c(`Tag Code`,`First Year YYYY`)) %>% #take columns first detection year and pit code
+              select(c(`Tag Code`,`First Year YYYY`,`First Day Num`)) %>% #take columns first detection year and pit code
              # arrange(recap_date) %>% #arrange in order of increasing recap_date
              distinct(`Tag Code`,.keep_all=TRUE) %>% #remove duplicate detections at multiple "sites" at this trap 
-              rename("LWe_J"="First Year YYYY"),by="Tag Code") %>%   #rename to represent site for merging
+              rename("LWe_J"="First Year YYYY",
+                     "LWe_J_doy"="First Day Num"),by="Tag Code") %>%   #rename to represent site for merging
 
 #McNary Juvenile detection
   left_join(lower_mid_col_dams %>% 
             filter(`Site Code Value` =="MCJ") %>% #subset McNary juvenile detection sites 
-            select(c(`Tag Code`,`First Year YYYY`)) %>% #take columns first detection year and pit code 
-            rename("McN_J"="First Year YYYY"),by="Tag Code") %>%   #rename to represent site for merging
+            select(c(`Tag Code`,`First Year YYYY`,`First Day Num`)) %>% #take columns first detection year and pit code 
+            rename("McN_J"="First Year YYYY",
+                   "McN_J_doy"="First Day Num"),by="Tag Code") %>%   #rename to represent site for merging
 
 #John Day Juvenle detection
   left_join(lower_mid_col_dams %>% 
               filter(`Site Code Value` =="JDJ") %>% 
-              select(c(`Tag Code`,`First Year YYYY`)) %>%
-              rename("JDD_J"="First Year YYYY"),by="Tag Code") %>%
+              select(c(`Tag Code`,`First Year YYYY`,`First Day Num`)) %>%
+              rename("JDD_J"="First Year YYYY",
+                     "JDD_J_doy"="First Day Num"),by="Tag Code") %>%
 
 #Bonneville Juvenile detection
   left_join(lower_mid_col_dams %>% 
             filter(`Site Code Value` %in% c("B1J","B2J","BCC")) %>% 
-            select(c(`Tag Code`,`First Year YYYY`)) %>% 
+            select(c(`Tag Code`,`First Year YYYY`,`First Day Num`)) %>% 
             arrange(`First Year YYYY`) %>% #arrange in order of increasing first year
             distinct(`Tag Code`,.keep_all=TRUE) %>% #remove duplicate detections at multiple "sites" at this dam 
-            rename("Bon_J"="First Year YYYY"),by="Tag Code") %>%   
+            rename("Bon_J"="First Year YYYY",
+                   "Bon_J_doy"="First Day Num"),by="Tag Code") %>%   
 
 #estuary towed array
   left_join(lower_mid_col_dams %>% 
             filter(`Site Code Value` =="TWX") %>% 
-            select(c(`Tag Code`,`First Year YYYY`)) %>%
-            rename("Est_J"="First Year YYYY"),by="Tag Code") %>% 
+            select(c(`Tag Code`,`First Year YYYY`,`First Day Num`)) %>%
+            rename("Est_J"="First Year YYYY",
+                   "Est_J_doy"="First Day Num"),by="Tag Code") %>% 
 
 #Bonneville Adult
   left_join(lower_mid_col_dams %>% 
             filter(`Site Code Value` %in% c("BO1", "BO2",  "BO3", "BO")) %>% 
-            select(c(`Tag Code`,`Last Year YYYY`)) %>% 
+            select(c(`Tag Code`,`Last Year YYYY`,`Last Day Num`)) %>% 
             arrange(desc(`Last Year YYYY`)) %>% #latest year detected first, so when we take distinct below that is the one we keep
             distinct(`Tag Code`,.keep_all=TRUE) %>% 
-            rename("Bon_A"="Last Year YYYY"),by="Tag Code") %>% 
+            rename("Bon_A"="Last Year YYYY",
+                   "Bon_A_doy"="Last Day Num"),by="Tag Code") %>% 
 
 #The Dalles Adult
   left_join(lower_mid_col_dams %>% 
             filter(`Site Code Value` %in% c("TD1", "TD2")) %>% 
-            select(c(`Tag Code`,`Last Year YYYY`)) %>%
+            select(c(`Tag Code`,`Last Year YYYY`,`Last Day Num`)) %>%
             arrange(desc(`Last Year YYYY`)) %>%
             distinct(`Tag Code`,.keep_all=TRUE) %>%
-            rename("TDD_A"="Last Year YYYY"),by="Tag Code") %>%
+            rename("TDD_A"="Last Year YYYY",
+                   "TDD_A_doy"="Last Day Num"),by="Tag Code") %>%
 
 #John Day Adult
   left_join(lower_mid_col_dams %>% 
             filter(`Site Code Value` %in% c("JO1", "JO2")) %>% 
-            select(c(`Tag Code`,`Last Year YYYY`)) %>%
+            select(c(`Tag Code`,`Last Year YYYY`,`Last Day Num`)) %>%
             arrange(desc(`Last Year YYYY`)) %>%
             distinct(`Tag Code`,.keep_all=TRUE) %>%
-            rename("JDD_A"="Last Year YYYY"),by="Tag Code") %>% 
+            rename("JDD_A"="Last Year YYYY",
+                   "JDD_A_doy"="Last Day Num"),by="Tag Code") %>% 
 
 #McNary Adult
 left_join(lower_mid_col_dams %>% 
           filter(`Site Code Value` %in% c("MC1", "MC2")) %>% 
-          select(c(`Tag Code`,`Last Year YYYY`)) %>% 
+          select(c(`Tag Code`,`Last Year YYYY`,`Last Day Num`)) %>% 
           arrange(desc(`Last Year YYYY`)) %>%
           distinct(`Tag Code`,.keep_all=TRUE) %>%
-          rename("McN_A"="Last Year YYYY"),by="Tag Code") %>% 
+          rename("McN_A"="Last Year YYYY",
+                 "McN_A_doy"="Last Day Num"),by="Tag Code") %>% 
   
 #Priest Rapids Adult
   left_join(upper_col_dams_tum %>% 
             filter(`Site Code Value` == c("PRA")) %>% 
-            select(c(`Tag Code`,`Last Year YYYY`)) %>% 
-            rename("PRa_A"="Last Year YYYY"),by="Tag Code") %>% 
+            select(c(`Tag Code`,`Last Year YYYY`,`Last Day Num`)) %>% 
+            rename("PRa_A"="Last Year YYYY",
+                   "PRa_A_doy"="Last Day Num"),by="Tag Code") %>% 
   
 #Rock Island Adult
   left_join(upper_col_dams_tum %>% 
             filter(`Site Code Value` == c("RIA")) %>% 
-            select(c(`Tag Code`,`Last Year YYYY`)) %>% 
-            rename("RIs_A"="Last Year YYYY"),by="Tag Code") %>% 
+            select(c(`Tag Code`,`Last Year YYYY`,`Last Day Num`)) %>% 
+            rename("RIs_A"="Last Year YYYY",
+                   "RIs_A_doy"="Last Day Num"),by="Tag Code") %>% 
   
 #Tumwater adult #TODO check if juveniles/ ghost tags detected
   left_join(upper_col_dams_tum %>% 
             filter(`Site Code Value` == c("TUF")) %>%
-            select(c(`Tag Code`,`Last Year YYYY`)) %>%
-            rename("Tum_A"="Last Year YYYY"),by="Tag Code") %>% 
+            select(c(`Tag Code`,`Last Year YYYY`,`Last Day Num`)) %>%
+            rename("Tum_A"="Last Year YYYY",
+                   "Tum_A_doy"="Last Day Num"),by="Tag Code") %>% 
 
+  relocate( ends_with("doy"),.after=Tum_A) %>% 
   #Add juvenile life history
   
   #add age
@@ -202,7 +222,7 @@ left_join(lower_mid_col_dams %>%
   filter(!( select(., Bon_A:RIs_A)%>% rowSums() ==0& Tum_A !=0)) %>% 
   
   mutate(LWe_J=if_else(stream=="LWE",1,LWe_J)) %>%
-  select(sea_Year_p,LH,stream,LWe_J:Tum_A,`Length mm`,`Release Day Number`)
+  select(sea_Year_p,LH,stream,LWe_J:Tum_A,`Length mm`,`Release Day Number`,LWe_J_doy:Tum_A_doy)
 
 
 write.csv(mark_file_CH,file=here("Data","mark_file_CH.csv"))
