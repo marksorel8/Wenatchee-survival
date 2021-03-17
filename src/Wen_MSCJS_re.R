@@ -24,11 +24,14 @@ if(file.exists(here("data","all_bio_data.csv"))){
   all_bio_data<-read_csv(here("data","all_bio_data.csv"))
 }
 
-make_dat<-function(mark_file_CH=mark_file_CH,sites=c("LWe_J","McN_J","JDD_J","Bon_J","Est_J","Bon_A","McN_A","PRa_A","RIs_A","Tum_A"),start_year=2006, end_year=2017,cont_cov,length_bin=5,doy_bin=10){
+make_dat<-function(mark_file_CH=mark_file_CH,sites=c("LWe_J","McN_J","JDD_J","Bon_J","Est_J","Bon_A","McN_A","PRa_A","RIs_A","Tum_A"),start_year=2006, end_year=2017,cont_cov,length_bin=5,doy_bin=10,inc_unk=FALSE){
 
   
-   # sites=c("LWe_J","McN_J","Bon_J","Bon_A","McN_A","Tum_A");start_year=2006; end_year=2017;cont_cov="rel_DOY_bin";length_bin=5;doy_bin=10
-
+   # sites=c("LWe_J","McN_J","Bon_J","Bon_A","McN_A","Tum_A");start_year=2006; end_year=2017;cont_cov="rel_DOY_bin";length_bin=5;doy_bin=10;inc_unk=FALSE
+  
+  #drop lower trap releases if not ussing
+  if(!inc_unk){mark_file_CH <-mark_file_CH %>% filter(LH!="Unk") %>% droplevels()}
+  
   if(is.null(all_of(cont_cov))){
     dat_out<- mark_file_CH %>%  
       #subset columns needed for analysis
@@ -39,7 +42,7 @@ make_dat<-function(mark_file_CH=mark_file_CH,sites=c("LWe_J","McN_J","JDD_J","Bo
       #add grouped length and release day columns
       mutate(length_bin=ceiling(Length.mm/length_bin)*length_bin-(length_bin/2),
              rel_DOY_bin=ceiling((Release.Day.Number+ifelse(LH=="smolt",365,0))/doy_bin)*doy_bin-(doy_bin/2) ,
-             rel_DOY_bin=ifelse(LH=="Unk",0,rel_DOY_bin)) %>%
+             rel_DOY_bin=ifelse(LH=="Unk",rel_DOY_bin[1],rel_DOY_bin))  %>%
       #subset some very small or large length
       filter(length_bin>=55 &length_bin<=200 & rel_DOY_bin>10) %>%
       mutate(across(c(length_bin,rel_DOY_bin),scale)) %>% 
@@ -48,16 +51,16 @@ make_dat<-function(mark_file_CH=mark_file_CH,sites=c("LWe_J","McN_J","JDD_J","Bo
              all_of(sites),all_of(cont_cov))
   }else{if(all_of(cont_cov)=="rel_DOY_bin"){
     dat_out<- mark_file_CH %>%  
-    #add grouped length and release day columns
-    mutate(rel_DOY_bin=ceiling((Release.Day.Number+ifelse(LH=="smolt",365,0))/doy_bin)*doy_bin-(doy_bin/2),
-           rel_DOY_bin=ifelse(LH=="Unk",0,rel_DOY_bin)) %>%
-    #subset some very small or large length
-    filter(rel_DOY_bin>10) %>%
+      #add grouped length and release day columns
+      mutate(rel_DOY_bin=ceiling((Release.Day.Number+ifelse(LH=="smolt",365,0))/doy_bin)*doy_bin-(doy_bin/2),
+             rel_DOY_bin=ifelse(LH=="Unk",rel_DOY_bin[1],rel_DOY_bin)) %>%
+      #subset some very small or large length
+      filter(rel_DOY_bin>10) %>%
       mutate(across(c(rel_DOY_bin),scale)) %>% 
-    #subset columns needed for analysis
-    select(sea_Year_p,LH,stream, #grouping variables
-           all_of(sites),all_of(cont_cov))
-  
+      #subset columns needed for analysis
+      select(sea_Year_p,LH,stream, #grouping variables
+             all_of(sites),all_of(cont_cov))
+    
   }else{
     dat_out<- mark_file_CH %>%  
       #add grouped length and release day columns
@@ -65,11 +68,13 @@ make_dat<-function(mark_file_CH=mark_file_CH,sites=c("LWe_J","McN_J","JDD_J","Bo
       ) %>%
       #subset some very small or large length
       filter(length_bin>=55 &length_bin<=200 ) %>%
-      mutate(across(c(length_bin),scale)) %>% 
+      mutate(across(c(length_bin,rel_DOY_bin),scale)) %>% 
       #subset columns needed for analysis
       select(sea_Year_p,LH,stream, #grouping variables
              all_of(sites),all_of(cont_cov))
   }}}
+  
+  
   dat_out<- dat_out %>%  
     #subset columns needed for analysis
     select(sea_Year_p,LH,stream, #grouping variables
@@ -87,7 +92,6 @@ make_dat<-function(mark_file_CH=mark_file_CH,sites=c("LWe_J","McN_J","JDD_J","Bo
     group_by_all() %>% summarise(freq=n()) %>% as.data.frame() %>% 
     arrange(LH) # arrange so unknown LH (marked at lower wenatchee trap) comes last
   
-
 #Occasion sites
 occasion_sites<-colnames(select(dat_out,sites[1]: sites[length(sites)]))
 #get number of site/occasions
@@ -96,55 +100,12 @@ nOCC<-nchar(dat_out$ch[1])-1
 nDS_OCC<-sum(substr(occasion_sites,5,5)=="J")
 #numbr of unique capture histories
 n_unique_CH<-nrow(dat_out)
+#number of unique CHs that are unknown
+n_known_CH<-sum(dat_out$LH!="Unk")
 #number of states
 n_states<-3
 #occasions corresponding to lower wenatchee and mcnary juveniles (for trap dependence)
 trap_dep<-which(sites%in%c("LWe_J", "McN_J"))
-
-
-#process data using RMark function. Specifies grouping variables for parameters, and type of model and hence parameters. "Multistrate" used S(Phi), p, and psi
-# wenatchee.processed<-RMark::process.data(dat_out,model="Multistrata",groups=c("LH","stream","sea_Year_p",cont_cov,sites[trap_dep]))
-
-#Make design data using RMark function. Sets up matrices for each parameter where there is a row for each combination of the grouping variables, occasion, age, etc. Specifiying the pim.type can reduce some of the combinations/# of rows. See?RMark::make.design.data() for more info. 
-# wenatchee.ddl<-RMark::make.design.data(wenatchee.processed,parameters=list(S=list(pim.type="time"), #survival changes by occasion and potentially stratum(i.e. fish age)
-#                                                                            p=list(pim.type="time"),#detection changes by occasion and potentially stratum(i.e. fish age)
-#                                                                            Psi=list(pim.type="constant")), # state (age at return) transitions only occur at one time period.
-#                                        remove.unused = FALSE)
-
-
-#potentially more efficient way f reducing calculations
-# test<-dat_out %>% 
-#   #release group
-#   select(sea_Year_p:stream,all_of(cont_cov)) %>% distinct() %>% 
-#   #add time
-#   full_join(tibble(time=2:length(sites)),by=character()) %>% mutate(Time=time-2) %>% 
-#   #add trap dependency
-#   full_join(tibble(time=which(sites=="LWe_J")+2,LWe_J=0:1),by="time") %>% 
-#   full_join(tibble(time=which(sites=="McN_J")+2,McN_J=0:1,LWe),by="time") %>% 
-#   mutate(across(LWe_J:McN_J,~replace(., is.na(.), 0))) %>% 
-#   #add stratum
-#   full_join(tibble(time=rep(((nDS_OCC+1):(nOCC-1))+1,3),stratum=rep(1:3,each=nOCC-nDS_OCC-1)),by="time") %>% 
-#   mutate(stratum=as.factor(replace(stratum, is.na(stratum), 1))) %>% 
-#   #make time a factor variable
-#   mutate(time=as.factor(time)) %>% 
-#   #make group column
-#   mutate(group=select(., LH,stream,sea_Year_p,all_of(cont_cov),LWe_J,McN_J) %>%  reduce(paste0))
-  
-  
-# test<-dat_out %>% 
-#   #release group
-#   select(sea_Year_p:stream,all_of(cont_cov)) %>% distinct() %>% 
-#   #add trap dependency
-#   full_join(tibble(LWe_J=0:1),by=character()) %>% 
-#   full_join(tibble(McN_J=0:1),by=character()) %>% 
-#   #add stratum
-#   full_join(tibble(stratum=1),by=character()) %>% 
-#   full_join(tibble(tostratum=as.factor(2:3)),by=character()) %>% 
-#   #make group column
-#   mutate(group=select(., LH,stream,sea_Year_p,all_of(cont_cov),LWe_J,McN_J) %>%  reduce(paste0)) %>% 
-#   mutate(par.index=1:nrow(.))
-
-
 
 
 
@@ -303,6 +264,8 @@ Psi_pim<-match(paste0(dat_out %>% select(LH,stream,sea_Year_p,all_of(cont_cov),s
 #### number released per year, LH, stream, and continuous covariate bin
 releases<-dat_out %>% select(LH,stream,(cont_cov),sea_Year_p,freq) %>% group_by(across(LH:sea_Year_p))%>% summarise(freq =sum(freq))
 
+#cohorts thaty aren't releases form lower trap
+n_known_CH_sim<-sum(releases$LH!="Unk")
 
 ### phi pim for simulation
 phi_pim_sim<-inner_join(releases,Phi.design.dat %>% select(par.index,time,stratum,c("LH","stream","sea_Year_p",cont_cov,sites[trap_dep]))) %>% arrange(time,stratum,LWe_J,McN_J) %>% # combine releases with design data
@@ -353,15 +316,31 @@ p.design.dat <- p.design.dat %>% filter(LH!="Unk" &stream!="LWE") %>% droplevels
 n_known_LH_p<-nrow(p.design.dat)
 
 # Psi.design.dat <- Psi.design.dat %>% filter(LH!="Unk" &stream!="LWE") %>% droplevels()
- 
 #### pims
-Phi.pim_unk <- inner_join(Phi.design.dat_unk %>% select(sea_Year_p,time,stratum,LWe_J,McN_J ), Phi.design.dat %>% filter(stream=="Chiwawa"&LH!="summer") %>% select(par.index,sea_Year_p,LH,time,stratum,LWe_J,McN_J ) %>% droplevels(),by=c("sea_Year_p","time","stratum","LWe_J","McN_J")) %>% pivot_wider(values_from=par.index,names_from=c(LH)) 
 
-p.pim_unk <- inner_join(p.design.dat_unk %>% select(sea_Year_p,time,stratum,LWe_J,McN_J ), p.design.dat %>% filter(stream=="Chiwawa"&LH!="summer") %>% select(par.index,sea_Year_p,LH,time,stratum,LWe_J,McN_J ) %>% droplevels(),by=c("sea_Year_p","time","stratum","LWe_J","McN_J")) %>% pivot_wider(values_from=par.index,names_from=c(LH))
+#placeholders
+Phi.pim_unk<-NA
+p.pim_unk<-NA
+Phi.pim_unk_years <- NA
+p.pim_unk_years<- NA
+#make real pims
+if(inc_unk){
+Phi.pim_unk <- inner_join(Phi.design.dat_unk %>% select(sea_Year_p,time,stratum,LWe_J,McN_J)%>% droplevels() %>% ungroup %>% distinct(), Phi.design.dat %>% filter(stream=="Chiwawa"&LH!="summer") %>% select(par.index,sea_Year_p,LH,time,stratum,LWe_J,McN_J) %>% droplevels() %>% ungroup() %>% distinct(across(sea_Year_p:McN_J),.keep_all = TRUE),by=c("sea_Year_p","time","stratum","LWe_J","McN_J")) %>% pivot_wider(values_from=par.index,names_from=c(LH)) 
 
+p.pim_unk <- inner_join(p.design.dat_unk %>% select(sea_Year_p,time,stratum,LWe_J,McN_J)%>% droplevels() %>% ungroup %>% distinct(), p.design.dat %>% filter(stream=="Chiwawa"&LH!="summer") %>% select(par.index,sea_Year_p,LH,time,stratum,LWe_J,McN_J) %>% droplevels() %>% ungroup() %>% distinct(across(sea_Year_p:McN_J),.keep_all = TRUE),by=c("sea_Year_p","time","stratum","LWe_J","McN_J")) %>% pivot_wider(values_from=par.index,names_from=c(LH)) 
+
+#no subyearlings released in 2006 so make subyearling parameters smolts parameters
+
+Phi.pim_unk[Phi.pim_unk$sea_Year_p==2006,"fall"]<-Phi.pim_unk[Phi.pim_unk$sea_Year_p==2006,"smolt"]
+p.pim_unk[p.pim_unk$sea_Year_p==2006,"fall"]<-p.pim_unk[p.pim_unk$sea_Year_p==2006,"smolt"]
+
+Phi.pim_unk_years <- Phi.pim_unk%>% pull(sea_Year_p ) %>% as.numeric() - 1
+p.pim_unk_years<- p.pim_unk %>% pull(sea_Year_p ) %>% as.numeric() - 1
+
+Phi.pim_unk <- Phi.pim_unk %>% select(fall:smolt) %>% as.matrix()
+p.pim_unk <- p.pim_unk %>% select(fall:smolt) %>% as.matrix()
+}
 # Psi.pim_unk <- inner_join(Psi.design.dat_unk %>% select(mig_year) %>% distinct(), Psi.design.dat %>% filter(stratum==1&tostratum==2&stream=="Chiwawa"&LH!="summer") %>% select(par.index,stratum,tostratum,mig_year,LH )%>% distinct(across(stratum:mig_year),.keep_all=TRUE) %>% droplevels()) %>% pivot_wider(values_from=par.index,names_from=c(LH))
-
-
 
 #number of groups in the psi deisgn matrix
 n_groups<-nrow(Psi.design.dat)/2
@@ -395,20 +374,34 @@ return(list(dat_out=dat_out,
             nOCC=nOCC,
             nDS_OCC=nDS_OCC,
             n_unique_CH=n_unique_CH,
+            n_known_CH=n_known_CH,
+            n_known_CH_sim=n_known_CH_sim,
             n_states=n_states,
-            releases=releases,
             n_released=releases$freq,
+            f_rel=ifelse(releases$LH=="Unk",1,0),
             phi_pim_sim=phi_pim_sim,
             p_pim_sim=p_pim_sim ,
             psi_pim_sim=psi_pim_sim$par.index,
             TD_occ=TD_occ,
-            TD_i= TD_i
+            TD_i= TD_i,
+            Phi.pim_unk=Phi.pim_unk,
+            p.pim_unk=p.pim_unk ,
+            Nyears=length(start_year:end_year),
+            Phi.pim_unk_years = Phi.pim_unk,
+            p.pim_unk_years= p.pim_unk ,
+            n_unk_LH_phi=n_unk_LH_phi,
+            n_unk_LH_p=n_unk_LH_p,
+            n_known_LH_phi=n_known_LH_phi,
+            n_known_LH_p=n_known_LH_p,
+            f=ifelse(dat_out$LH=="Unk",1,0),
+            inc_unk=inc_unk
             ))
 
 }
 
 
-fit_wen_mscjs<-function(x,phi_formula, p_formula, psi_formula,doFit=TRUE,silent=FALSE,sd_rep=TRUE,sim_rand=1,REML=FALSE,pen=1){
+
+fit_wen_mscjs<-function(x,phi_formula, p_formula, psi_formula,doFit=TRUE,silent=FALSE,sd_rep=TRUE,sim_rand=1,REML=FALSE,hypersd=1,map_hypers=c(FALSE,FALSE),pen=1){
 #~~~~
 #glmmTMB objects to get design matrices etc. for each parameter
 ## phi
@@ -434,6 +427,8 @@ dat_TMB<-with(x,list(
   n_states=n_states,
   n_groups=n_groups,
   n_unique_CH=n_unique_CH,
+  n_known_CH_sim=n_known_CH_sim,
+  n_known_CH=n_known_CH,
   CH=select(dat_out,sites[1]:sites[length(sites)]) %>% as.matrix(),
   freq=dat_out$freq,
   X_phi=Phi.design.glmmTMB$data.tmb$X,
@@ -449,13 +444,26 @@ dat_TMB<-with(x,list(
   p_terms= p.design.glmmTMB$data.tmb$terms,
   psi_terms= Psi.design.glmmTMB$data.tmb$terms,
   n_released=n_released,
+  f_rel=f_rel,
   phi_pim_sim=phi_pim_sim,
   p_pim_sim=p_pim_sim ,
   psi_pim_sim=psi_pim_sim,
   TD_occ=TD_occ,
   TD_i= TD_i,
-  pen=pen,
-  sim_rand = sim_rand #draw random effects from hyperdistribution in simulation rather than sampling from posterior. 
+  Phi_pim_unk=Phi.pim_unk,
+  p_pim_unk=p.pim_unk,
+  Phi_pim_unk_years=Phi.pim_unk_years,
+  p_pim_unk_years=p.pim_unk_years,
+  n_unk_LH_phi=n_unk_LH_phi,
+  n_unk_LH_p=n_unk_LH_p,
+  n_known_LH_phi=n_known_LH_phi,
+  n_known_LH_p=n_known_LH_p,
+  f=f,
+  hyper_mean=0,
+  hyper_SD=hypersd,
+  pen=1,
+  
+  sim_rand = sim_rand #draw random effects from hyperdistribution in simulation rather than sampling from posterior.
 ))
 
 
@@ -469,22 +477,40 @@ par_TMB<-list(
   b_psi=Psi.design.glmmTMB$parameters$b,
   theta_phi=Phi.design.glmmTMB$parameters$theta,
   theta_p=p.design.glmmTMB$parameters$theta,
-  theta_psi=Psi.design.glmmTMB$parameters$theta
+  theta_psi=Psi.design.glmmTMB$parameters$theta,
+  logit_p_subs=rep(0,(x$Nyears-2)),
+  hyper_SD=hypersd,
+  hyper_mean=0
 )  
   fit<-NA
   mod<-NA
 
   #~~~~
   setwd(here("Src"))
-  #compile and load TMB model
-  TMB::compile("wen_mscjs_re.cpp")
-  dyn.load(dynlib("wen_mscjs_re"))
   
   random<-c("b_phi","b_p","b_psi")
   if(REML){random<-c("beta_phi","beta_p","beta_psi",random)}
+  
+  # set hyper paramaters of distribution of proportionf os subyearlings at trap as fixed.
+  map<-list()
+  if(map_hypers[1]){map$hyper_mean=factor(NA)}
+  if(map_hypers[2]){map$hyper_SD=factor(NA)}
+  
+  
 #initialize model
+  if(!x$inc_unk){  #model excluding unknown LH stream fish released at LWe_J
+    #compile and load TMB model
+    TMB::compile("wen_mscjs_re.cpp")
+    dyn.load(dynlib("wen_mscjs_re"))
 mod<-TMB::MakeADFun(data=dat_TMB,parameters = par_TMB,random=random,DLL ="wen_mscjs_re", silent = silent)
-
+  }else{ #model including unknown LH stream fish released at LWe_J
+    #compile and load TMB model
+    TMB::compile("wen_mscjs_re_2.cpp")
+    dyn.load(dynlib("wen_mscjs_re_2"))
+    mod<-TMB::MakeADFun(data=dat_TMB,parameters = par_TMB,random=random,map=map,DLL ="wen_mscjs_re_2", silent = silent)
+  }
+  
+  
 if(doFit){
 try(fit<-TMBhelper::fit_tmb(mod,newtonsteps = 1,getsd = sd_rep,getJointPrecision = sd_rep ))
 }
