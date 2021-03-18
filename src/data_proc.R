@@ -73,6 +73,9 @@ mark_file_CH<-mark_file %>%
              distinct(`Tag Code`,.keep_all=TRUE) %>% #remove duplicate detections at multiple "sites" at this trap 
               rename("LWe_J"="First Year YYYY",
                      "LWe_J_doy"="First Day Num"),by="Tag Code") %>%   #rename to represent site for merging
+  
+  #add release doy for LWe_J
+  mutate(LWe_J_doy=ifelse(mark_time==1,`Release Day Number`,LWe_J_doy)) %>% 
 
 #McNary Juvenile detection
   left_join(lower_mid_col_dams %>% 

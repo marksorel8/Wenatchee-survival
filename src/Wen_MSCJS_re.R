@@ -377,6 +377,7 @@ return(list(dat_out=dat_out,
             n_known_CH=n_known_CH,
             n_known_CH_sim=n_known_CH_sim,
             n_states=n_states,
+            releases=releases,
             n_released=releases$freq,
             f_rel=ifelse(releases$LH=="Unk",1,0),
             phi_pim_sim=phi_pim_sim,
@@ -387,8 +388,8 @@ return(list(dat_out=dat_out,
             Phi.pim_unk=Phi.pim_unk,
             p.pim_unk=p.pim_unk ,
             Nyears=length(start_year:end_year),
-            Phi.pim_unk_years = Phi.pim_unk,
-            p.pim_unk_years= p.pim_unk ,
+            Phi.pim_unk_years = Phi.pim_unk_years,
+            p.pim_unk_years= p.pim_unk_years ,
             n_unk_LH_phi=n_unk_LH_phi,
             n_unk_LH_p=n_unk_LH_p,
             n_known_LH_phi=n_known_LH_phi,
@@ -492,9 +493,7 @@ par_TMB<-list(
   if(REML){random<-c("beta_phi","beta_p","beta_psi",random)}
   
   # set hyper paramaters of distribution of proportionf os subyearlings at trap as fixed.
-  map<-list()
-  if(map_hypers[1]){map$hyper_mean=factor(NA)}
-  if(map_hypers[2]){map$hyper_SD=factor(NA)}
+
   
   
 #initialize model
@@ -505,6 +504,10 @@ par_TMB<-list(
 mod<-TMB::MakeADFun(data=dat_TMB,parameters = par_TMB,random=random,DLL ="wen_mscjs_re", silent = silent)
   }else{ #model including unknown LH stream fish released at LWe_J
     #compile and load TMB model
+      map<-list()
+  if(map_hypers[1]){map$hyper_mean=factor(NA)}
+  if(map_hypers[2]){map$hyper_SD=factor(NA)}
+      random<-c(random,"logit_p_subs")
     TMB::compile("wen_mscjs_re_2.cpp")
     dyn.load(dynlib("wen_mscjs_re_2"))
     mod<-TMB::MakeADFun(data=dat_TMB,parameters = par_TMB,random=random,map=map,DLL ="wen_mscjs_re_2", silent = silent)

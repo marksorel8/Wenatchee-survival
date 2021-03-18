@@ -203,12 +203,21 @@ mscjs_dat<- make_dat(mark_file_CH,sites=c( "LWe_J",
    #"Est_J",
   "Bon_A","McN_A",
   #"PRa_A","RIs_A",
-  "Tum_A"),cont_cov=c(),length_bin = 5,doy_bin = 10,inc_unk = TRUE)#,"rel_DOY_bin","length_bin"
+  "Tum_A"),cont_cov=c(),length_bin = 5,doy_bin = 10,inc_unk = FALSE)#,"rel_DOY_bin","length_bin"
 
 rm(mark_file)
 rm(all_bio_data)
 rm(mark_file_CH)
 gc()
+
+mscjs_dat$n_unk_LH_p
+mscjs_dat$n_unk_LH_phi
+mscjs_dat$p.pim_unk %>% range()
+
+mscjs_dat$p.design.dat %>% dim()
+mscjs_dat$p_pim[[1]] %>% range()
+mscjs_dat$Phi.design.dat %>% 
+mscjs_dat$dat_out %>% dim()
 ```
 
 ## print out of model parameters  
@@ -336,17 +345,17 @@ mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
                             # pc(0+time1:sum_flow:LHsummer+time1:sum_air:LHsummer|one) +
                             pc(0+time1:win_flow:age_0+time1:win_air:age_0|one) +
                             # pc(0+time1:spr_dis+time1:spr_air|one) +
-                            diag(0+time1|mig_year)+ diag(0+time1:age_class |mig_year) +
+                            diag(0+time1|mig_year)+ #diag(0+time1:age_class |mig_year) +
                             ## to McNary
                             time2+ pc(0+time2|age_class) +  #pc(0+time2:LHsummer|one)+
                             # pc(0+time2:RIS_flow_juv+time2:RIS_temp_juv+time2:UC_spill_pct_juv|one) +
-                            diag(0+time2 |mig_year)+ diag(0+time2:age_class |mig_year)+
+                            diag(0+time2 |mig_year)+ #diag(0+time2:age_class |mig_year)+
                             ##to Bonneville
                             time3 + pc(0+time3|age_class) + # pc(0+time3:LHsummer|one) +
-                            diag(0+time3|mig_year)+ diag(0+time3:age_class |mig_year)+
+                            diag(0+time3|mig_year)+ #diag(0+time3:age_class |mig_year)+
                             # pc(0+time3:McN_flow+time3:McN_temp+time3:MC_spill_pct_juv|one) +
                             ## SAR to Bonneville adult
-                            time4 + pc(0+time4|LH) + diag(0+time4|mig_year)+ diag(0+time4:age_class |mig_year)+
+                            time4 + pc(0+time4|LH) + diag(0+time4|mig_year)+ #diag(0+time4:age_class |mig_year)+
                             pc(0+time4:ersstArc.win+time4:ersstWAcoast.sum|one) +
                             ## to McNary Adult
                             time5 +  # pc(0+time5|stratum ) + #diag(0+time5|mig_year)+                 
@@ -378,8 +387,10 @@ mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
                             (0+tostratum|mig_year)
                            ,
                             doFit = TRUE,silent=TRUE,
-                            sim_rand =0,REML=FALSE,pen=1
+                            sim_rand =0,REML=FALSE,pen=2,hypersd=1,map_hypers=c(FALSE,FALSE)
 )
+
+mscjs_fit$fit
 
 #penalized complexity with length
 mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
@@ -443,6 +454,9 @@ mscjs_fit$Phi.design.glmmTMB$data.tmb$terms$`0 + time1 | stream:LH`
 dev.new()
 print_out(mscjs_fit)
 plot_func()
+
+test<-mscjs_fit$mod$report()
+test$p_yrlngs %>% `names<-`(c(2006:2010,2013:2017)) %>% round(2)
 ```
 
 
@@ -467,14 +481,15 @@ obs_dat<-mscjs_dat$dat_out %>%
   #sum detection by stream, year, and life history
   group_by(LH,stream,sea_Year_p) %>% summarise(across(LWe_J :Tum_A_3, sum)) %>% ungroup()
 
-obs_dat_long<- obs_dat%>% pivot_longer(LWe_J :Tum_A_3) 
+obs_dat_long<- obs_dat%>% pivot_longer(LWe_J :Tum_A_3) %>% filter(!(LH=="Unk" & !name%in%c("McN_J","Bon_J")))
 
 # * expected detections data*
 sim<-mscjs_fit$mod$simulate(par=last_best)
 
 exp_det_MLE<-cbind(mscjs_dat$releases %>% ungroup() %>% select(LH,stream,sea_Year_p) , sim$det_1,sim$det_2,sim$det_3) %>% `colnames<-`(colnames(obs_dat %>% select(LH  :Tum_A_3))) %>% 
     #sum detection by stream, year, and life history
-  group_by(LH,stream,sea_Year_p) %>% summarise(across(LWe_J :Tum_A_3, sum)) %>% ungroup() %>% pivot_longer(LWe_J :Tum_A_3) 
+  group_by(LH,stream,sea_Year_p) %>% summarise(across(LWe_J :Tum_A_3, sum)) %>% ungroup() %>% pivot_longer(LWe_J :Tum_A_3) %>% 
+  filter(!(LH=="Unk" & !name%in%c("McN_J","Bon_J")))
 
 # plot(obs_dat_long$value,exp_det_MLE$value) 
  
@@ -494,12 +509,14 @@ for(i in 1:250){
 
   exp_det<-cbind(mscjs_dat$releases %>% ungroup() %>% select(LH,stream,sea_Year_p) , sim$det_1,sim$det_2,sim$det_3) %>% `colnames<-`(colnames(obs_dat %>% select(LH  :Tum_A_3))) %>% 
     #sum detection by stream, year, and life history
-  group_by(LH,stream,sea_Year_p) %>% summarise(across(LWe_J :Tum_A_3, sum)) %>% ungroup() %>% pivot_longer(LWe_J :Tum_A_3) 
+  group_by(LH,stream,sea_Year_p) %>% summarise(across(LWe_J :Tum_A_3, sum)) %>% ungroup() %>% pivot_longer(LWe_J :Tum_A_3) %>% 
+    filter(!(LH=="Unk" & !name%in%c("McN_J","Bon_J")))
 
 # * simulated detection from model *
 sim_obs<-cbind(mscjs_dat$releases %>% ungroup() %>% select(LH,stream,sea_Year_p) , sim$sim_det_1,sim$sim_det_2,sim$sim_det_3) %>% `colnames<-`(colnames(obs_dat %>% select(LH  :Tum_A_3))) %>% 
     #sum detection by stream, year, and life history
-  group_by(LH,stream,sea_Year_p) %>% summarise(across(LWe_J :Tum_A_3, sum)) %>% ungroup() %>% pivot_longer(LWe_J :Tum_A_3) 
+  group_by(LH,stream,sea_Year_p) %>% summarise(across(LWe_J :Tum_A_3, sum)) %>% ungroup() %>% pivot_longer(LWe_J :Tum_A_3) %>% 
+  filter(!(LH=="Unk" & !name%in%c("McN_J","Bon_J"))) 
 
 post_pred[,i]<-sim_obs$value
 
@@ -527,7 +544,8 @@ post_pred<-replicate(250,{
    # * simulated detection from model *
 sim_obs<-cbind(mscjs_dat$releases %>% ungroup() %>% select(LH,stream,sea_Year_p) , sim_data$sim_det_1,sim_data$sim_det_2,sim_data$sim_det_3) %>% `colnames<-`(colnames(obs_dat %>% select(LH  :Tum_A_3))) %>% 
     #sum detection by stream, year, and life history
-  group_by(LH,stream,sea_Year_p) %>% summarise(across(LWe_J :Tum_A_3, sum)) %>% ungroup() %>% pivot_longer(LWe_J :Tum_A_3) 
+  group_by(LH,stream,sea_Year_p) %>% summarise(across(LWe_J :Tum_A_3, sum)) %>% ungroup() %>% pivot_longer(LWe_J :Tum_A_3) %>% 
+  filter(!(LH=="Unk" & !name%in%c("McN_J","Bon_J")))
    sim_obs$value
 })
 
@@ -580,21 +598,24 @@ plot_func<-function(){
 sd_rep<-mscjs_fit$fit$SD
 mod_rep<-mscjs_fit$mod$report()
 
-Phi.design.dat2 <- mscjs_dat$Phi.design.dat%>% mutate(phi_fit=mod_rep$phi,
+Phi.design.dat2 <- mscjs_dat$Phi.design.dat%>% mutate(
                                             eta_phi= sd_rep$value[names(sd_rep$value)=="eta_phi"],
                                             eta_phi_sd=sd_rep$sd[names(sd_rep$value)=="eta_phi"],
+                                            phi_fit=plogis(eta_phi),
                                             lcl_phi=plogis(qnorm(.025,eta_phi,eta_phi_sd)),
                                             ucl_phi=plogis(qnorm(.975,eta_phi,eta_phi_sd))) %>% 
-  mutate(LH=fct_relevel(LH,"summer","fall","smolt")) %>% group_by(LH,mig_year,stream,time) %>%
+  mutate(LH=fct_relevel(LH,"summer","fall","smolt")) %>%
+  group_by(LH,mig_year,stream,time) %>%
   mutate(cohort_freq=sum(freq)) %>% 
   mutate(across(phi_fit:ucl_phi,~sum(.*freq/cohort_freq))) #%>% 
   # summarize(sum(length_bin*freq/cohort_freq))
 
 # Phi.design.dat2<-Phi.design.dat2 %>% select(time ,stratum , LH , stream ,mig_year, phi_fit)
 
-p.design.dat <- mscjs_dat$p.design.dat %>% mutate(p_fit=mod_rep$p[-length(mod_rep$p)],
+p.design.dat <- mscjs_dat$p.design.dat %>% mutate(#p_fit=mod_rep$p[-length(mod_rep$p)],
                                             eta_p=sd_rep$value[names(sd_rep$value)=="eta_p"],
                                             eta_p_sd=sd_rep$sd[names(sd_rep$value)=="eta_p"],
+                                             p_fit=plogis(eta_p),
                                             lcl_p=plogis(qnorm(.025,eta_p,eta_p_sd)),
                                             ucl_p=plogis(qnorm(.975,eta_p,eta_p_sd)))
 
@@ -645,13 +666,13 @@ ggplot(data= as_tibble(p.design.dat)%>% filter(Time>2),aes(x=mig_year ,y=p_fit,c
 # Mark model for comparison
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 dat_out<-select(mark_file_CH,sea_Year_p,LH,stream, #grouping variables
-               LWe_J, McN_J,Bon_J) %>% #sites/occasions to include in model
+                McN_J,Bon_J) %>% #sites/occasions to include in model
   #first year with all stream data through last year where data on all three return ages is available (because it is 2020)
-  filter(sea_Year_p>=2007&sea_Year_p<=2016 &!sea_Year_p%in%c(2011:2012),LH=="summer") %>%
+  filter(sea_Year_p>=2007&sea_Year_p<=2016 &!sea_Year_p%in%c(2011:2012),LH=="Unk") %>%
   #make grouping variables factors
   #mutate_at(vars(sea_Year_p:stream),~as.factor(as.character(.x)))%>% mutate(McN_J=apply(select(.,McN_J,JDD_J),1,max)) %>% select(-JDD_J) %>% 
   #create multistate capture histories
-  mutate(ch=select(., c(LWe_J, McN_J,Bon_J)) %>%  reduce(paste0)) %>%
+  mutate(ch=select(., c( McN_J,Bon_J)) %>%  reduce(paste0)) %>%
   #mutate(ch=select(., McN_J,Bon_J,Est_J) %>% reduce(paste0)) %>%
   mutate(ch=paste0("1",ch)) 
 
@@ -739,10 +760,10 @@ S.stratumxtime=list(formula=~-1+time+time_1:Yrlng)
 
 
 test<-RMark::mark(wenatchee.processed,wenatchee.ddl,
-                  model.parameters=list(Phi=list(formula=~-1+time:sea_Year_p),p= list(formula=~-1+time:sea_Year_p)),run=TRUE)
+                  model.parameters=list(Phi=list(formula=~-1+time),p= list(formula=~-1+time)),run=TRUE)
 
 real_test<-get.real(test,par="Phi")
-phi<-as.numeric(lapply(real_test,function(x)x$pim[1,2]))
+phi<-as.numeric(lapply(real_test,function(x)x$pim[1,1]))
 mean(phi)
 
 
@@ -757,5 +778,43 @@ sd_rep$value
 sd_rep$par.fixed - test$results$beta[,1]
 #compare standard errors
 sqrt(diag(sd_rep$cov.fixed)) - test$results$beta[,2]
+
+
+
+
+```
+
+
+
+Look at timing of different life histories at dams
+```{r timing}
+
+plot_func<-function(site,mark_file_CH){
+dat<-mark_file_CH %>% group_by(LH) %>% rename(x=all_of(site)) %>% mutate(med.doy=median(x,na.rm=T)) %>% mutate(LH=as.factor(LH),LH=fct_relevel(LH,"summer","fall","Unk","smolt")) %>% ungroup()
+                                                
+ggplot(dat=dat , aes(x=x)) +geom_density(fill="grey")+geom_vline(dat=dat , aes(xintercept=med.doy))+
+  facet_wrap(~LH,ncol=1)+ggtitle(site)
+}
+
+
+plot_func("LWe_J_doy",mark_file_CH)
+
+plot_func("McN_J_doy",mark_file_CH)
+
+plot_func("JDD_J_doy",mark_file_CH)
+
+plot_func("Bon_J_doy",mark_file_CH)
+
+plot_func("Bon_A_doy",mark_file_CH %>% filter(Bon_A>0) )
+
+plot_func("McN_A_doy",mark_file_CH %>% filter(McN_A>0) )
+
+plot_func("PRa_A_doy",mark_file_CH %>% filter(PRa_A>0) )
+
+plot_func("RIs_A_doy",mark_file_CH %>% filter(RIs_A>0) )
+
+plot_func("Tum_A_doy",mark_file_CH %>% filter(Tum_A>0) )
+
+
 
 ```
