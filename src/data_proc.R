@@ -49,7 +49,7 @@ obs_dat_LWe_releases<-read_csv(here("Data","ptagis","ptagis_obs_data_lower_wen_s
   select(!obs_date:date_det) %>% droplevels() %>%
   distinct() %>% ungroup() %>%
   mutate("First Year YYYY"=lubridate::year(first_date),"Last Year YYYY"=lubridate::year(last_det)) %>%
-  mutate("First Day Num"=lubridate::yday(first_date),"Last DOY"=lubridate::yday(last_det)) %>%
+  mutate("First Day Num"=lubridate::yday(first_date),"Last Day Num"=lubridate::yday(last_det)) %>%
   rename("Site Code Value"=obs_site,"Tag Code"=tag_id)
 
 #add rows for detections of fish released at lower wenatchee trap
