@@ -122,9 +122,9 @@ Type termwise_nll(array<Type> &U, vector<Type> theta, per_term_info<Type>& term,
     for(int i = 0; i < term.blockReps; i++){
       ans -= dnorm(vector<Type>(U.col(i)), Type(0), sd, true).sum();
       ans -= (dexp(sd,pen,true).sum() +theta.sum()); //penaliuze complexity
-      if (do_simulate) {
-        U.col(i) = rnorm(Type(0), sd);
-      }
+      // if (do_simulate) {
+      //   U.col(i) = rnorm(Type(0), sd);
+      // }
     }
     term.sd = sd; // For report
   }
@@ -363,9 +363,7 @@ DATA_INTEGER(nDS_OCC);      //number of downstream survival/ reacputure
 DATA_INTEGER(n_states);      //number of possible adult return ages (i.e. statres -3) 
 DATA_INTEGER(n_groups);      //number groups (i.e., unique combos of LH,stream,downstream,year). Used in psi mlogit backtransform
 DATA_INTEGER(n_unique_CH); //number of unique capture occasions
-// DATA_INTEGER(Est_J_time); // capture occasion of estuary Juvenile
-// DATA_INTEGER(JDD_J_time); // capture occasion of John Day Dam Juvenile
-// DATA_IVECTOR(PRa_RIs_A_times); // capture occasion of Priest Rapids and Rock Island Adult
+DATA_IVECTOR(f);  //release occasion
 
 
 //CH data
@@ -395,7 +393,7 @@ DATA_IVECTOR(psi_pim_sim);  // index of psi parameters for the simulation
 DATA_IVECTOR(TD_occ);       // occasions with trap dependent detection (effect of detection/non-detection at previous occasion)
 DATA_IVECTOR(TD_i);         // p_pim_sim index for detection parameters for fish that were detected at the previous occasion
 DATA_INTEGER(sim_rand);     //flag indicating whether to simulate the random effects in simulations
-
+DATA_IVECTOR(f_rel);       // occasion of release for each cohort
 //penality parameter for PC prior
 DATA_SCALAR(pen);
   
@@ -480,7 +478,7 @@ DATA_SCALAR(pen);
     NLL_it=Type(0); //initialize capture history NLL at 0
 
   //downstream migration
-  for(int t=0; t<nDS_OCC; t++){       //loop over downstream occasions (excluding capture occasion)
+  for(int t=f(n); t<nDS_OCC; t++){       //loop over downstream occasions (excluding capture occasion)
     //survival process
     pS(0) += Type((Type(1)-phi(Phi_pim(0)(n,t)))*pS(1)); //prob die or stay dead
     pS(1) *= Type(phi(Phi_pim(0)(n,t))); //prob stay alive
@@ -655,10 +653,12 @@ if(sim_rand){
 int n_cohorts = n_released.size();  // number of unique release cohorts (stream, LH, year)
 
 //expected detections
-    matrix<Type> det_1(n_cohorts,n_OCC);        //expected detections for state 1
-    matrix<Type> det_2(n_cohorts,n_OCC-nDS_OCC); //expected detections for state 2
-    matrix<Type> det_3(n_cohorts,n_OCC-nDS_OCC); //expected detections for state 3
-
+matrix<Type> det_1(n_cohorts,n_OCC);        //expected detections for state 1
+matrix<Type> det_2(n_cohorts,n_OCC-nDS_OCC); //expected detections for state 2
+matrix<Type> det_3(n_cohorts,n_OCC-nDS_OCC); //expected detections for state 3
+det_1.setZero();
+det_2.setZero();
+det_3.setZero();
 
 //simulated survival and state
 matrix<Type> sim_state_1(n_cohorts,n_OCC+1);       // alive for state 1 (times a bit different to have first column represent numebr released)
@@ -669,93 +669,100 @@ matrix<Type> sim_state_3(n_cohorts,n_OCC-nDS_OCC); // alive for state 3
 matrix<Type> sim_det_1(n_cohorts,n_OCC);         // detections for state 1
 matrix<Type> sim_det_2(n_cohorts,n_OCC-nDS_OCC); // detections for state 2
 matrix<Type> sim_det_3(n_cohorts,n_OCC-nDS_OCC); // detections for state 3
-
-
+sim_det_1.setZero();
+sim_det_2.setZero();
+sim_det_3.setZero();
 //Calculate expected detections
 int nUS_OCC = n_OCC-nDS_OCC-1; // number of upstream occasions
-    for(int n=0; n<n_cohorts; n++){ // loop over release cohorts
-      pS.setZero(); //initialize at 0,1,0,0 (conditioning at capture)
-      pS(1)=Type(1);
-
-      //downstream migration
-      for(int t=0; t<nDS_OCC; t++){       //loop over downstream occasions (excluding capture occasion)
-        //survival process
-        pS(1) *= Type(phi_hat(phi_pim_sim(n,t))); //prob stay alive
-
-        //observation process
-      if(t==TD_occ(0)){ //if occasion that has trap dependency with detection at Lower Wenatchee (most likely McNary)
-        det_1(n,t) = Type(p_hat(p_pim_sim(n,t))*pS(1)*n_released(n)*(Type(1)-p_hat(p_pim_sim(n,t-1)))); //not detected at previous
-        det_1(n,t) += Type(p_hat(p_pim_sim(n,TD_i(0)))*pS(1)*n_released(n))*p_hat(p_pim_sim(n,t-1));     // detected at previous
-      }else{if(t==TD_occ(1)){//if occasion that has trap dependency with detection at McNary (most likely JDD or Bonneville)
-        det_1(n,t) = Type(p_hat(p_pim_sim(n,t))*pS(1)*n_released(n)*(Type(1)-p_hat(p_pim_sim(n,t-1)))); //not detected at previous
-        det_1(n,t) += Type(p_hat(p_pim_sim(n,TD_i(1)))*pS(1)*n_released(n)*p_hat(p_pim_sim(n,t-1)));     // detected at previous
+for(int n=0; n<n_cohorts; n++){ // loop over release cohorts
+  pS.setZero(); //initialize at 0,1,0,0 (conditioning at capture)
+  pS(1)=Type(1);
+  
+  //downstream migration
+  for(int t=f_rel(n); t<nDS_OCC; t++){       //loop over downstream occasions (excluding capture occasion)
+    //survival process
+    pS(1) *= Type(phi_hat(phi_pim_sim(n,t))); //prob stay alive
+    
+    //observation process
+    if(t==TD_occ(0)){ //if occasion that has trap dependency with detection at Lower Wenatchee (most likely McNary)
+      if(f_rel(n)==1){
+        det_1(n,t) =  Type(p_hat(p_pim_sim(n,TD_i(0)))*pS(1)*n_released(n));
       }else{
-        det_1(n,t) = Type(p_hat(p_pim_sim(n,t))*pS(1)*n_released(n)); //expected obs        
-      }}
+        det_1(n,t) = Type(p_hat(p_pim_sim(n,t))*pS(1)*n_released(n)*(Type(1)-p_hat(p_pim_sim(n,t-1)))); //not detected at previous
+        det_1(n,t) += Type(p_hat(p_pim_sim(n,TD_i(0)))*pS(1)*n_released(n))*p_hat(p_pim_sim(n,t-1));}     // detected at previous
+    }else{if(t==TD_occ(1)){//if occasion that has trap dependency with detection at McNary (most likely JDD or Bonneville)
+      det_1(n,t) = Type(p_hat(p_pim_sim(n,t))*pS(1)*n_released(n)*(Type(1)-p_hat(p_pim_sim(n,t-1)))); //not detected at previous
+      det_1(n,t) += Type(p_hat(p_pim_sim(n,TD_i(1)))*pS(1)*n_released(n)*p_hat(p_pim_sim(n,t-1)));     // detected at previous
+    }else{
+      det_1(n,t) = Type(p_hat(p_pim_sim(n,t))*pS(1)*n_released(n)); //expected obs
+    }
+    
+    }}
+  
+
+    //ocean occasion
+    int t = nDS_OCC;  //set occasion to be ocean occasion
+    ////survival process
+    pS(1) *= Type(phi_hat(phi_pim_sim(n,t))); //prob survive ocean
+    
+    //maturation age process
+    pS(2) = pS(1) * psi_hat(psi_pim_sim(n),1); //return prob after 2 year
+    pS(3) = pS(1) * psi_hat(psi_pim_sim(n),2); //return prob after 3 year
+    pS(1) *= psi_hat(psi_pim_sim(n),0);        //return prob after 1 year
+    
+    
+    
+    for(int t=(nDS_OCC+1); t<n_OCC; t++){       //loop over upstream occasions
       
-      }
-      
-      
-
-      //ocean occasion
-      int t = nDS_OCC;  //set occasion to be ocean occasion
-      ////survival process
-      pS(1) *= Type(phi_hat(phi_pim_sim(n,t))); //prob survive ocean
-
-      //maturation age process
-      pS(2) = pS(1) * psi_hat(psi_pim_sim(n),1); //return prob after 2 year
-      pS(3) = pS(1) * psi_hat(psi_pim_sim(n),2); //return prob after 3 year
-      pS(1) *= psi_hat(psi_pim_sim(n),0);        //return prob after 1 year
-
-
-
-      for(int t=(nDS_OCC+1); t<n_OCC; t++){       //loop over upstream occasions
-
-        ////observation process at t-1 (Obs_t below), because I'm going to fix the detection prob at 1 for the last occasion after this loop
-        int Obs_t=t-1;
-        //////expected obs
-          det_1(n,Obs_t) = pS(1) * p_hat(p_pim_sim(n,Obs_t)) * n_released(n);
-          det_2(n,Obs_t-nDS_OCC) =pS(2) * p_hat(p_pim_sim(n,Obs_t+nUS_OCC)) * n_released(n);
-          det_3(n,Obs_t-nDS_OCC) =pS(3) * p_hat(p_pim_sim(n,Obs_t+nUS_OCC+nUS_OCC)) * n_released(n);
-
-        //upstream migration
-        ////survival process at time t
-        pS(1) *= Type(phi_hat(phi_pim_sim(n,t)));                          // sum(prob vec * 0,   phi_1,       0,       0)
-        pS(2) *=  Type(phi_hat(phi_pim_sim(n,t+nUS_OCC)));                 // sum(prob vec * 0,       0,   phi_2,       0)
-        pS(3) *=  Type(phi_hat(phi_pim_sim(n,t+nUS_OCC+nUS_OCC)));         // sum(prob vec * 0,       0,       0,   phi_3)
-
-      }
-
-      ////observation process at final time assuming detection probability is 1
+      ////observation process at t-1 (Obs_t below), because I'm going to fix the detection prob at 1 for the last occasion after this loop
+      int Obs_t=t-1;
       //////expected obs
-      det_1(n,n_OCC-1) = pS(1) * n_released(n);
-      det_2(n,n_OCC-nDS_OCC-1) =pS(2)  * n_released(n);
-      det_3(n,n_OCC-nDS_OCC-1) =pS(3)  * n_released(n);
+      det_1(n,Obs_t) = pS(1) * p_hat(p_pim_sim(n,Obs_t)) * n_released(n);
+      det_2(n,Obs_t-nDS_OCC) =pS(2) * p_hat(p_pim_sim(n,Obs_t+nUS_OCC)) * n_released(n);
+      det_3(n,Obs_t-nDS_OCC) =pS(3) * p_hat(p_pim_sim(n,Obs_t+nUS_OCC+nUS_OCC)) * n_released(n);
+      
+      //upstream migration
+      ////survival process at time t
+      pS(1) *= Type(phi_hat(phi_pim_sim(n,t)));                          // sum(prob vec * 0,   phi_1,       0,       0)
+      pS(2) *=  Type(phi_hat(phi_pim_sim(n,t+nUS_OCC)));                 // sum(prob vec * 0,       0,   phi_2,       0)
+      pS(3) *=  Type(phi_hat(phi_pim_sim(n,t+nUS_OCC+nUS_OCC)));         // sum(prob vec * 0,       0,       0,   phi_3)
+      
+    }
+    
+    ////observation process at final time assuming detection probability is 1
+    //////expected obs
+    det_1(n,n_OCC-1) = pS(1) * n_released(n);
+    det_2(n,n_OCC-nDS_OCC-1) =pS(2)  * n_released(n);
+    det_3(n,n_OCC-nDS_OCC-1) =pS(3)  * n_released(n);
+    
 
-    } // end of loop over release cohorts
+}//end loop over release cohorts
 
 
 
-    Type temp = 0;          //placeholder for number surviving ocean
-    Type det_surv = 0;      // placeholder for number of fish detected previously that survived (for trap dependent detection)
-    Type not_det_surv = 0;  // placeholder for number of fish not detected previously that survived (for trap dependent detection)
+Type temp = 0;          //placeholder for number surviving ocean
+Type det_surv = 0;      // placeholder for number of fish detected previously that survived (for trap dependent detection)
+Type not_det_surv = 0;  // placeholder for number of fish not detected previously that survived (for trap dependent detection)
 //Simulate data
 for(int n=0; n<n_released.size(); n++){ // loop over individual release cohorts
   pS.setZero(); //initialize at 0,1,0,0 (conditioning at capture)
   pS(1)=Type(1);
-  sim_state_1(n,0)=Type(n_released(n));    //initialize with number released for each CH at time 1
+  sim_state_1(n,f_rel(n))=Type(n_released(n));    //initialize with number released for each CH at time 1
   
   //downstream migration
-  for(int t=0; t<nDS_OCC; t++){       //loop over downstream occasions (excluding capture occasion)
-   
+  for(int t=f_rel(n); t<nDS_OCC; t++){       //loop over downstream occasions (excluding capture occasion)
     if(t==TD_occ(0)){ //if occasion that has trap dependency with detection at Lower Wenatchee (most likely McNary)
       //survival process
-      not_det_surv= rbinom(Type( sim_state_1(n,t)-sim_det_1(n,t-1)),phi(phi_pim_sim(n,t))); //simulated stay alive not detected previously
-      det_surv = rbinom(Type( sim_det_1(n,t-1)),phi(phi_pim_sim(n,t))); //simulated stay alive detected previously
-      sim_state_1(n,t+1) = det_surv + not_det_surv; //simulated stay alive
-      //observation process
-      sim_det_1(n,t) = rbinom(Type( not_det_surv), Type(p(p_pim_sim(n,t)) ));  //not detected at previous
-      sim_det_1(n,t) += rbinom(Type(det_surv),  Type(p(p_pim_sim(n,TD_i(0)))));     // detected at previous
+      if(f_rel(n)==1){
+        sim_state_1(n,t+1)=rbinom(Type( sim_state_1(n,t)),phi(phi_pim_sim(n,t)));
+        sim_det_1(n,t)= rbinom(Type(sim_state_1(n,t+1)),  Type(p(p_pim_sim(n,TD_i(0)))));
+      }else{
+        not_det_surv= rbinom(Type( sim_state_1(n,t)-sim_det_1(n,t-1)),phi(phi_pim_sim(n,t))); //simulated stay alive not detected previously
+        det_surv = rbinom(Type( sim_det_1(n,t-1)),phi(phi_pim_sim(n,t))); //simulated stay alive detected previously
+        sim_state_1(n,t+1) = det_surv + not_det_surv; //simulated stay alive
+        //observation process
+        sim_det_1(n,t) = rbinom(Type( not_det_surv), Type(p(p_pim_sim(n,t)) ));  //not detected at previous
+        sim_det_1(n,t) += rbinom(Type(det_surv),  Type(p(p_pim_sim(n,TD_i(0)))));}     // detected at previous
     }else{if(t==TD_occ(1)){//if occasion that has trap dependency with detection at McNary (most likely JDD or Bonneville)
       //survival process
       not_det_surv= rbinom(Type( sim_state_1(n,t)-sim_det_1(n,t-1)),phi(phi_pim_sim(n,t))); //simulated stay alive not detected previously
@@ -768,55 +775,56 @@ for(int n=0; n<n_released.size(); n++){ // loop over individual release cohorts
       //survival process
       sim_state_1(n,t+1) = rbinom(Type( sim_state_1(n,t)),phi(phi_pim_sim(n,t))); //simulated stay alive
       //observation process
-      sim_det_1(n,t) = rbinom(Type( sim_state_1(n,t+1)),  Type(p(p_pim_sim(n,t)))); //simulated obs        
-    }}
+      sim_det_1(n,t) = rbinom(Type( sim_state_1(n,t+1)),  Type(p(p_pim_sim(n,t)))); //simulated obs
+    }
     
-  }
-  
+    }}
+ 
+    //ocean occasion
+    int t = nDS_OCC;  //set occasion to be ocean occasion
+    ////survival process
+    temp = rbinom(Type(sim_state_1(n,t)),Type(phi(phi_pim_sim(n,t)))); //simulated survive ocean
+    
+    //maturation age simulation. rmultinomial through sequential rbinom
+    sim_state_1(n,t+1) = rbinom(Type(temp),Type(psi(psi_pim_sim(n),0)));        //simulated return after 1 year
+    sim_state_2(n,0) = rbinom(Type(temp-sim_state_1(n,t+1)),
+                Type(psi(psi_pim_sim(n),1)/(Type(1)-Type(psi(psi_pim_sim(n),0))))); //simulated return after 2 year
+    sim_state_3(n,0) = temp-sim_state_1(n,t+1)-sim_state_2(n,0);        //simulated return after 1 year
+    
+    
+    for(int t=(nDS_OCC+1); t<n_OCC; t++){       //loop over upstream occasions
+      
+      ////observation process at t-1 (Obs_t below), because I'm going to fix the detection prob at 1 for the last occasion after this loop
+      int Obs_t=t-1;
+      //////simulated obs
+      sim_det_1(n,Obs_t) = rbinom(Type(sim_state_1(n,Obs_t+1)), Type(p(p_pim_sim(n,Obs_t))));
+      sim_det_2(n,Obs_t-nDS_OCC) = rbinom(Type(sim_state_2(n,Obs_t-nDS_OCC)),  Type(p(p_pim_sim(n,Obs_t+nUS_OCC))));
+      sim_det_3(n,Obs_t-nDS_OCC) = rbinom(Type(sim_state_3(n,Obs_t-nDS_OCC)),  Type(p(p_pim_sim(n,Obs_t+nUS_OCC+nUS_OCC))));
+      
+      //upstream migration
+      ////survival simulation at time t
+      sim_state_1(n,t+1) = rbinom(Type(sim_state_1(n,t)), Type(phi(phi_pim_sim(n,t))));                                 // sum(prob vec * 0,   phi_1,       0,       0)
+      sim_state_2(n,t-nDS_OCC) = rbinom(Type(sim_state_2(n,t-nDS_OCC-1)),  Type(phi(phi_pim_sim(n,t+nUS_OCC))));                // sum(prob vec * 0,       0,   phi_2,       0)
+      sim_state_3(n,t-nDS_OCC) = rbinom(Type(sim_state_3(n,t-nDS_OCC-1)), Type(phi(phi_pim_sim(n,t+nUS_OCC+nUS_OCC))));                 // sum(prob vec * 0,       0,       0,   phi_3)
+      
+    }
+    
+    ////observation process at final time assuming detection probability is 1
+    //////simulated obs (final occasion detection prob = 1)
+    sim_det_1(n,n_OCC-1) =  sim_state_1(n,n_OCC) ;
+    sim_det_2(n,n_OCC-nDS_OCC-1) =  sim_state_2(n,n_OCC-nDS_OCC-1);
+    sim_det_3(n,n_OCC-nDS_OCC-1) =  sim_state_3(n,n_OCC-nDS_OCC-1);
 
-  //ocean occasion
-  int t = nDS_OCC;  //set occasion to be ocean occasion
-  ////survival process
-  temp = rbinom(Type(sim_state_1(n,t)),Type(phi(phi_pim_sim(n,t)))); //simulated survive ocean
+}//end loop over release cohorts
 
-  //maturation age simulation. rmultinomial through sequential rbinom
-  sim_state_1(n,t+1) = rbinom(Type(temp),Type(psi(psi_pim_sim(n),0)));        //simulated return after 1 year
-  sim_state_2(n,0) = rbinom(Type(temp-sim_state_1(n,t+1)),
-              Type(psi(psi_pim_sim(n),1)/(Type(1)-Type(psi(psi_pim_sim(n),0))))); //simulated return after 2 year
-  sim_state_3(n,0) = temp-sim_state_1(n,t+1)-sim_state_2(n,0);        //simulated return after 1 year
-  
-
-  for(int t=(nDS_OCC+1); t<n_OCC; t++){       //loop over upstream occasions
-
-    ////observation process at t-1 (Obs_t below), because I'm going to fix the detection prob at 1 for the last occasion after this loop
-    int Obs_t=t-1;
-    //////simulated obs
-    sim_det_1(n,Obs_t) = rbinom(Type(sim_state_1(n,Obs_t+1)), Type(p(p_pim_sim(n,Obs_t))));
-    sim_det_2(n,Obs_t-nDS_OCC) = rbinom(Type(sim_state_2(n,Obs_t-nDS_OCC)),  Type(p(p_pim_sim(n,Obs_t+nUS_OCC))));
-    sim_det_3(n,Obs_t-nDS_OCC) = rbinom(Type(sim_state_3(n,Obs_t-nDS_OCC)),  Type(p(p_pim_sim(n,Obs_t+nUS_OCC+nUS_OCC))));
-
-    //upstream migration
-    ////survival simulation at time t
-    sim_state_1(n,t+1) = rbinom(Type(sim_state_1(n,t)), Type(phi(phi_pim_sim(n,t))));                                 // sum(prob vec * 0,   phi_1,       0,       0)
-    sim_state_2(n,t-nDS_OCC) = rbinom(Type(sim_state_2(n,t-nDS_OCC-1)),  Type(phi(phi_pim_sim(n,t+nUS_OCC))));                // sum(prob vec * 0,       0,   phi_2,       0)
-    sim_state_3(n,t-nDS_OCC) = rbinom(Type(sim_state_3(n,t-nDS_OCC-1)), Type(phi(phi_pim_sim(n,t+nUS_OCC+nUS_OCC))));                 // sum(prob vec * 0,       0,       0,   phi_3)
-
-  }
-
-  ////observation process at final time assuming detection probability is 1
-  //////simulated obs (final occasion detection prob = 1)
-  sim_det_1(n,n_OCC-1) =  sim_state_1(n,n_OCC) ;
-  sim_det_2(n,n_OCC-nDS_OCC-1) =  sim_state_2(n,n_OCC-nDS_OCC-1);
-  sim_det_3(n,n_OCC-nDS_OCC-1) =  sim_state_3(n,n_OCC-nDS_OCC-1);
-} // end of loop of unique CH
 ////Report simulated data and expectation
-    REPORT(det_1);
-    REPORT(det_2);
-    REPORT(det_3);
-    REPORT(sim_det_1);
-    REPORT(sim_det_2);
-    REPORT(sim_det_3);
-      } //end simulate
+REPORT(det_1);
+REPORT(det_2);
+REPORT(det_3);
+REPORT(sim_det_1);
+REPORT(sim_det_2);
+REPORT(sim_det_3);
+  } //end simulate
   
   //return jnll
   return(jnll);

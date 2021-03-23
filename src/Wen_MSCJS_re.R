@@ -24,13 +24,13 @@ if(file.exists(here("data","all_bio_data.csv"))){
   all_bio_data<-read_csv(here("data","all_bio_data.csv"))
 }
 
-make_dat<-function(mark_file_CH=mark_file_CH,sites=c("LWe_J","McN_J","JDD_J","Bon_J","Est_J","Bon_A","McN_A","PRa_A","RIs_A","Tum_A"),start_year=2006, end_year=2017,cont_cov,length_bin=5,doy_bin=10,inc_unk=FALSE){
+make_dat<-function(mark_file_CH=mark_file_CH,sites=c("LWe_J","McN_J","JDD_J","Bon_J","Est_J","Bon_A","McN_A","PRa_A","RIs_A","Tum_A"),start_year=2006, end_year=2017,cont_cov,length_bin=5,doy_bin=10,inc_unk=FALSE,exc_unk=FALSE){
 
   
-   # sites=c("LWe_J","McN_J","Bon_J","Bon_A","McN_A","Tum_A");start_year=2006; end_year=2017;cont_cov="rel_DOY_bin";length_bin=5;doy_bin=10;inc_unk=FALSE
+   # sites=c("LWe_J","McN_J","Bon_J","Bon_A","McN_A","Tum_A");start_year=2006; end_year=2017;cont_cov="rel_DOY_bin";length_bin=5;doy_bin=10;inc_unk=FALSE;inc_unk=FALSE;exc_unk=FALSE
   
   #drop lower trap releases if not ussing
-  if(!inc_unk){mark_file_CH <-mark_file_CH %>% filter(LH!="Unk") %>% droplevels()}
+   if(exc_unk){mark_file_CH <-mark_file_CH %>% filter(LH!="Unk") %>% droplevels()}
   
   if(is.null(all_of(cont_cov))){
     dat_out<- mark_file_CH %>%  
@@ -68,7 +68,7 @@ make_dat<-function(mark_file_CH=mark_file_CH,sites=c("LWe_J","McN_J","JDD_J","Bo
       ) %>%
       #subset some very small or large length
       filter(length_bin>=55 &length_bin<=200 ) %>%
-      mutate(across(c(length_bin,rel_DOY_bin),scale)) %>% 
+      mutate(across(c(length_bin),scale)) %>% 
       #subset columns needed for analysis
       select(sea_Year_p,LH,stream, #grouping variables
              all_of(sites),all_of(cont_cov))
@@ -294,7 +294,17 @@ psi_pim_sim<-left_join(releases %>% rename(mig_year=sea_Year_p)   %>% ungroup(),
 
 
 ## *** PIMS for calculating weighted averages for unknown LH fish
+#placeholders
+Phi.pim_unk<-NA
+p.pim_unk<-NA
+Phi.pim_unk_years <- NA
+p.pim_unk_years<- NA
+n_unk_LH_phi<-0
+n_unk_LH_p<-0
+n_known_LH_phi<-nrow(Phi.design.dat)
+n_known_LH_p<-nrow(p.design.dat)
 
+if(inc_unk){
 ####Subset design data to just unknown LH fish (marked in tributaries)
 Phi.design.dat_unk <- Phi.design.dat %>% filter(LH=="Unk" &stream=="LWE") %>% droplevels()
 #### number of rows or phi design data for known LH parameters
@@ -318,13 +328,9 @@ n_known_LH_p<-nrow(p.design.dat)
 # Psi.design.dat <- Psi.design.dat %>% filter(LH!="Unk" &stream!="LWE") %>% droplevels()
 #### pims
 
-#placeholders
-Phi.pim_unk<-NA
-p.pim_unk<-NA
-Phi.pim_unk_years <- NA
-p.pim_unk_years<- NA
+
 #make real pims
-if(inc_unk){
+
 Phi.pim_unk <- inner_join(Phi.design.dat_unk %>% select(sea_Year_p,time,stratum,LWe_J,McN_J)%>% droplevels() %>% ungroup %>% distinct(), Phi.design.dat %>% filter(stream=="Chiwawa"&LH!="summer") %>% select(par.index,sea_Year_p,LH,time,stratum,LWe_J,McN_J) %>% droplevels() %>% ungroup() %>% distinct(across(sea_Year_p:McN_J),.keep_all = TRUE),by=c("sea_Year_p","time","stratum","LWe_J","McN_J")) %>% pivot_wider(values_from=par.index,names_from=c(LH)) 
 
 p.pim_unk <- inner_join(p.design.dat_unk %>% select(sea_Year_p,time,stratum,LWe_J,McN_J)%>% droplevels() %>% ungroup %>% distinct(), p.design.dat %>% filter(stream=="Chiwawa"&LH!="summer") %>% select(par.index,sea_Year_p,LH,time,stratum,LWe_J,McN_J) %>% droplevels() %>% ungroup() %>% distinct(across(sea_Year_p:McN_J),.keep_all = TRUE),by=c("sea_Year_p","time","stratum","LWe_J","McN_J")) %>% pivot_wider(values_from=par.index,names_from=c(LH)) 
@@ -407,6 +413,7 @@ fit_wen_mscjs<-function(x,phi_formula, p_formula, psi_formula,doFit=TRUE,silent=
 #glmmTMB objects to get design matrices etc. for each parameter
 ## phi
 Phi.design.glmmTMB<-glmmTMB.mod::glmmTMB(formula(phi_formula), data=x$Phi.design.dat,dispformula = ~0,doFit=FALSE)
+#,contrasts = list(LH="contr.sum",time="contr.sum",stream="contr.sum",age_class="contr.sum")
 #time+time:LH+time:stream+diag(0+time|stream:LH:mig_year)
 ## p
 p.design.glmmTMB<-glmmTMB.mod::glmmTMB(formula(p_formula), data=x$p.design.dat,dispformula = ~0,doFit=FALSE)
@@ -462,7 +469,7 @@ dat_TMB<-with(x,list(
   f=f,
   hyper_mean=0,
   hyper_SD=hypersd,
-  pen=1,
+  pen=pen,
   
   sim_rand = sim_rand #draw random effects from hyperdistribution in simulation rather than sampling from posterior.
 ))
