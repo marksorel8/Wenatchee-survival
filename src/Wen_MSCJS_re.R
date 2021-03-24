@@ -412,14 +412,14 @@ fit_wen_mscjs<-function(x,phi_formula, p_formula, psi_formula,doFit=TRUE,silent=
 #~~~~
 #glmmTMB objects to get design matrices etc. for each parameter
 ## phi
-Phi.design.glmmTMB<-glmmTMB.mod::glmmTMB(formula(phi_formula), data=x$Phi.design.dat,dispformula = ~0,doFit=FALSE)
+Phi.design.glmmTMB<-glmmTMB.mod::glmmTMB(formula(phi_formula), data=x$Phi.design.dat,dispformula = ~0,doFit=FALSE,contrasts = list(LH="contr.sum",stream="contr.sum",age_class="contr.sum"))
 #,contrasts = list(LH="contr.sum",time="contr.sum",stream="contr.sum",age_class="contr.sum")
 #time+time:LH+time:stream+diag(0+time|stream:LH:mig_year)
 ## p
-p.design.glmmTMB<-glmmTMB.mod::glmmTMB(formula(p_formula), data=x$p.design.dat,dispformula = ~0,doFit=FALSE)
+p.design.glmmTMB<-glmmTMB.mod::glmmTMB(formula(p_formula), data=x$p.design.dat,dispformula = ~0,doFit=FALSE,contrasts = list(LH="contr.sum",stream="contr.sum",age_class="contr.sum"))
 #par.index~time+time:LH+time:stream
 ## psi
-Psi.design.glmmTMB<-glmmTMB.mod::glmmTMB(formula(psi_formula), data=x$Psi.design.dat,dispformula = ~0,doFit=FALSE)
+Psi.design.glmmTMB<-glmmTMB.mod::glmmTMB(formula(psi_formula), data=x$Psi.design.dat,dispformula = ~0,doFit=FALSE,contrasts = list(LH="contr.sum",stream="contr.sum",age_class="contr.sum"))
 #par.index~tostratum+tostratum:LH,
 
 #+diag(0+time|stream:LH:mig_year)
@@ -477,9 +477,15 @@ dat_TMB<-with(x,list(
 
 #make param inits for TMB
 par_TMB<-list(
-  beta_phi=Phi.design.glmmTMB$parameters$beta,
-  beta_p=p.design.glmmTMB$parameters$beta,
-  beta_psi=Psi.design.glmmTMB$parameters$beta,
+  beta_phi_ints=Phi.design.glmmTMB$parameters$beta[1:(x$nOCC+2)], #intercept for each site and unique LH intercepts for time 1
+  beta_phi_pen=Phi.design.glmmTMB$parameters$beta[-(1:(x$nOCC+2))],
+  beta_p_ints=p.design.glmmTMB$parameters$beta[1:(x$nOCC+1)],#intercept for each site except the last and unique LH intercepts for time1
+  beta_p_pen=p.design.glmmTMB$parameters$beta[-(1:(x$nOCC+1))],
+  beta_psi_ints=Psi.design.glmmTMB$parameters$beta[1:2], #intercept for each strata
+  beta_psi_pen=Psi.design.glmmTMB$parameters$beta[-(1:2)],
+  log_pen_sds=rep(0,length(Phi.design.glmmTMB$parameters$beta[-(1:(x$nOCC+2))])+
+                    length(p.design.glmmTMB$parameters$beta[-(1:(x$nOCC+1))])+
+                    length(Psi.design.glmmTMB$parameters$beta[-(1:2)])), # standard deviations of penalty priors
   b_phi=Phi.design.glmmTMB$parameters$b,
   b_p=p.design.glmmTMB$parameters$b,
   b_psi=Psi.design.glmmTMB$parameters$b,
@@ -496,13 +502,13 @@ par_TMB<-list(
   #~~~~
   setwd(here("Src"))
   
-  random<-c("b_phi","b_p","b_psi")
-  if(REML){random<-c("beta_phi","beta_p","beta_psi",random)}
+  random<-c("b_phi","b_p","b_psi","beta_phi_pen","beta_p_pen","beta_psi_pen")
+  if(REML){random<-c("beta_phi_ints","beta_p_ints","beta_psi_ints",random)}
   
   # set hyper paramaters of distribution of proportionf os subyearlings at trap as fixed.
 
   
-  
+  if(doFit){ 
 #initialize model
   if(!x$inc_unk){  #model excluding unknown LH stream fish released at LWe_J
     #compile and load TMB model
@@ -521,7 +527,7 @@ mod<-TMB::MakeADFun(data=dat_TMB,parameters = par_TMB,random=random,DLL ="wen_ms
   }
   
   
-if(doFit){
+
 try(fit<-TMBhelper::fit_tmb(mod,newtonsteps = 1,getsd = sd_rep,getJointPrecision = sd_rep ))
 }
 

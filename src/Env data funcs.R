@@ -39,6 +39,11 @@ discharge_func<-function(){
 ###I hate that I can;t figure out a better way to download these data, but for now I'm going to the NWS website (https://w2.weather.gov/climate/xmacis.php?wfo=otx) and using the "NOWData" tool to retrieve a table of monthly summarized average temperatures at Wenatachee Pangborn airpoirt from 2000-2021. I'm then copying the table into excel and saving it as a .csv (I know...uncool). 
 
 Wen_air<-read.csv(here("Data","env cov","wen prang monthly air temp.csv")) %>% pivot_longer(cols=2:13,names_to="month",names_prefix = "X",values_to="temp") %>% select(-2) %>% rename(Year=year,y=temp)
+ 
+# Chiw_temp<-readxl::read_xlsx(here("Data","env cov","Temp Request 3-9-21.xlsx"))
+# dev.new()
+# ggplot(Chiw_temp,aes(x=Date,y=`AvgOfTemp, °C`))+geom_line()
+
 
 #dowload discharage data
 Dis<-discharge_func()
@@ -81,6 +86,21 @@ winter_mean_func<-function(dat,resp_name){
   return(dat_wtr) 
 }
 
+#winter variability 
+winter_CV_func<-function(dat,resp_name){
+  ## autumn flows in year t
+  aut <- subset(dat, (month>=10 & month<=12))
+  ## spring flows in year t+1
+  spr <- subset(dat,
+                (month>=1 & month<=2))
+  ## change spr year index to match aut
+  aut[,"Year"] <- as.integer(aut[,"Year"]) + 1
+  ## combine flows indexed to winter start year & calculate max flow
+  dat_wtr <- aggregate(y ~ Year, data = rbind(aut,spr), function(x){sd(x)/mean(x)}) %>% rename(mig_year=Year)
+  dat_wtr[,"y"] <- round(dat_wtr[,"y"], 1) 
+  
+  return(dat_wtr) 
+}
 
 
 
@@ -112,6 +132,7 @@ env_dat_out<-
 #mainstem wenatchee flow and air temp
 summer_mean_func(as.data.frame(Dis)) %>% rename(sum_flow=y) %>% 
 full_join(winter_mean_func(as.data.frame(Dis)) %>% rename(win_flow=y)) %>% 
+full_join(winter_mean_func(as.data.frame(Dis)) %>% rename(win_flow_CV=y)) %>% 
 full_join(summer_mean_func(as.data.frame(Wen_air)) %>% rename(sum_air=y)) %>% 
 full_join(winter_mean_func(as.data.frame(Wen_air)) %>% rename(win_air=y)) %>% 
 full_join(spring_mean_func(as.data.frame(Wen_air)%>%rename(year=Year),3,4) %>% rename(spr_air=y)) %>% 
