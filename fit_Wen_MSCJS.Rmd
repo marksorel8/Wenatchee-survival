@@ -9,7 +9,7 @@ output: html_document
 
 ## Introduction
 
-One of the most important aspects of population dynamics is stochasticity (Lande et al. 2003). Environmental stochasticity is the variability in environmental factors like weather that affect demographic rates, whereas demographic stochasticity refers to variability in demographic outcomes given vital rates. Both types of stochasticity can have strong effects on abundance and extinction risk and tend to be primary drivers of population dynamics for marine fish populations. 
+Two of the most important drivers of population dynamics are stochasticity (Lande et al. 2003). Environmental stochasticity is the variability in environmental factors like weather that affect demographic rates, whereas demographic stochasticity refers to variability in demographic outcomes given vital rates. Both types of stochasticity can have strong effects on abundance and extinction risk and tend to be primary drivers of population dynamics for marine fish populations. 
 
 Another primary driver of population dynamics is individual heterogeneity (Pfister and Stevens 2003). Variability exists among individuals of a population in traits, such as growth rate, that are related to demographic rates like survival. Furthermore, individual heterogeneity can interact with stochasticity to determine demographic variability through time and space (Vindenes et al. 2008). Including individual heterogeneity in population models can enable more accurate characterization of population dynamics and provide valuable insights into the drivers of population dynamics (Conner and White 1999). 
 
@@ -203,7 +203,7 @@ mscjs_dat<- make_dat(mark_file_CH,sites=c( "LWe_J",
    #"Est_J",
   "Bon_A","McN_A",
   #"PRa_A","RIs_A",
-  "Tum_A"),cont_cov=c(),length_bin = 5,doy_bin = 10,inc_unk = FALSE,exc_unk=FALSE) #,"rel_DOY_bin","length_bin"
+  "Tum_A"),cont_cov=c(),length_bin = 5,doy_bin = 10,inc_unk = FALSE,exc_unk=TRUE) #,"rel_DOY_bin","length_bin"
 
 rm(mark_file)
 rm(all_bio_data)
@@ -228,7 +228,7 @@ contrasts(test_data$stream)<-contr.sum(3)
 contrasts(mscjs_dat$Phi.design.dat$stream)<-contr.sum(3)
 
 
-test<-model.matrix(y~-1+time+timej:LH + timej:stream+timej:stream:LH +timek:LH, data=test_data,contrasts.arg = list(LH=contr.sum(3),stream=contr.sum(3)))
+test<-model.matrix(y~timej:LH + timej:stream+timej:stream:LH +timek:LH, data=test_data,contrasts.arg = list(LH=contr.sum(3),stream=contr.sum(3)))
 
 (test)
 
@@ -249,6 +249,12 @@ ffs <- fff
 contrasts(ffs) <- contr.sum(5, sparse = TRUE)[, 1:2]; contrasts(ffs)
 stopifnot(all.equal(ffs, fff))
 contrasts(ffs) <- contr.sum(5, sparse = TRUE); contrasts(ffs)
+
+
+
+dimnames(mscjs_fit$dat_TMB$Z_phi)
+range(mscjs_fit$dat_TMB$Z_phi[,1:20])
+dimnames(mscjs_fit$dat_TMB$X_phi)
 
 ```
 
@@ -304,7 +310,8 @@ dev.new()
 print_out(mscjs_fit)
 plot_func()
 
-mscjs_fit$dat_TMB$X_phi %>% as_tibble()
+mscjs_fit$dat_TMB$X_phi %>% dimnames()
+
 ```
 
 
@@ -316,9 +323,9 @@ mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
                          phi_formula=par.index~
                            
                             ## to Bonneville
-                            -1+ time1:LH + pc(0+time1|stream )+ pc(0+time1:stream|LH )+
+                            -1+  time1:LH +time1:stream +time1:LH:stream+ pc(0+time1|stream )+ pc(0+time1:stream|LH )+
                             # pc(0+time1:rel_DOY_bin:age_0|one)+
-                            # pc(0+time1:sum_flow:LHsummer+time1:sum_air:LHsummer|one) +
+                            # pc(0+tizme1:sum_flow:LHsummer+time1:sum_air:LHsummer|one) +
                             pc(0+time1:win_flow:age_0+time1:win_air:age_0|one) +
                             # pc(0+time1:spr_dis+time1:spr_air|one) +
                             diag(0+time1|mig_year)+ #diag(0+time1:age_class |mig_year) +
@@ -334,7 +341,7 @@ mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
                             # pc(0+time3:McN_flow+time3:McN_temp+time3:MC_spill_pct_juv|one) +
                            
                             ## SAR to Bonneville adult
-                            time4 + pc(0+time4|LH) + (0+time4:age_class |mig_year)+#diag(0+time4|mig_year)+ 
+                            time4 + pc(0+time4|LH) + diag(0+time4:age_class |mig_year)+#diag(0+time4|mig_year)+ 
                             pc(0+time4:ersstArc.win+time4:ersstWAcoast.sum|one) +
                             ## to McNary Adult
                             time5 +  # pc(0+time5|stratum ) + #diag(0+time5|mig_year)+                 
@@ -372,7 +379,7 @@ mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
                            ,
                            
     
-                            doFit = FALSE,silent=TRUE,
+                            doFit = TRUE,silent=TRUE,
                             sim_rand =0,REML=FALSE,pen=1,hypersd=1,map_hypers=c(FALSE,FALSE)
 )
 
@@ -384,26 +391,26 @@ mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
                          phi_formula=par.index~
                            
                             ## to Bonneville
-                            -1+ time1+time1:LHsummer+time1:LHsmolt + pc(0+time1|stream )+ pc(0+time1:stream|LH )+
+                            -1+ time1:LH+ time1:stream+ time1:LH:stream+
                             # pc(0+time1:rel_DOY_bin:age_0|one)+
                             # pc(0+time1:sum_flow:LHsummer+time1:sum_air:LHsummer|one) +
-                            pc(0+time1:win_flow:age_0+time1:win_air:age_0|one) +
+                            time1:win_air:age_0 +#time1:win_flow:age_0+
                             # pc(0+time1:spr_dis+time1:spr_air|one) +
                             diag(0+time1|mig_year)+#diag(0+time1:age_class |mig_year) +
                            
                             ## to McNary
-                            time2+ pc(0+time2|LH) +  #pc(0+time2:LHsummer|one)+
-                            # pc(0+time2:RIS_flow_juv+time2:RIS_temp_juv+time2:UC_spill_pct_juv|one) +
+                            time2+ time2:age_class +  #pc(0+time2:LHsummer|one)+
+                            time2:RIS_temp_juv+time2:UC_spill_pct_juv +
                             diag(0+time2 |mig_year)+ #(0+time2:age_class |mig_year)+
                            
                             ##to Bonneville
-                            time3 + pc(0+time3|LH) + # pc(0+time3:LHsummer|one) +
+                            time3 + time3:age_class + # pc(0+time3:LHsummer|one) +
                             diag(0+time3|mig_year)+#diag(0+time3:age_class |mig_year)+
-                            # pc(0+time3:McN_flow+time3:McN_temp+time3:MC_spill_pct_juv|one) +
+                            time3:McN_temp+time3:MC_spill_pct_juv+
                            
                             ## SAR to Bonneville adult
-                            time4 + pc(0+time4|LH) + (0+time4 |mig_year)+
-                            pc(0+time4:ersstArc.win+time4:ersstWAcoast.sum|one) +
+                            time4 + time4:age_class + (0+time4:age_class |mig_year)+
+                            time4:ersstWAcoast.sum +time4:ersstArc.win+
                             ## to McNary Adult
                             time5 + #  pc(0+time5|stratum ) + diag(0+time5|mig_year)+                 
                            
@@ -415,17 +422,18 @@ mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
                             p_formula= par.index~
                            
                             ## Lower Wenatchee Trap
-                            -1+ time2+time2:LHsummer+time2:LHsmolt  + pc(0+time2|stream ) + 
+                            -1+ time2:LH+ time2:stream  + 
                            diag(0+time2|mig_year) +
                             
                            ## McNary Juveniles
-                            time3 + pc(0+time3|LH) +
+                            time3 + time3:age_class +
                             diag(0+time3 |mig_year)+ 
-                            
+                            # time3:LWe_J:age_class+
                            # Bonneville Juvenile
-                            time4 + pc(0+time4|LH) +  
-                            diag(0+time4 |mig_year) + 
-                             # pc(0+time4:McN_J:age_0|one) +
+                            time4 + time4:age_class +  
+                            # time4:McN_J:age_class+
+                           diag(0+time4 |mig_year) + 
+                             
                             
                            # Bonn adult
                             time5 + #pc(0+time5|stratum ) + diag(0+time5 |mig_year)+
@@ -435,182 +443,19 @@ mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
                          ,
                           #maturation age                        
                             psi_formula= par.index~
-                            -1+tostratum + pc(0+tostratum|LH) + pc(0+tostratum|stream) +
+                            -1+tostratum + tostratum:age_class + tostratum:stream +
                             (0+tostratum|mig_year)
                            ,
                            
     
                             doFit = TRUE,silent=TRUE,
-                            sim_rand =0,REML=FALSE,pen=1,hypersd=1,map_hypers=c(FALSE,FALSE)
+                            sim_rand =0,REML=FALSE,pen=5,hypersd=1,map_hypers=c(FALSE,FALSE)
 )
 
-
-
-
-
-#penalized complexity
-mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
-                         #survival
-                         phi_formula=par.index~
-                           
-                            ## to Bonneville
-                            -1+ time1:LH + time1:streamWhite + pc(0+time1:streamChiwawa|one) +
-                           #pc(0+time1:streamChiwawa+time1:streamWhite|one )+ 
-                           pc(0+time1:streamChiwawa:LHsummer +
-                                time1:streamChiwawa:LHsmolt +
-                                time1:streamWhite:LHsummer +
-                                time1:streamWhite:LHsmolt|one ) +
-                            # pc(0+time1:rel_DOY_bin:age_0|one)+
-                            # pc(0+time1:sum_flow:LHsummer+time1:sum_air:LHsummer|one) +
-                            pc(0+time1:win_flow:age_0+time1:win_air:age_0|one) +
-                            # pc(0+time1:spr_dis+time1:spr_air|one) +
-                            diag(0+time1|mig_year) + #diag(0+time1:age_class |mig_year) +
-                           
-                            ## to McNary
-                            time2+ pc(0+time2:LHsmolt+time2:LHsummer|one) + 
-                            #pc(0+time2:LHsummer|one)+
-                            # pc(0+time2:RIS_flow_juv+time2:RIS_temp_juv+time2:UC_spill_pct_juv|one) +
-                            diag(0+time2 |mig_year)+  #(0+time2:age_class |mig_year)+
-                           
-                            ##to Bonneville
-                            time3 + pc(0+time3:LHsmolt+time3:LHsummer|one) + # pc(0+time3:LHsummer|one) +
-                            diag(0+time3|mig_year) + #diag(0+time3:age_class |mig_year)+
-                            # pc(0+time3:McN_flow+time3:McN_temp+time3:MC_spill_pct_juv|one) +
-                           
-                            ## SAR to Bonneville adult
-                            time4 + pc(0+time4:LHsmolt+time4:LHsummer|one) + (0+time4:age_class |mig_year)+#diag(0+time4|mig_year)+ 
-                            pc(0+time4:ersstArc.win+time4:ersstWAcoast.sum|one) +
-                            ## to McNary Adult
-                            time5 +  # pc(0+time5|stratum ) + #diag(0+time5|mig_year)+                 
-                           
-                            ## to Tumwater Adults
-                            time6 #+ pc(0+time6|stratum ) #+ diag(0+time6|mig_year)
-                            ,
-                           
-                         #survival
-                            p_formula= par.index~
-                           
-                            ## Lower Wenatchee Trap
-                            -1+ time2+pc(0+time2:LHsmolt+time2:LHsummer|one) +  
-                               pc(0+time2:streamChiwawa+time2:streamWhite|one)+
-                               pc(0+time2:streamChiwawa:LHsummer+
-                                time2:streamChiwawa:LHsmolt+
-                                time2:streamWhite:LHsummer+
-                                time2:streamWhite:LHsmolt|one ) +  
-                           diag(0+time2|mig_year) +
-                            
-                           ## McNary Juveniles
-                            time3 + pc(0+time3:LHsmolt+time3:LHsummer|one) +
-                            diag(0+time3 |mig_year)+ 
-                            
-                           # Bonneville Juvenile
-                            time4 + pc(0+time4:LHsmolt+time4:LHsummer|one) +  
-                            diag(0+time4 |mig_year) + 
-                           # pc(0+time4:McN_J:age_class|one) +
-                            
-                           # Bonn adult
-                            time5 + #pc(0+time5|stratum ) + #diag(0+time5 |mig_year)+
-                            
-                           #McNary adult
-                            time6 #+ pc(0+time6|stratum )# + diag(0+time6 |mig_year)+
-                         ,
-                          #maturation age                        
-                            psi_formula= par.index~
-                            -1+tostratum + pc(0+tostratum:LHsmolt+tostratum:LHsummer|one) +
-                            pc(0+tostratum:streamWhite+tostratum:streamChiwawa|one) +
-                            (0+tostratum|mig_year)
-                           ,
-                           
-    
-                            doFit = TRUE,silent=TRUE,
-                            sim_rand =0,REML=FALSE,pen=1,hypersd=1,map_hypers=c(FALSE,FALSE)
-)
-
-
-
-
-
-
-
-
-#penalized complexity
-mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
-                         #survival
-                         phi_formula=par.index~
-                           
-                            ## to Bonneville
-                            -1+ time1+time1:LHsmolt+time1:LHsummer + time1:streamWhite + pc(0+time1:streamChiwawa|one) +
-                           #pc(0+time1:streamChiwawa+time1:streamWhite|one )+ 
-                           pc(0+time1:streamChiwawa:LHsummer +
-                                time1:streamChiwawa:LHsmolt +
-                                time1:streamWhite:LHsummer +
-                                time1:streamWhite:LHsmolt|one ) +
-                            # pc(0+time1:rel_DOY_bin:age_0|one)+
-                            # pc(0+time1:sum_flow:LHsummer+time1:sum_air:LHsummer|one) +
-                            pc(0+time1:win_flow:age_0+time1:win_air:age_0|one) +
-                            # pc(0+time1:spr_dis+time1:spr_air|one) +
-                            diag(0+time1|mig_year) + #diag(0+time1:age_class |mig_year) +
-                           
-                            ## to McNary
-                            time2+ pc(0+time2:LHsmolt+time2:LHsummer+time2:LHUnk|one) + 
-                            #pc(0+time2:LHsummer|one)+
-                            # pc(0+time2:RIS_flow_juv+time2:RIS_temp_juv+time2:UC_spill_pct_juv|one) +
-                            diag(0+time2 |mig_year)+  #(0+time2:age_class |mig_year)+
-                           
-                            ##to Bonneville
-                            time3 + pc(0+time3:LHsmolt+time3:LHsummer+time3:LHUnk|one) + # pc(0+time3:LHsummer|one) +
-                            diag(0+time3|mig_year) + #diag(0+time3:age_class |mig_year)+
-                            # pc(0+time3:McN_flow+time3:McN_temp+time3:MC_spill_pct_juv|one) +
-                           
-                            ## SAR to Bonneville adult
-                            time4 + pc(0+time4:LHsmolt+time4:LHsummer+time4:LHUnk|one) + (0+time4 |mig_year)+#diag(0+time4|mig_year)+ 
-                            pc(0+time4:ersstArc.win+time4:ersstWAcoast.sum|one) +
-                            ## to McNary Adult
-                            time5 +  # pc(0+time5|stratum ) + #diag(0+time5|mig_year)+                 
-                           
-                            ## to Tumwater Adults
-                            time6 #+ pc(0+time6|stratum ) #+ diag(0+time6|mig_year)
-                            ,
-                           
-                         #survival
-                            p_formula= par.index~
-                           
-                            ## Lower Wenatchee Trap
-                            -1+ time2+pc(0+time2:LHsmolt+time2:LHsummer|one) +  
-                               pc(0+time2:streamChiwawa+time2:streamWhite|one)+
-                               pc(0+time2:streamChiwawa:LHsummer+
-                                time2:streamChiwawa:LHsmolt+
-                                time2:streamWhite:LHsummer+
-                                time2:streamWhite:LHsmolt|one ) +  
-                           diag(0+time2|mig_year) +
-                            
-                           ## McNary Juveniles
-                            time3 + pc(0+time3:LHsmolt+time3:LHsummer+time3:LHUnk|one) +
-                            diag(0+time3 |mig_year)+ 
-                            
-                           # Bonneville Juvenile
-                            time4 + pc(0+time4:LHsmolt+time4:LHsummer+time4:LHUnk|one) +  
-                            diag(0+time4 |mig_year) + 
-                           # pc(0+time4:McN_J:age_class|one) +
-                            
-                           # Bonn adult
-                            time5 + #pc(0+time5|stratum ) + #diag(0+time5 |mig_year)+
-                            
-                           #McNary adult
-                            time6 #+ pc(0+time6|stratum )# + diag(0+time6 |mig_year)+
-                         ,
-                          #maturation age                        
-                            psi_formula= par.index~
-                            -1+tostratum + pc(0+tostratum:LHsmolt+tostratum:LHsummer+tostratum:LHUnk|one) +
-                            pc(0+tostratum:streamWhite+tostratum:streamChiwawa+tostratum:streamLWE|one) +
-                            (0+tostratum|mig_year)
-                           ,
-                           
-    
-                            doFit = TRUE,silent=TRUE,
-                            sim_rand =0,REML=FALSE,pen=1,hypersd=1,map_hypers=c(FALSE,FALSE)
-)
-
+mscjs_fit$mod$par
+dev.new()
+plot_func()
+print_out(mscjs_fit)
 
 save(mscjs_fit,file = here("mscjs_fit.Rdata"))
 
