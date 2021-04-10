@@ -414,9 +414,14 @@ DATA_SCALAR(pen);
   // Parameters
   //~~~~~~~~~~~~~~~~~~~
   //fixed effects
-  PARAMETER_VECTOR(beta_phi);  //Phi fixed effect coefficients
-  PARAMETER_VECTOR(beta_p);    //p fixed effect coefficients
-  PARAMETER_VECTOR(beta_psi);   //psi fixed effect coefficients
+  PARAMETER_VECTOR(beta_phi_ints);  //Phi fixed effect coefficients
+  PARAMETER_VECTOR(beta_p_ints);    //p fixed effect coefficients
+  PARAMETER_VECTOR(beta_psi_ints);   //psi fixed effect coefficients
+  //penalized effects
+  PARAMETER_VECTOR(beta_phi_pen);  //Phi effect coefficients
+  PARAMETER_VECTOR(beta_p_pen);    //p effect coefficients
+  PARAMETER_VECTOR(beta_psi_pen);   //psi effect coefficients
+  PARAMETER_VECTOR(log_pen_sds);   //penalty log SDs
   //random effects
   PARAMETER_VECTOR(b_phi);      //phi random effects
   PARAMETER_VECTOR(b_p);        //p random effects
@@ -437,6 +442,18 @@ DATA_SCALAR(pen);
   parallel_accumulator<Type> jnll(this);
 // Type jnll = 0;
   // Linear predictors
+  
+  //concatenate intercepts and penalized coefficient
+  vector<Type> beta_phi(X_phi.cols()); 
+  beta_phi << beta_phi_ints,beta_phi_pen;
+  vector<Type> beta_p(X_p.cols());
+  beta_p << beta_p_ints,beta_p_pen;
+  vector<Type> beta_psi(X_psi.cols());
+  beta_psi << beta_psi_ints,beta_psi_pen;
+  ADREPORT(beta_phi);
+  ADREPORT(beta_p);
+  ADREPORT(beta_psi);
+  
   //// Fixed component
   vector<Type> eta_phi = X_phi*beta_phi;
   vector<Type> eta_p = X_p*beta_p;
@@ -492,7 +509,15 @@ DATA_SCALAR(pen);
   jnll += allterms_nll(b_p, theta_p, p_terms, this->do_simulate,pen);//p
   jnll += allterms_nll(b_psi, theta_psi, psi_terms, this->do_simulate,pen);//psi
   
+  // Penalties
+  vector<Type> pen_betas(beta_phi_pen.size()+
+    beta_p_pen.size()+
+    beta_psi_pen.size());
+  pen_betas << beta_phi_pen,beta_p_pen,beta_psi_pen;
   
+  jnll -= (dnorm(pen_betas,Type(0),exp(log_pen_sds),true).sum()+
+    dexp(exp(log_pen_sds),pen,true).sum()+
+    log_pen_sds.sum());
 
   ////Variables
   vector<Type> pS(4); //state probs: dead, 1, 2, 3
@@ -643,6 +668,10 @@ matrix<Type> psi_hat =  psi;
     
 if(sim_rand){
     // Linear predictors
+    beta_phi << beta_phi_ints,beta_phi_pen;
+  beta_p << beta_p_ints,beta_p_pen;
+  beta_psi << beta_psi_ints,beta_psi_pen;
+  
     //// Fixed component
     eta_phi = X_phi*beta_phi;
     eta_p = X_p*beta_p;

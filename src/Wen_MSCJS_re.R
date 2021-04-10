@@ -129,14 +129,15 @@ Phi.design.dat<-
   mutate(group=select(., LH,stream,sea_Year_p,all_of(cont_cov),LWe_J,McN_J) %>%  reduce(paste0)) %>% 
   mutate(par.index=1:nrow(.)) %>% 
   filter(Time>(nDS_OCC)|stratum==1) %>%  #cant be in strata (fish age) other than 1 on downstream, or ocean for survival. Note "Time" column indexing starts at 0, so occasion/Time (nDS_OCC-1) is the last juvenile detection occasion
-  # filter(!Time%in%(c(JDD_J_time,Est_J_time,PRa_RIs_A_times)-1)) %>% 
-   # filter(!Time%in%(c(JDD_J_time,Est_J_time)-1)) %>% 
-  # if Est_J of JDD included, I will fix survival to be 1 between McN_J and JDD_J and Bon_J and Est_J within the cpp code, but want to pull it out of design matrix here
-  mutate(mig_year=as.factor(ifelse(Time<=(nDS_OCC),as.numeric(as.character(sea_Year_p)) ,as.numeric(as.character(sea_Year_p)) +as.numeric(as.character(stratum)))),
+   mutate(mig_year=as.factor(ifelse(Time<=(nDS_OCC),as.numeric(as.character(sea_Year_p)) ,as.numeric(as.character(sea_Year_p)) +as.numeric(as.character(stratum)))),
          mig_year_num=as.numeric(mig_year)) %>%   #add a column for the actual migration year, which is the seaward year for juveniles and the seaward + stratum for adults
 cbind(.,model.matrix(~time+stream+LH+stratum-1,data=.)) %>% 
  mutate(streamChiwawa=as.numeric(streamNason+streamWhite==0),
-        age_class=as.factor(ifelse(LH!="smolt","sub","yrlng")), LHfall=as.numeric(LH=="fall"),age_0=as.numeric(LH!="smolt"), LWe_new=as.numeric(as.numeric(as.character(sea_Year_p)>2011))) %>% 
+        age_class=as.factor(ifelse(LH%in%c("fall","summer"),"sub",as.character(LH))), 
+        LHfall=as.numeric(LH=="fall"),age_0=as.numeric(LH!="smolt"), 
+        LWe_new=as.numeric(as.numeric(as.character(sea_Year_p)>2011)),
+        LH_t1=ifelse(LH=="Unk","smolt",as.character(LH)),
+        stream_t1=ifelse(stream=="LWE","Chiwawa",as.character(stream))) %>% 
   #make length bin and release DOY numeric
   # mutate(across(.cols=all_of(cont_cov),.fns=function(x)scale(as.numeric(as.character(x))))) %>% 
   #make par index a sequence
@@ -181,7 +182,11 @@ p.design.dat<-
   #make length bin and release DOY numeric
   # mutate(across(.cols=all_of(cont_cov),.fns=function(x)scale(as.numeric(as.character(x))))) %>% 
 
-  mutate( age_class=as.factor(ifelse(LH=="Unk","Unk",ifelse(LH!="smolt","sub","yrlng"))), LHfall=as.numeric(LH=="fall"),age_0=as.numeric(LH!="smolt"), LWe_new=as.numeric(as.numeric(as.character(sea_Year_p)>2011))) %>% 
+  mutate( age_class=as.factor(ifelse(LH%in%c("fall","summer"),"sub",as.character(LH))),
+          LHfall=as.numeric(LH=="fall"),age_0=as.numeric(LH!="smolt"),
+          LWe_new=as.numeric(as.numeric(as.character(sea_Year_p)>2011)),
+          LH_t1=as.factor(ifelse(LH=="Unk","smolt",as.character(LH))),
+          stream_t1=as.factor(ifelse(stream=="LWE","Chiwawa",as.character(stream)))) %>% 
   dplyr::filter( !(as.numeric(as.character(sea_Year_p))%in%(2011:2012) & Time==occ_LWe_J )) %>%   
   
   filter((LH=="Unk" &stream=="LWE" )|(LH!="Unk" &stream!="LWE")) %>% 
@@ -189,6 +194,10 @@ p.design.dat<-
 
   #make par index a sequence
   mutate(par.index=(1:nrow(.))-1)%>% 
+  #add environmental covariates
+  left_join(env_dat %>% mutate(mig_year=as.factor(mig_year)),by="mig_year") %>% 
+  mutate(across(sum_flow:transport.win,scale)) %>% 
+  replace(is.na(.), 0) %>% 
   #add a column of 1's to use as a goruping variable when specifying penalized cemplexity priors
   mutate(one="1")
 
@@ -408,15 +417,15 @@ return(list(dat_out=dat_out,
 
 
 
-fit_wen_mscjs<-function(x,phi_formula, p_formula, psi_formula,doFit=TRUE,silent=FALSE,sd_rep=TRUE,sim_rand=1,REML=FALSE,hypersd=1,map_hypers=c(FALSE,FALSE),pen=1){
+fit_wen_mscjs<-function(x,phi_formula, p_formula, psi_formula,doFit=TRUE,silent=FALSE,sd_rep=TRUE,sim_rand=1,REML=FALSE,hypersd=1,map_hypers=c(FALSE,FALSE),pen=1,start_par=NULL){
 #~~~~
 #glmmTMB objects to get design matrices etc. for each parameter
 ## phi
-Phi.design.glmmTMB<-glmmTMB.mod::glmmTMB(formula(phi_formula), data=x$Phi.design.dat,dispformula = ~0,doFit=FALSE,contrasts = list(LH="contr.sum",stream="contr.sum",age_class="contr.sum"))
+Phi.design.glmmTMB<-glmmTMB.mod::glmmTMB(formula(phi_formula), data=x$Phi.design.dat,dispformula = ~0,doFit=FALSE,contrasts = list(LH_t1="contr.sum",stream_t1="contr.sum",LH="contr.sum",stream="contr.sum",age_class="contr.sum"))
 #,contrasts = list(LH="contr.sum",time="contr.sum",stream="contr.sum",age_class="contr.sum")
 #time+time:LH+time:stream+diag(0+time|stream:LH:mig_year)
 ## p
-p.design.glmmTMB<-glmmTMB.mod::glmmTMB(formula(p_formula), data=x$p.design.dat,dispformula = ~0,doFit=FALSE,contrasts = list(LH="contr.sum",stream="contr.sum",age_class="contr.sum"))
+p.design.glmmTMB<-glmmTMB.mod::glmmTMB(formula(p_formula), data=x$p.design.dat,dispformula = ~0,doFit=FALSE,contrasts = list(LH_t1="contr.sum",stream_t1="contr.sum",LH="contr.sum",stream="contr.sum",age_class="contr.sum"))
 #par.index~time+time:LH+time:stream
 ## psi
 Psi.design.glmmTMB<-glmmTMB.mod::glmmTMB(formula(psi_formula), data=x$Psi.design.dat,dispformula = ~0,doFit=FALSE,contrasts = list(LH="contr.sum",stream="contr.sum",age_class="contr.sum"))
@@ -476,6 +485,10 @@ dat_TMB<-with(x,list(
 
 
 #make param inits for TMB
+if(!is.null(start_par)){
+  par_TMB<-start_par  
+}else
+
 par_TMB<-list(
   beta_phi_ints=Phi.design.glmmTMB$parameters$beta[1:(x$nOCC+2)], #intercept for each site and unique LH intercepts for time 1
   beta_phi_pen=Phi.design.glmmTMB$parameters$beta[-(1:(x$nOCC+2))],
@@ -508,7 +521,7 @@ par_TMB<-list(
   # set hyper paramaters of distribution of proportionf os subyearlings at trap as fixed.
 
   
-  if(doFit){ 
+
 #initialize model
   if(!x$inc_unk){  #model excluding unknown LH stream fish released at LWe_J
     #compile and load TMB model
@@ -527,7 +540,7 @@ mod<-TMB::MakeADFun(data=dat_TMB,parameters = par_TMB,random=random,DLL ="wen_ms
   }
   
   
-
+  if(doFit){ 
 try(fit<-TMBhelper::fit_tmb(mod,newtonsteps = 1,getsd = sd_rep,getJointPrecision = sd_rep ))
 }
 

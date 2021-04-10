@@ -42,6 +42,11 @@ lower_mid_col_dams<-read_csv(here("Data","ptagis","mid_lower_Col_Interrogation_S
 #upper Columbia mainstem Dam and Tumwater Dam detections
 upper_col_dams_tum<-read_csv(here("Data","ptagis","upper_Col_Wen_Interrogation_summary.csv"))
 
+#detections on instream arrays
+inst_array_det<-read_csv(here("Data","ptagis","Interrogation Summary wen trib tag adult array det.csv"))
+
+
+
 #detection data for fish released in lower Wenatchee trap from Dan W. 
 obs_dat_LWe_releases<-read_csv(here("Data","ptagis","ptagis_obs_data_lower_wen_screwt.csv")) %>%
   mutate(date_det=lubridate::date(lubridate::mdy_hms(obs_date))) %>%
@@ -52,7 +57,7 @@ obs_dat_LWe_releases<-read_csv(here("Data","ptagis","ptagis_obs_data_lower_wen_s
   mutate("First Day Num"=lubridate::yday(first_date),"Last Day Num"=lubridate::yday(last_det)) %>%
   rename("Site Code Value"=obs_site,"Tag Code"=tag_id)
 
-#add rows for detections of fish released at lower wenatchee trap
+#add data for detections of fish released at lower wenatchee trap
 lower_mid_col_dams<-bind_rows(lower_mid_col_dams,obs_dat_LWe_releases %>% filter(`Site Code Value`%in% c("MCJ","JDJ","B1J","B2J","BCC","TWX","BO1", "BO2", "BO3", "BO", "MC1", "MC2","JO1", "JO2","TD1", "TD2")))
 
 upper_col_dams_tum<-bind_rows(upper_col_dams_tum,obs_dat_LWe_releases %>% filter(`Site Code Value`%in% c(  "PRA","RIA","TUF")))
@@ -164,7 +169,16 @@ left_join(lower_mid_col_dams %>%
             rename("Tum_A"="Last Year YYYY",
                    "Tum_A_doy"="Last Day Num"),by="Tag Code") %>% 
 
-  relocate( ends_with("doy"),.after=Tum_A) %>% 
+  #instream arrays above Tumwater day
+  left_join(inst_array_det %>% 
+              select(c(`Tag Code`,`Last Year YYYY`,`Last Day Num`)) %>%
+              arrange(desc(`Last Year YYYY`),desc(`Last Day Num`)) %>% #arrange in order of increasing first year
+              distinct(`Tag Code`,.keep_all=TRUE) %>% #remove duplicate detections at multiple "sites" at this dam 
+              rename("instr_array"="Last Year YYYY",
+                     "instr_array_A_doy"="Last Day Num"),by="Tag Code") %>%   
+  
+#move all the detection day of year columns to after all the detections year columns
+  relocate( ends_with("doy"),.after=instr_array) %>% 
   #Add juvenile life history
   
   #add age
@@ -210,22 +224,31 @@ left_join(lower_mid_col_dams %>%
   mutate(sea_Year_p = ifelse(age%in%c("YCW","Unk"),`Mark Year YYYY`,`Mark Year YYYY`+1)) %>% 
   
   #mutate detections to be years between seaward migration year and detection year 
-  mutate_at(vars(LWe_J:Tum_A), ~.x-sea_Year_p) %>%  
-  #make juvenile detection "A" and non-detections "0"
+  mutate_at(vars(LWe_J:instr_array), ~.x-sea_Year_p) %>%  
+  #make juvenile detection "1" and non-detections "0"
   mutate_at(vars(LWe_J:Est_J), ~case_when(is.na(.x)~ 0,
                                           .x==0~1)) %>%
   # #make adult detections after 1 year "1", after 2 year "2" after three years "3" otherwise "0"
-  mutate_at(vars(Bon_A:Tum_A), ~case_when(is.na(.x)~ 0,
+  mutate_at(vars(Bon_A:instr_array), ~case_when(is.na(.x)~ 0,
                                           .x==0~0,
                                           .x==1~1,
                                           .x==2~2,
                                           .x==3~3,
                                           TRUE ~0)) %>% 
-  #drop rows with capture history where only adult detection is at tumwater dam (because of concern about "ghost tags)
-  filter(!( select(., Bon_A:RIs_A)%>% rowSums() ==0& Tum_A !=0)) %>% 
+  #if only adult detection is at tumwater dam presume "ghost tag" (fish died and some years later tag washed downstream over dam) and change detection to 0
+  mutate(Tum_A=ifelse( select(., Bon_A:RIs_A)%>% rowSums() ==0& Tum_A !=0 ,0,Tum_A)) %>% 
   
+  #zero out instream array adult detections unless they occurred after a valid ddownstream adult detection
+  mutate(instr_array=ifelse(
+    select(., Bon_A:RIs_A) %>%  reduce(pmax.int,na.rm=T)!=instr_array | #adult mainstem year is not equal to instream array year
+      select(., Bon_A_doy:RIs_A_doy) %>%  reduce(pmax.int,na.rm=T)>instr_array_A_doy ,#adult mainstem day is greater than instream array day
+    0, instr_array )) %>% 
+
+  #make detection of LWe_J 1 if that is release location (for trap dependence)
   mutate(LWe_J=if_else(stream=="LWE",1,LWe_J)) %>%
-  select(sea_Year_p,LH,stream,LWe_J:Tum_A,`Length mm`,`Release Day Number`,LWe_J_doy:Tum_A_doy)
+  #subset columns of interest
+  select(sea_Year_p,LH,stream,LWe_J:instr_array,`Length mm`,`Release Day Number`,LWe_J_doy:instr_array_A_doy)
 
 
 write.csv(mark_file_CH,file=here("Data","mark_file_CH.csv"))
+

@@ -122,9 +122,9 @@ Type termwise_nll(array<Type> &U, vector<Type> theta, per_term_info<Type>& term,
     for(int i = 0; i < term.blockReps; i++){
       ans -= dnorm(vector<Type>(U.col(i)), Type(0), sd, true).sum();
       ans -= (dexp(sd,pen,true).sum() +theta.sum()); //penaliuze complexity
-      // if (do_simulate) {
-      //   U.col(i) = rnorm(Type(0), sd);
-      // }
+      if (do_simulate) {
+        U.col(i) = rnorm(Type(0), sd);
+      }
     }
     term.sd = sd; // For report
   }
@@ -359,8 +359,8 @@ Type objective_function<Type>::operator() ()
 // Data
 //~~~~~~~~~~~~~~~~~~~
 DATA_INTEGER(n_OCC);      //number of total survival/ recputure occasions;
-DATA_INTEGER(nDS_OCC);      //number of downstream survival/ reacputure
-DATA_INTEGER(n_states);      //number of possible adult return ages (i.e. statres -3) 
+DATA_INTEGER(nDS_OCC);      //number of downstream survival/ recapture occasions;
+DATA_INTEGER(n_states);      //number of possible adult return ages 
 DATA_INTEGER(n_groups);      //number groups (i.e., unique combos of LH,stream,downstream,year). Used in psi mlogit backtransform
 DATA_INTEGER(n_unique_CH); //number of unique capture occasions
 DATA_IVECTOR(f);  //release occasion
@@ -471,7 +471,7 @@ ADREPORT(beta_psi);
   // Likelihood
   //~~~~~~~~~~~~~~~~~~~
   
-  // Random effects
+  // Random effects (allterms_nll returns the nll and also simulates new values of the random effects)
   jnll += allterms_nll(b_phi, theta_phi, phi_terms, this->do_simulate, pen);//phi
   jnll += allterms_nll(b_p, theta_p, p_terms, this->do_simulate, pen);//p
   jnll += allterms_nll(b_psi, theta_psi, psi_terms, this->do_simulate, pen);//psi
@@ -492,6 +492,8 @@ ADREPORT(beta_psi);
   Type NLL_it=0;      // holds the NLL for each CH
   Type tmp = 0;       // holds the prob of a given state during observation process in upstream migration
 
+  vector<Type> NLL_it_vec(n_unique_CH); // holds likelihood of each unique CH
+  
   for(int n=0; n<n_unique_CH; n++){ // loop over individual unique capture histories
     pS.setZero(); //initialize at 0,1,0,0 (conditioning at capture)
     pS(1)=Type(1);
@@ -572,7 +574,9 @@ ADREPORT(beta_psi);
   
   //multiply the NLL of an individual CH by the frequency of that CH and subtract from total jnll
   jnll-=(NLL_it*freq(n));
+  NLL_it_vec(n)=NLL_it;
   }
+  REPORT(NLL_it_vec);
   //end of likelihood
   
   //~~~~~~~~~~~~~~~~~~~
@@ -619,11 +623,10 @@ ADREPORT(beta_psi);
   ADREPORT(exp(theta_psi));
   
   //calculate expected numbers of detections 
-  ////going to use do so by unique CH, even though it is redundant, just because the PIMS are already 
-  ////available for unique CH. 
   SIMULATE {
 
-//Parameters to use to calculate the expectation of the number of detections
+//Parameters to use to calculate the expectation of the number of detections 
+//(based on the empiracle bayes estimates of random effects)
 vector<Type> p_hat = p;
 vector<Type> phi_hat = phi;
 matrix<Type> psi_hat =  psi;
@@ -631,13 +634,9 @@ matrix<Type> psi_hat =  psi;
     REPORT(phi_hat);
     REPORT(psi_hat);
     
-if(sim_rand){
+if(sim_rand){ // if(sim_rand) simulate the random effects from their hyperdistribution
     // Linear predictors
     //// Fixed component
-  beta_phi << beta_phi_ints,beta_phi_pen;
-  beta_p << beta_p_ints,beta_p_pen;
-  beta_psi << beta_psi_ints,beta_psi_pen;
-  
     eta_phi = X_phi*beta_phi;
     eta_p = X_p*beta_p;
     eta_psi = X_psi*beta_psi;
@@ -655,7 +654,7 @@ if(sim_rand){
     REPORT(p_hat);
     REPORT(psi_hat);
 
-    //// Random component
+    //// Random component (recalculating using simulated b_phi, b_p, and b_psi)
     eta_phi += Z_phi*b_phi;
     eta_p += Z_p*b_p;
     eta_psi += Z_psi*b_psi;
