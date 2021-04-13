@@ -7,8 +7,13 @@ output:
   pdf_document: default
   html_document: default
 ---
+## Main message
 
+Alternative juvenile life history strategies are associated with different survival and maturation ages at subsequent life stages. 
 
+## Working abstract
+
+Juvenile life history diversity is thought to increase population stability, but the mechanisms underlying that stability are rarely understood because it is difficult to track the performance of individuals that expressed different juvenile life histories throughout their lives. We analyzed a rare long-term mark-recapture data set of Chinook salmon that were observed to express different juvenile life history tactics with regard to emigration timing from natal stream. Juvenile salmon either emigrated from their natal stream in their first year of life and spent months in downstream rearing habitat prior to migrating to the ocean or remained in their natal stream entirely until migrating to the ocean. All fish migrated to the ocean in their second spring of life. Earlier emigrants from the natal stream entered the migration corridor about 20 days earlier on average and migrated somewhat slower and had lower downstream-survival rates than later emigrants in the upper migration corridor. Earlier emigrants from the natal stream returned from the ocean at higher rates and somewhat younger ages. Overwinter survival of early emigrants downstream of natal areas prior to seaward emigration was found to be negatively related to winter air temperature, and as in other recent studies, marine survival was positively related to coastal upwelling in spring and negatively related to sea surface temperature in summer. Understanding differences in survival and maturation age of animals that exhibit different juvenile life history strategies leads to a more holistic conceptualization of the factors governing population productivity and stability, enabling more mechanistic simulation of the affects of management and climate change on populations.   
 
 
 ## Methods
@@ -100,14 +105,14 @@ plot_doy("Bon_J_doy",mark_file_CH %>% filter(LH!="Unk"),"Bonneville Dam juvenile
 
 ### Model
   
-We used a multistate Cormack-Jolly-Seber model to estimate the probability of survival $\phi^t_{l,a,y,s}$ during interval $t$ for fish that expressed juvenile life history $l$ from stream $a$ in year $y$ and, for upstream migrating adults, age $s$. Within the model we also estimated probabilities $\boldsymbol \psi_{l,y}$ of spending 1, 2 or 3 years at sea conditional on surviving to return from the ocean. 
+We used a multistate Cormack-Jolly-Seber model to estimate the probability of survival $\phi^t_{l,a,y,s}$ during interval $t$ for fish that expressed juvenile life history $l$ from stream $a$ in year $y$ and, for upstream migrating adults, age $s$. Within the model we also estimated probabilities $\boldsymbol \psi_{l,y}$ of fish spending 1, 2 or 3 years at sea conditional on surviving to return from the ocean. 
   
 #### Survival -
 
 Survival probabilities were modeled in logit space as,
 $$logit(\phi^t_{l,a,y,s})=\alpha^t + {\mathbf{x}^{t'}_{l,a,y,s}} \boldsymbol \beta ^t + \delta^t_{y}+\epsilon^t_{l,y}$$
 
-where $\alpha^t$ was an interval-specific intercept, $\mathbf{x}^t_{l,a,y,s}$ was a row of the design matrix, $\boldsymbol \beta ^t$ was a vector of coefficients, $\delta^t_{y}$ were synchronous random year effects, and $\epsilon^t_{y,l}$ were idiosyncratic random year effects for fish that expressed different juvenile life history strategies. To increase the precision of estimates and improve the predictive abbility of the model, we applied penalized-complexity priors on coefficients $\boldsymbol\beta^t$ and random effects $\delta^t_y$ and $\epsilon_{y,l}$,  
+where $\alpha^t$ was an interval-specific intercept, $\mathbf{x}^t_{l,a,y,s}$ was a row of the design matrix, $\boldsymbol \beta^t$ was a vector of coefficients, $\delta^t_{y}$ were synchronous random year effects, and $\epsilon^t_{y,l}$ were idiosyncratic random year effects for fish that expressed different juvenile life history strategies. To increase the precision of estimates and improve the predictive ability of the model, we applied penalized-complexity priors on coefficients $\boldsymbol\beta^t$ and random effects $\delta^t_y$ and $\epsilon_{y,l}$,  
 
 $$
 \begin{split}
@@ -119,9 +124,9 @@ $$
 \end{split}
 $$
 
-where $\lambda$ determines the magnitude of the penalty. To select $\lambda$, we fit models with a range of $\lambda$ values and assessed their predictive performance by the leave-one-out information criterion (looic) implemented with the *loo* package, as well as the model goodness of fit. 
+where $\lambda$ determined the magnitude of the penalty. To select $\lambda$, we fit models with a range of $\lambda$ values and assessed their predictive performance by the leave-one-out information criterion (looic) implemented with the *loo* package, as well as by assessing model goodness of fit as described below. 
 
-During the first survival interval we allowed each juvenile life history its own intercept (i.e., $\alpha^t_l$) because each life history spends different amounts of time in this interval and are therefore  expected to have different survivals. In subsequent occasions we treated the intermediate life history (fall emigrants) as the intercept $\alpha^t$ and penalized coefficients for the summer- and smolt-emigrant life histories. During the first interval we included penalized effects of natal stream and stream x life-history interactions, because fish from different streams migrate through somewhat different habtitats. In particular, fish from the White River must transit Lake Wenatchee, whereas fish from Nason and Chiwawa do not. In subsequent occasions, we did not allow for survival differences among natal stream, because the model did not always estimate reasonable survival rates when stream differences were included. For intervals representing upstream migration of adults we included penalized effects of age, treating the intermediate age 4 as the intercept. No effects of juvenile life history or natal stream were included for adult upstream survival.
+During the first survival interval we allowed each juvenile life history its own intercept (i.e., $\alpha^t_l$) because each life history spends different amounts of time in this interval and are therefore  expected to have different survivals. In subsequent occasions we treated the intermediate life history (fall emigrants) as the intercept $\alpha^t$ and penalized coefficients for the summer- and smolt-emigrant life histories. During the first interval we included penalized effects of natal stream and stream x life-history interactions, where stream and life-history were contrast-coded in the design matrix, because fish from different streams migrate through somewhat different habitats. In particular, fish from the White River transit Lake Wenatchee, whereas fish from Nason and Chiwawa do not. In subsequent occasions, we did not allow for survival differences among natal stream, because the model did not always estimate reasonable survival rates when stream differences were included. For intervals representing upstream migration of adults we included penalized effects of age, treating the intermediate age 4 as the intercept. No effects of either juvenile life history or natal stream were included for adult upstream survival.
 
   
 We included effects of several environmental covariates on survival probabilities. We included effects of average annual winter (November-February) air temperature and stream discharge on survival of life histories that emigrated from their natal stream as subyearlings (summer and fall emigrants), assuming common effects across life histories and streams. We included effects of average water temperature and discharge at Rock Island Dam in April-May and McNary dam in May-June on survival during the second and third intervals respectively, again assuming common effects across juvenile life histories and streams. Based on the findings of Crozier et al. (2021), we evaluated the effects of the following covariates on marine survival: sea surface temperature in the northeast Pacific Ocean during the winter prior to when smolts enter the marine environment, a coastal upwelling index measured during the spring, and sea surface temperature off the coast of Washington State during the summer after smolts enter the ocean.  
@@ -176,7 +181,7 @@ The model was fit by maximizing the log-likelihood function with respect to para
 We assessed goodness of fit with posterior predictive checks on the number of detection from each release cohort (life history x stream x year) and age at each occasion. To generate posterior samples, we drew 250 sets of fixed and random parameter values from the posterior distribution represented by a multivariate normal defined by the maximum likelihood estimates of fixed effects and empirical Bayes estimates of random effects, and the precision matrix of the fixed and random effects returned by TMB. We then simulated one data set based on each parameter set, which matched the size (number of released fish) of the observed data. We also conducted posterior predictive simulations where we sampled random year effects from their hyper-distributions rather than using the empirical Bayes estimates, and set the random-year effects to zero when calculating expected number of detections. We used the DHARMa package (Hartig 2021) to generate and examine scaled quantile residuals for the number of detections from each release cohort and age at each occasion. We also evaluated Bayesian p-values using the Freeman-Tukey statistic as the discrepancy function (Conn et al. 2018).  
 
 
-## Preliminary Results (diagnostic, not paper table and figures)
+## Preliminary Results (diagnostic, not paper tables and figures)
 
 ```{r , message=FALSE, warning=FALSE, process_dat,echo=FALSE,cache=FALSE}
 mscjs_dat<- make_dat(mark_file_CH,sites=c( "LWe_J",
@@ -198,42 +203,43 @@ rm(all_bio_data)
 #penalized complexity
 
 Loo_pen2<-list()
-for ( i in 13:15){
+AIC_vec<-numeric(20)
+for ( i in 11:15){
 
 mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
                          #survival
                          phi_formula=par.index~
                            
                             ## to Bonneville
-                            -1+ time1:LH + time1:stream+ time1:LH:stream+
+                            -1+ time1:LH + time1:stream+ time1:C(LH, base = 1):stream+
                             # pc(0+time1:rel_DOY_bin:age_0|one)+
                             # time1:sum_flow:LHsummer+time1:sum_air:LHsummer +
                             time1:win_air:age_0 +time1:win_flow:age_0+
                             # pc(0+time1:spr_dis+time1:spr_air|one) +
                              
                             pc(0+time1|mig_year) + 
-                            # pc(0+time1:LH|mig_year)+
+                            pc(0+time1:LH|mig_year)+
                            
                             ## to McNary
-                             time2+time2:C(age_class, base = 1)+#smolt +time2:LHsummer + time2:LHUnk+
+                             time2+time2:C(LH, base = 1)+
                               time2:RIS_flow_juv+time2:RIS_temp_juv+time2:UC_spill_pct_juv +
                             pc(0+time2 |mig_year)+
-                           # pc(0+time2:LH|mig_year)+
+                           pc(0+time2:LH|mig_year)+
                            
                             ##to Bonneville
-                            time3 + time3:C(age_class, base = 1)+
+                            time3 + time3:C(LH, base = 1)+
                             pc(0+time3|mig_year)+
-                            # pc(0+time3:LH|mig_year)+
+                            pc(0+time3:LH|mig_year)+
                              time3:McN_flow+ time3:McN_temp+time3:MC_spill_pct_juv+
                            
                             ## SAR to Bonneville adult
-                            time4 + time4:C(age_class, base = 1) +# time4:stream+
+                            time4 + time4:C(LH, base = 1) +
                            pc(0+time4 |mig_year)+ 
-                           # pc(0+time4:LH |mig_year)+
+                           pc(0+time4:LH |mig_year)+
                             time4:ersstWAcoast.sum +time4:ersstArc.win+
-                           time4:cui.spr +#time4:pdo.sum+
+                           time4:cui.spr +
                             ## to McNary Adult
-                            time5 + C(stratum, base = 2):time5 + pc(0+time5|mig_year)+  
+                            time5 + time5:C(stratum, base = 2) + pc(0+time5|mig_year)+  
                            
                             ## to Tumwater Adults
                             time6 + time6:C(stratum, base = 2)+ pc(0+time6|mig_year) 
@@ -243,22 +249,22 @@ mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
                             p_formula= par.index~
                            
                             ## Lower Wenatchee Trap
-                            -1+ time2:LH+ time2:stream  + time2:LH:stream+
+                            -1+ time2:LH+ time2:stream  + time2:C(LH, base = 1):stream+
                            pc(0+time2|mig_year)+
-                           # pc(0+time2:LH|mig_year) +#time2:LWe_new+
+                           pc(0+time2:LH|mig_year) +#time2:LWe_new+
                             
                            ## McNary Juveniles
-                            time3 + time3:C(age_class, base = 1)+ 
-                           time3:McN_flow+ time3:McN_temp+time3:McN_spill+
+                            time3 + time3:C(LH, base = 1)+ 
+                           time3:McN_flow +time3:McN_spill+
                             pc(0+time3|mig_year)+
-                           # pc(0+time3:LH|mig_year) + 
-                            time3:LWe_J:age_class+
+                           pc(0+time3:LH|mig_year) +
+                            # time3:LWe_J:age_class+
                            # Bonneville Juvenile
-                            time4 +time4:C(age_class, base = 1) + 
-                           time4:Bon_flow+ time4:Bon_temp+time4:Bon_spill+
-                            time4:McN_J:age_class+
+                            time4 +time4:C(LH, base = 1) + 
+                           time4:Bon_flow+time4:Bon_spill+
+                            # time4:McN_J:age_class+
                            pc(0+time4|mig_year)+
-                           # pc(0+time4:LH|mig_year) +
+                           pc(0+time4:LH|mig_year) +
                              
                             
                            # Bonn adult
@@ -269,7 +275,7 @@ mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
                          ,
                           #maturation age                        
                             psi_formula= par.index~
-                            -1+tostratum + tostratum:C(age_class, base = 1)+
+                            -1+tostratum + tostratum:C(LH, base = 1)+
                            # tostratum:streamChiwawa +
                            # tostratum:streamWhite+
                             (0+tostratum|mig_year)#+pc(0+tostratum:LH|mig_year)
@@ -277,14 +283,14 @@ mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
                            
     
                             doFit = TRUE,silent=TRUE,
-                            sim_rand =0,REML=FALSE,pen=5, hypersd=1,map_hypers=c(FALSE,FALSE))
+                            sim_rand =0,REML=FALSE,pen=i, hypersd=1,map_hypers=c(FALSE,FALSE))
                          # start_par=mscjs_fit$mod$env$parList(par=last_best))
 
 
 #calculate LOOIC for model
 last_best<-mscjs_fit$mod$env$last.par.best
 sim_posterior<-rmvnorm_prec(mu=mscjs_fit$mod$env$last.par.best, 
-                            prec=mscjs_fit$fit$SD$jointPrecision, 1000, random_seed=1 )
+                            prec=mscjs_fit$fit$SD$jointPrecision, 500, random_seed=1 )
 
 x_mat<-matrix(NA,ncol=sum(mscjs_fit$dat_TMB$freq),nrow=500)
 for ( j in 1:500){
@@ -299,12 +305,20 @@ loo_out<-loo::loo(x_mat,cores=8)
 
 #save LOOIC in list
 Loo_pen2[[i-1]]<-loo_out
+AIC_vec[i]<-mscjs_fit$fit$AIC
 print(i)
 }
 
-# save list of all LOOICs
- save(Loo_pen2,file=here("Loo_pen3.Rdata"))
 
+# save list of all LOOICs
+ # save(Loo_pen2,file=here("Loo_pen8.Rdata"))
+#Loo_pen5.Rdata = age_class interceptsa and year random effects
+#Loo_pen6.Rdata = age_class intercepts
+#Loo_pen7.Rdata = LH intercepts 
+#Loo_pen8.Rdata = LH intercepts year and random effects 
+#Loo_pen8.Rdata = LH intercepts year and random effects (summer and smolt) 
+ 
+ 
 # dev.new()
 # plot_func()
 # print_out(mscjs_fit)
@@ -328,9 +342,9 @@ print(i)
 We selected $\lambda$ = 7, which resulted in a model that scored well based on LOOIC and passed most GOF test. Based on this value of $\lambda$, a parameter on which the penalized-complexity prior was applied had a 1% change of being greater than or equal to `r round(-log(0.01)/7,3)`. 
 
 ```{r plot_looic, message=FALSE, warning=FALSE,echo=FALSE,eval=TRUE}
-load(file=here("Loo_pen.Rdata"))
+load(file=here("Loo_pen6.Rdata"))
 Looic<-unlist(lapply(Loo_pen2,function(x){x$estimates[3,1]}))
-plot(4:15,Looic,xlab=expression(lambda),ylab="LOOIC",pch=19)
+plot(c(5:8,10:15),Looic,xlab=expression(lambda),ylab="LOOIC",pch=19)
 ```
 
 
@@ -339,23 +353,23 @@ plot(4:15,Looic,xlab=expression(lambda),ylab="LOOIC",pch=19)
 
 
 
-```{r message=FALSE, warning=FALSE,eval=FALSE,cache=FALSE}
+```{r null_model ,message=FALSE, warning=FALSE,eval=FALSE,cache=FALSE}
 # "null" model
 mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
                          phi_formula=par.index~
                            
                            #fixed effect
-                           -1+ time1:LH+time1:streamWhite +time2+time2:age_0+time3 +time3:age_0+time4:age_0+time4 +time5+time6,
+                           -1+ time1:LH+time1:streamWhite:LH+ +time2+time2:age_class+time3+time3:age_class +time4:LH+time4 +time5+time6,
                       
                          p_formula= par.index~
                            #fixed effects
-                           -1+ time2:LH +time2:streamWhite+time3:age_0+ time4:age_0  +time5  +time6+time3+time4,
+                           -1+ time2:LH+time3+time3:age_class+time4+time4:age_class+  +time5  +time6+time3:age_class:LWe_J+time4:McN_J:age_class, 
                          
                          psi_formula= par.index~
                            #fixed effects
-                           -1+tostratum,
+                           -1+tostratum+tostratum:age_class,
                          
-                         doFit = TRUE,silent=TRUE,sim_rand = 0,pen=1,hypersd=1,map_hypers=c(FALSE,FALSE)
+                         doFit = TRUE,silent=TRUE,sim_rand = 0,pen=1.5,hypersd=1,map_hypers=c(FALSE,FALSE)
 )
 
 dev.new()
@@ -519,67 +533,67 @@ mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
                          phi_formula=par.index~
                            
                             ## to Bonneville
-                            -1+ time1:LH + time1:stream+ time1:LH:stream+
+                            -1+ time1:LH + time1:stream+ time1:C(LH, base = 1):stream+
                             # pc(0+time1:rel_DOY_bin:age_0|one)+
                             # time1:sum_flow:LHsummer+time1:sum_air:LHsummer +
                             time1:win_air:age_0 +time1:win_flow:age_0+
                             # pc(0+time1:spr_dis+time1:spr_air|one) +
                              
-                            pc(0+time1|mig_year) + 
-                            pc(0+time1:LH|mig_year)+
+                            pc(0+time1|mig_year) +
+                        # pc(0+time1:LH|mig_year)+
                            
                             ## to McNary
-                             time2+time2:C(LH, base = 1)+#smolt +time2:LHsummer + time2:LHUnk+
+                             time2+time2:C(LH, base = 1)+
                               time2:RIS_flow_juv+time2:RIS_temp_juv+time2:UC_spill_pct_juv +
                             pc(0+time2 |mig_year)+
-                           pc(0+time2:LH|mig_year)+
+                           # pc(0+time2:LH|mig_year)+
                            
                             ##to Bonneville
                             time3 + time3:C(LH, base = 1)+
                             pc(0+time3|mig_year)+
-                            pc(0+time3:LH|mig_year)+
+                            # pc(0+time3:LH|mig_year)+
                              time3:McN_flow+ time3:McN_temp+time3:MC_spill_pct_juv+
                            
                             ## SAR to Bonneville adult
-                            time4 + time4:C(LH, base = 1) +# time4:stream+
+                            time4 + time4:C(LH, base = 1) +
                            pc(0+time4 |mig_year)+ 
-                           pc(0+time4:LH |mig_year)+
+                           # pc(0+time4:LH|mig_year)+
                             time4:ersstWAcoast.sum +time4:ersstArc.win+
-                           time4:cui.spr +#time4:pdo.sum+
+                           time4:cui.spr +
                             ## to McNary Adult
-                            time5 + C(stratum, base = 2):time5 +# pc(0+time5|mig_year)+  
+                            time5 + time5:C(stratum, base = 2) + pc(0+time5|mig_year)+  
                            
                             ## to Tumwater Adults
-                            time6 + time6:C(stratum, base = 2)#+ pc(0+time6|mig_year) 
+                            time6 + time6:C(stratum, base = 2)+ pc(0+time6|mig_year) 
                             ,
                            
                          #detection
                             p_formula= par.index~
                            
                             ## Lower Wenatchee Trap
-                            -1+ time2:LH+ time2:stream  + time2:LH:stream+
+                            -1+ time2:LH+ time2:stream  + time2:C(LH, base = 1):stream+
                            pc(0+time2|mig_year)+
-                           pc(0+time2:LH|mig_year) +#time2:LWe_new+
+                           # pc(0+time2:LH|mig_year) +#time2:LWe_new+
                             
                            ## McNary Juveniles
                             time3 + time3:C(LH, base = 1)+ 
-                           time3:McN_flow+ time3:McN_temp+time3:McN_spill+
+                           time3:McN_flow +time3:McN_spill+
                             pc(0+time3|mig_year)+
-                           pc(0+time3:LH|mig_year) +
-                            time3:LWe_J:LH+
+                           # pc(0+time3:LH|mig_year) +
+                            # time3:LWe_J:age_class+
                            # Bonneville Juvenile
                             time4 +time4:C(LH, base = 1) + 
-                           time4:Bon_flow+ time4:Bon_temp+time4:Bon_spill+
-                            time4:McN_J:LH+
+                           time4:Bon_flow+time4:Bon_spill+
+                            # time4:McN_J:LH+
                            pc(0+time4|mig_year)+
-                           pc(0+time4:LH|mig_year) +
+                           # pc(0+time4:LH|mig_year) +
                              
                             
                            # Bonn adult
-                            time5 +time5:C(stratum, base = 2) + #pc(0+time5 |mig_year)+ 
+                            time5 +time5:C(stratum, base = 2) + pc(0+time5 |mig_year)+ 
                             
                            #McNary adult
-                            time6 + time6:C(stratum, base = 2)# + pc(0+time6 |mig_year) 
+                            time6 + time6:C(stratum, base = 2)+ pc(0+time6 |mig_year) 
                          ,
                           #maturation age                        
                             psi_formula= par.index~
@@ -591,7 +605,7 @@ mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
                            
     
                             doFit = TRUE,silent=TRUE,
-                            sim_rand =0,REML=FALSE,pen=8, hypersd=1,map_hypers=c(FALSE,FALSE))
+                            sim_rand =0,REML=FALSE,pen=5, hypersd=1,map_hypers=c(FALSE,FALSE))
                          # start_par=mscjs_fit$mod$env$parList(par=last_best))
 
 
@@ -728,7 +742,7 @@ obs_dat_long<- obs_dat%>% pivot_longer(LWe_J :Tum_A_3) %>%   filter(!(LH=="Unk" 
 
 # Draw paramater-set samples from the posterior
 sim_posterior<-rmvnorm_prec(mu=mscjs_fit$mod$env$last.par.best, 
-                            prec=mscjs_fit$fit$SD$jointPrecision, 250, random_seed=1 )  
+                            prec=mscjs_fit$fit$SD$jointPrecision, 500, random_seed=1 )  
 
 
 #calculate posterior predictive p value
@@ -747,8 +761,8 @@ The Bayesian p-value when the empricle Bayes estimates of the random effects wer
 
 ```{r DHARMa_GOF, echo=FALSE,eval=TRUE, message=FALSE, warning=FALSE}
 # standardized residuals
-dharm_sim<-make_stan_res(mscjs_fit,mscjs_dat,obs_dat_long,sim_rand=0,n_samps = 500)
-dharm_sim_samp_year<-make_stan_res(mscjs_fit,mscjs_dat,obs_dat_long,sim_rand=1,n_samps = 500) #sampling random year effects from hypder distribution
+dharm_sim<-make_stan_res(mscjs_fit,mscjs_dat,obs_dat_long,sim_rand=0,n_samps = 250)
+dharm_sim_samp_year<-make_stan_res(mscjs_fit,mscjs_dat,obs_dat_long,sim_rand=1,n_samps = 250) #sampling random year effects from hypder distribution
 ```
 
 \  
