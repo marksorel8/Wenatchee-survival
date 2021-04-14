@@ -158,7 +158,7 @@ full_join(spring_mean_func(as.data.frame(Dis)%>%rename(year=Year),3,4) %>% renam
   full_join(spring_mean_func(mainstem_flow_temp %>% filter(location=="BON",parameter=="tempc"),first_month = 5,last_month = 6) %>% rename(Bon_temp=y)) %>% 
   full_join(spring_mean_func(MC_spill %>% filter(location=="BON",parameter=="spillpct"),first_month = 5,last_month = 6) %>% rename(Bon_spill=y)) %>% 
   ## mid columbia spill %
-  full_join(spring_mean_func(MC_spill %>% filter(location%in%c("Bon","JDA","TDA","MCN" ), parameter=="spillpct") %>% select(-location) ,first_month = 4,last_month = 5) %>% rename(MC_spill_pct_juv=y)) %>% 
+  full_join(spring_mean_func(MC_spill %>% filter(location%in%c("JDA","TDA","MCN" ), parameter=="spillpct") %>% select(-location) ,first_month = 4,last_month = 5) %>% rename(MC_spill_pct_juv=y)) %>% 
   filter(mig_year>=2006&mig_year<=2020) 
   
 # Covariates that I recieved from Brian Burke for SAR model
