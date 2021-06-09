@@ -119,9 +119,9 @@ Type termwise_nll(array<Type> &U, vector<Type> theta, per_term_info<Type>& term,
   else if (term.blockCode == pc_covstruct){
     // case: diag_covstruct
     vector<Type> sd = exp(theta);
+    ans -= (dexp(sd,pen,true).sum() +theta.sum()); //penalize complexity
     for(int i = 0; i < term.blockReps; i++){
       ans -= dnorm(vector<Type>(U.col(i)), Type(0), sd, true).sum();
-      ans -= (dexp(sd,pen,true).sum() +theta.sum()); //penaliuze complexity
       if (do_simulate) {
         U.col(i) = rnorm(Type(0), sd);
       }
@@ -336,7 +336,7 @@ Type allterms_nll(vector<Type> &u, vector<Type> theta,
   return ans;
 }
 
-
+// data structure that holds the parameter index matrices
 template<class Type>
 struct pim: vector<matrix<int> > {
 
@@ -351,6 +351,7 @@ struct pim: vector<matrix<int> > {
 };
 
 
+//Objective funtion
 
 template<class Type>
 Type objective_function<Type>::operator() ()
@@ -358,24 +359,24 @@ Type objective_function<Type>::operator() ()
 //~~~~~~~~~~~~~~~~~~~
 // Data
 //~~~~~~~~~~~~~~~~~~~
-DATA_INTEGER(n_OCC);      //number of total survival/ recputure occasions;
-DATA_INTEGER(nDS_OCC);      //number of downstream survival/ recapture occasions;
+DATA_INTEGER(n_OCC);         //number of total survival/ recputure occasions;
+DATA_INTEGER(nDS_OCC);       //number of downstream survival/ recapture occasions;
 DATA_INTEGER(n_states);      //number of possible adult return ages 
 DATA_INTEGER(n_groups);      //number groups (i.e., unique combos of LH,stream,downstream,year). Used in psi mlogit backtransform
-DATA_INTEGER(n_unique_CH); //number of unique capture occasions
-DATA_IVECTOR(f);  //release occasion
+DATA_INTEGER(n_unique_CH);   //number of unique capture occasions
+DATA_IVECTOR(f);             //release occasion
 
 
 //CH data
 DATA_IMATRIX(CH);           //capture histories (excluding occasion at marking (which we are conditioning on))
-DATA_IVECTOR(freq);       //frequency of capture histories
+DATA_IVECTOR(freq);         //frequency of capture histories
 //design matrices fixed effects
-DATA_MATRIX(X_phi);         //fixed effect design matrix for phi
-DATA_MATRIX(X_p);         // fixed effect design matrix for p
-DATA_MATRIX(X_psi);         // fixed effect design matrix for psi
+DATA_MATRIX(X_phi);        //fixed effect design matrix for phi
+DATA_MATRIX(X_p);          // fixed effect design matrix for p
+DATA_MATRIX(X_psi);        // fixed effect design matrix for psi
 //design matrices random effects
 DATA_SPARSE_MATRIX(Z_phi); //random effect design matrix for phi
-DATA_SPARSE_MATRIX(Z_p); //random effect design matrix for p
+DATA_SPARSE_MATRIX(Z_p);   //random effect design matrix for p
 DATA_SPARSE_MATRIX(Z_psi); //random effect design matrix for psi
 //PIMS
 DATA_STRUCT(Phi_pim, pim); //index vector of matrices for phi parameter vector for a given Ch x occasion
@@ -393,9 +394,9 @@ DATA_IVECTOR(psi_pim_sim);  // index of psi parameters for the simulation
 DATA_IVECTOR(TD_occ);       // occasions with trap dependent detection (effect of detection/non-detection at previous occasion)
 DATA_IVECTOR(TD_i);         // p_pim_sim index for detection parameters for fish that were detected at the previous occasion
 DATA_INTEGER(sim_rand);     //flag indicating whether to simulate the random effects in simulations
-DATA_IVECTOR(f_rel);       // occasion of release for each cohort
+DATA_IVECTOR(f_rel);        // occasion of release for each cohort
 //penality parameter for PC prior
-DATA_SCALAR(pen);
+DATA_VECTOR(pen);
   
   //~~~~~~~~~~~~~~~~~~~
   // Parameters
@@ -437,16 +438,17 @@ ADREPORT(beta_p);
 ADREPORT(beta_psi);
 
 
-// Type jnll = 0;
   // Linear predictors
   //// Fixed component
-  vector<Type> eta_phi = X_phi*beta_phi;
-  vector<Type> eta_p = X_p*beta_p;
-  vector<Type> eta_psi = X_psi*beta_psi;
+  vector<Type> eta_phi_fixed = X_phi*beta_phi;
+  vector<Type> eta_p_fixed = X_p*beta_p;
+  vector<Type> eta_psi_fixed = X_psi*beta_psi;
+  ADREPORT(eta_phi_fixed);
+  ADREPORT(eta_p_fixed);
   //// Random component
-   eta_phi += Z_phi*b_phi;
-   eta_p += Z_p*b_p;
-   eta_psi += Z_psi*b_psi;
+  vector<Type> eta_phi = eta_phi_fixed + Z_phi*b_phi;
+  vector<Type> eta_p = eta_p_fixed + Z_p*b_p;
+  vector<Type> eta_psi = eta_psi_fixed + Z_psi*b_psi;
    ADREPORT(eta_phi);
    ADREPORT(eta_p);
    ADREPORT(eta_psi);
@@ -472,19 +474,20 @@ ADREPORT(beta_psi);
   //~~~~~~~~~~~~~~~~~~~
   
   // Random effects (allterms_nll returns the nll and also simulates new values of the random effects)
-  jnll += allterms_nll(b_phi, theta_phi, phi_terms, this->do_simulate, pen);//phi
-  jnll += allterms_nll(b_p, theta_p, p_terms, this->do_simulate, pen);//p
-  jnll += allterms_nll(b_psi, theta_psi, psi_terms, this->do_simulate, pen);//psi
+  jnll += allterms_nll(b_phi, theta_phi, phi_terms, this->do_simulate, Type(pen(0)));//phi
+  jnll += allterms_nll(b_p, theta_p, p_terms, this->do_simulate, Type(pen(0)));//p
+  jnll += allterms_nll(b_psi, theta_psi, psi_terms, this->do_simulate, Type(pen(0)));//psi
   
-  // Penalties
+  // PC priors (Simpson et al 2017)
+  //// concatenate all covariates to apply PC priors too
   vector<Type> pen_betas(beta_phi_pen.size()+
     beta_p_pen.size()+
     beta_psi_pen.size());
   pen_betas << beta_phi_pen,beta_p_pen,beta_psi_pen;
-
+  ///// treat coefficients as Gaussian random effects with exp prior on SD
   jnll -= (dnorm(pen_betas,Type(0),exp(log_pen_sds),true).sum()+
-    dexp(exp(log_pen_sds),pen,true).sum()+
-    log_pen_sds.sum());
+    dexp(exp(log_pen_sds),Type(pen(1)),true).sum()+ 
+    log_pen_sds.sum()); //for change of variables (log_pen_sds is parameter but penalizing pen_sd)
 
   ////Variables
   vector<Type> pS(4); //state probs: dead, 1, 2, 3

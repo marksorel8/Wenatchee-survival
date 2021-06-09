@@ -18,6 +18,8 @@ LWe_mark_file<-read_csv(here("Data","ptagis","Lower Wen Tagging detail.csv")) %>
          `Capture Method Code`=="SCREWT"
   ) %>% mutate(mark_time=1)
 
+
+
 mark_file<-rbind(mark_file,LWe_mark_file)
 rm(LWe_mark_file)
 

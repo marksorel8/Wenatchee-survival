@@ -119,9 +119,9 @@ Type termwise_nll(array<Type> &U, vector<Type> theta, per_term_info<Type>& term,
   else if (term.blockCode == pc_covstruct){
     // case: diag_covstruct
     vector<Type> sd = exp(theta);
+    ans -= (dexp(sd,pen,true).sum() +theta.sum()); //penaliuze complexity
     for(int i = 0; i < term.blockReps; i++){
       ans -= dnorm(vector<Type>(U.col(i)), Type(0), sd, true).sum();
-      ans -= (dexp(sd,pen,true).sum() +theta.sum()); //penaliuze complexity
       if (do_simulate) {
         U.col(i) = rnorm(Type(0), sd);
       }
@@ -408,7 +408,7 @@ DATA_IVECTOR(p_pim_unk_years);
 DATA_IVECTOR(f);  //release occasion
 
 //penality parameter for PC prior
-DATA_SCALAR(pen);
+DATA_VECTOR(pen);
   
   //~~~~~~~~~~~~~~~~~~~
   // Parameters
@@ -505,9 +505,9 @@ DATA_SCALAR(pen);
   //~~~~~~~~~~~~~~~~~~~
   
   // Random effects
-  jnll += allterms_nll(b_phi, theta_phi, phi_terms, this->do_simulate,pen);//phi
-  jnll += allterms_nll(b_p, theta_p, p_terms, this->do_simulate,pen);//p
-  jnll += allterms_nll(b_psi, theta_psi, psi_terms, this->do_simulate,pen);//psi
+  jnll += allterms_nll(b_phi, theta_phi, phi_terms, this->do_simulate,Type(pen(0)));//phi
+  jnll += allterms_nll(b_p, theta_p, p_terms, this->do_simulate,Type(pen(0)));//p
+  jnll += allterms_nll(b_psi, theta_psi, psi_terms, this->do_simulate,Type(pen(0)));//psi
   
   // Penalties
   vector<Type> pen_betas(beta_phi_pen.size()+
@@ -516,7 +516,7 @@ DATA_SCALAR(pen);
   pen_betas << beta_phi_pen,beta_p_pen,beta_psi_pen;
   
   jnll -= (dnorm(pen_betas,Type(0),exp(log_pen_sds),true).sum()+
-    dexp(exp(log_pen_sds),pen,true).sum()+
+    dexp(exp(log_pen_sds),Type(pen(1)),true).sum()+
     log_pen_sds.sum());
 
   ////Variables

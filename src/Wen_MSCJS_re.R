@@ -107,7 +107,7 @@ n_states<-3
 #occasions corresponding to lower wenatchee and mcnary juveniles (for trap dependence)
 trap_dep<-which(sites%in%c("LWe_J", "McN_J"))
 
-
+redd_dat<-read_csv(here("Data","redd_counts.csv")) %>% pivot_longer(Chiwawa:White,"stream",values_to = "redds") %>% mutate(mig_year=Year+2) %>% select(!Year)
 
 #~~~~
 #extract the individual design data for each parameter
@@ -146,6 +146,10 @@ cbind(.,model.matrix(~time+stream+LH+stratum-1,data=.)) %>%
   left_join(env_dat %>% mutate(mig_year=as.factor(mig_year)),by="mig_year") %>% 
   mutate(across(sum_flow:transport.win,scale)) %>% 
  replace(is.na(.), 0) %>% 
+  #add redd counts
+  left_join(redd_dat %>% mutate(mig_year=as.factor(mig_year)),by=c("mig_year","stream")) %>%
+  ungroup() %>% group_by(time,stream,LH) %>% mutate(redd_stan=(redds-mean(redds))/sd(redds)) %>% #standardize by time, stream, LH
+  ungroup() %>% 
   #add a column of 1's to use as a goruping variable when specifying penalized cemplexity priors
   mutate(one="1")
   # add column for first time
@@ -198,6 +202,10 @@ p.design.dat<-
   left_join(env_dat %>% mutate(mig_year=as.factor(mig_year)),by="mig_year") %>% 
   mutate(across(sum_flow:transport.win,scale)) %>% 
   replace(is.na(.), 0) %>% 
+  #add redd counts
+  left_join(redd_dat %>% mutate(mig_year=as.factor(mig_year)),by=c("mig_year","stream")) %>%
+  ungroup() %>% group_by(time,stream,LH) %>% mutate(redd_stan=(redds-mean(redds))/sd(redds)) %>% #standardize by time, stream, LH
+  ungroup() %>% 
   #add a column of 1's to use as a goruping variable when specifying penalized cemplexity priors
   mutate(one="1")
 
@@ -417,7 +425,7 @@ return(list(dat_out=dat_out,
 
 
 
-fit_wen_mscjs<-function(x,phi_formula, p_formula, psi_formula,doFit=TRUE,silent=FALSE,sd_rep=TRUE,sim_rand=1,REML=FALSE,hypersd=1,map_hypers=c(FALSE,FALSE),pen=1,start_par=NULL){
+fit_wen_mscjs<-function(x,phi_formula, p_formula, psi_formula,doFit=TRUE,silent=FALSE,sd_rep=TRUE,sim_rand=1,REML=FALSE,hypersd=1,map_hypers=c(FALSE,FALSE),pen=c(1,1),start_par=NULL){
 #~~~~
 #glmmTMB objects to get design matrices etc. for each parameter
 ## phi
@@ -490,14 +498,14 @@ if(!is.null(start_par)){
 }else
 
 par_TMB<-list(
-  beta_phi_ints=Phi.design.glmmTMB$parameters$beta[1:(x$nOCC+2)], #intercept for each site and unique LH intercepts for time 1
-  beta_phi_pen=Phi.design.glmmTMB$parameters$beta[-(1:(x$nOCC+2))],
-  beta_p_ints=p.design.glmmTMB$parameters$beta[1:(x$nOCC+1)],#intercept for each site except the last and unique LH intercepts for time1
-  beta_p_pen=p.design.glmmTMB$parameters$beta[-(1:(x$nOCC+1))],
+  beta_phi_ints=Phi.design.glmmTMB$parameters$beta[1:(x$nOCC+4)], #intercept for each site and unique LH intercepts for time 1
+  beta_phi_pen=Phi.design.glmmTMB$parameters$beta[-(1:(x$nOCC+4))],
+  beta_p_ints=p.design.glmmTMB$parameters$beta[1:(x$nOCC+2)],#intercept for each site except the last and unique LH intercepts for time1
+  beta_p_pen=p.design.glmmTMB$parameters$beta[-(1:(x$nOCC+2))],
   beta_psi_ints=Psi.design.glmmTMB$parameters$beta[1:2], #intercept for each strata
   beta_psi_pen=Psi.design.glmmTMB$parameters$beta[-(1:2)],
-  log_pen_sds=rep(0,length(Phi.design.glmmTMB$parameters$beta[-(1:(x$nOCC+2))])+
-                    length(p.design.glmmTMB$parameters$beta[-(1:(x$nOCC+1))])+
+  log_pen_sds=rep(0,length(Phi.design.glmmTMB$parameters$beta[-(1:(x$nOCC+4))])+
+                    length(p.design.glmmTMB$parameters$beta[-(1:(x$nOCC+2))])+
                     length(Psi.design.glmmTMB$parameters$beta[-(1:2)])), # standard deviations of penalty priors
   b_phi=Phi.design.glmmTMB$parameters$b,
   b_p=p.design.glmmTMB$parameters$b,
@@ -518,7 +526,7 @@ par_TMB<-list(
   random<-c("b_phi","b_p","b_psi","beta_phi_pen","beta_p_pen","beta_psi_pen")
   if(REML){random<-c("beta_phi_ints","beta_p_ints","beta_psi_ints",random)}
   
-  # set hyper paramaters of distribution of proportionf os subyearlings at trap as fixed.
+  # set hyper paramaters of distribution of proportion of subyearlings at trap as fixed.
 
   
 
@@ -547,6 +555,7 @@ try(fit<-TMBhelper::fit_tmb(mod,newtonsteps = 1,getsd = sd_rep,getJointPrecision
 
 
 return(list(fit=fit,
+            last_par_best=mod$env$last.par.best,
             mod=mod,
             Phi.design.glmmTMB=Phi.design.glmmTMB,
             p.design.glmmTMB=p.design.glmmTMB,
