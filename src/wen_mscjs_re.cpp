@@ -134,6 +134,7 @@ Type termwise_nll(array<Type> &U, vector<Type> theta, per_term_info<Type>& term,
     vector<Type> logsd = theta.head(n);
     vector<Type> corr_transf = theta.tail(theta.size() - n);
     vector<Type> sd = exp(logsd);
+    ans -= (dexp(sd,pen,true).sum() +logsd.sum()); //penalize complexity
     density::UNSTRUCTURED_CORR_t<Type> nldens(corr_transf);
     density::VECSCALE_t<density::UNSTRUCTURED_CORR_t<Type> > scnldens = density::VECSCALE(nldens, sd);
     for(int i = 0; i < term.blockReps; i++){
@@ -532,12 +533,12 @@ ADREPORT(beta_psi);
   
   ////observation process at t-1 (Obs_t below), because I'm going to fix the detection prob at 1 for the last occasion after this loop
   int Obs_t=t-1;
-  if(!CH(n,t-1)){
+  if(!CH(n,Obs_t)){
   pS(1) *= Type(Type(1)-p(p_pim(0)(n,Obs_t)));
   pS(2) *= Type(Type(1)-p(p_pim(1)(n,Obs_t)));
   pS(3) *= Type(Type(1)-p(p_pim(2)(n,Obs_t)));
   } else{
-    tmp=pS(CH(n,Obs_t))*p(p_pim((CH(n,Obs_t)-1))(n,Obs_t));
+    tmp=Type(pS(CH(n,Obs_t))*p(p_pim((CH(n,Obs_t)-1))(n,Obs_t)));
     pS.setZero();
     pS(CH(n,Obs_t))=tmp;
   }
