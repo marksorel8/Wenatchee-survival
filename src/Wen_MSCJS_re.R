@@ -27,7 +27,7 @@ if(file.exists(here("data","all_bio_data.csv"))){
 make_dat<-function(mark_file_CH=mark_file_CH,sites=c("LWe_J","McN_J","JDD_J","Bon_J","Est_J","Bon_A","McN_A","PRa_A","RIs_A","Tum_A"),start_year=2006, end_year=2017,cont_cov,length_bin=5,doy_bin=10,inc_unk=FALSE,exc_unk=FALSE){
 
   
-   # sites=c("LWe_J","McN_J","Bon_J","Bon_A","McN_A","Tum_A");start_year=2006; end_year=2017;cont_cov="rel_DOY_bin";length_bin=5;doy_bin=10;inc_unk=FALSE;inc_unk=FALSE;exc_unk=FALSE
+   # sites=c("LWe_J","McN_J","Bon_J","Bon_A","McN_A","Tum_A");start_year=2006; end_year=2017;cont_cov=c();length_bin=5;doy_bin=10;inc_unk=FALSE;inc_unk=FALSE;exc_unk=FALSE
   
   #drop lower trap releases if not ussing
    if(exc_unk){mark_file_CH <-mark_file_CH %>% filter(LH!="Unk") %>% droplevels()}
@@ -116,7 +116,9 @@ Phi.design.dat<-
   dat_out %>% 
   #release group
   select(sea_Year_p:stream,all_of(cont_cov)) %>% distinct() %>% 
+  expand(sea_Year_p,LH,stream) %>% #include combinations with no data
   #add time
+  arrange(LH) %>% 
   full_join(tibble(time=1:length(sites)),by=character()) %>% mutate(Time=time-1) %>% 
   #add trap dependency
   full_join(tibble(LWe_J=0:1),by=character()) %>% 
@@ -151,7 +153,7 @@ cbind(.,model.matrix(~time+stream+LH+stratum-1,data=.)) %>%
   ungroup() %>% group_by(time,stream,LH) %>% mutate(redd_stan=(redds-mean(redds))/sd(redds)) %>% #standardize by time, stream, LH
   ungroup() %>% 
   #add a column of 1's to use as a goruping variable when specifying penalized cemplexity priors
-  mutate(one="1")
+  mutate(one="1") 
   # add column for first time
 #downstream time
 #ocean time
