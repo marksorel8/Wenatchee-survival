@@ -51,7 +51,7 @@ print_out<-function(mscjs_fit){
              LH = case_when(LH=="LHsummer" ~"Sum.0", 
                             LH=="LHfall" ~ "Fal.0", 
                             LH=="LHsmolt" ~ "Spr.1",
-                            LH=="age_classsmolt" ~ "Age.1", 
+                            LH=="age_classsmolt" ~ "Spr.1", 
                             LH=="age_classsub" ~ "Age.0", 
                             TRUE ~ LH))
   
@@ -82,7 +82,9 @@ print_out<-function(mscjs_fit){
   
   print("Phi")
   print("fixed")
-  tibble(par_name=colnames(mscjs_fit$Phi.design.glmmTMB$data.tmb$X),estimate=ad_rep_vals[names(ad_rep_vals)=="beta_phi"],sd=ad_rep_sds[names(ad_rep_vals)=="beta_phi"]) %>%  mutate(p_value= round(2*pnorm(abs(estimate/sd), lower.tail = FALSE),3)) %>% print(n=100)
+  Phi.fixed<-tibble(par_name=colnames(mscjs_fit$dat_TMB$X_phi),estimate=ad_rep_vals[names(ad_rep_vals)=="beta_phi"],sd=ad_rep_sds[names(ad_rep_vals)=="beta_phi"]) %>% mutate(lcl=estimate+qnorm(.025)*sd,ucl=estimate+qnorm(.975)*sd)
+  
+  Phi.fixed %>%  mutate(p_value= round(2*pnorm(abs(estimate/sd), lower.tail = FALSE),3)) %>% print(n=100)
  print("Random covariance")
   try(phi_rand_cov<- print_cov("Phi"))
   
@@ -90,17 +92,20 @@ print_out<-function(mscjs_fit){
   
   print("p")
   print("fixed")
-  tibble(par_name=colnames(mscjs_fit$p.design.glmmTMB$data.tmb$X),estimate=ad_rep_vals[names(ad_rep_vals)=="beta_p"],sd=ad_rep_sds[names(ad_rep_vals)=="beta_p"]) %>%  mutate(p_value= round(2*pnorm(abs(estimate/sd), lower.tail = FALSE),3)) %>% print(n=100)
+  p.fixed<-tibble(par_name=colnames(mscjs_fit$p.design.glmmTMB$data.tmb$X),estimate=ad_rep_vals[names(ad_rep_vals)=="beta_p"],sd=ad_rep_sds[names(ad_rep_vals)=="beta_p"]) %>% mutate(lcl=estimate+qnorm(.025)*sd,ucl=estimate+qnorm(.975)*sd)
+  p.fixed %>%  mutate(p_value= round(2*pnorm(abs(estimate/sd), lower.tail = FALSE),3)) %>% print(n=100)
   print("Random covariance")
   try(p_rand_cov<-print_cov("p"))
   
   
   print("Psi")
   print("fixed")
-  tibble(par_name=colnames(mscjs_fit$Psi.design.glmmTMB$data.tmb$X),estimate=ad_rep_vals[names(ad_rep_vals)=="beta_psi"],sd=ad_rep_sds[names(ad_rep_vals)=="beta_psi"]) %>%  mutate(p_value= round(2*pnorm(abs(estimate/sd), lower.tail = FALSE),3)) %>% print(n=100)
+  Psi.fixed<-tibble(par_name=colnames(mscjs_fit$Psi.design.glmmTMB$data.tmb$X),estimate=ad_rep_vals[names(ad_rep_vals)=="beta_psi"],sd=ad_rep_sds[names(ad_rep_vals)=="beta_psi"]) %>% mutate(lcl=estimate+qnorm(.025)*sd,ucl=estimate+qnorm(.975)*sd)
+  
+  Psi.fixed%>%  mutate(p_value= round(2*pnorm(abs(estimate/sd), lower.tail = FALSE),3)) %>% print(n=100)
   try(psi_rand_cov<-print_cov("Psi"))
   
-  return(list(phi_rand_cov,p_rand_cov,psi_rand_cov))
+  return(list(phi_rand_cov=phi_rand_cov,p_rand_cov=p_rand_cov,psi_rand_cov=psi_rand_cov,Phi.fixed=Phi.fixed,p.fixed=p.fixed,Psi.fixed=Psi.fixed))
 }
 
 
@@ -128,11 +133,11 @@ tab_coef<-tibble(time=substr(mat_vars[,1],5,5),
        var=apply(mat_vars[,-1],1,function(x)x[which(!(substr(x,1,2)%in%c("LH","ag")))]),
        est=(ad_rep_vals[names(ad_rep_vals)=="beta_phi"][match(covs,colnames(fit_obj$Phi.design.glmmTMB$data.tmb$X))]),
        sd=(ad_rep_sds[names(ad_rep_vals)=="beta_phi"][match(covs,colnames(fit_obj$Phi.design.glmmTMB$data.tmb$X))])
-) %>% mutate( LH=case_when(LH=="LHfall"~"Fal-0",
-                               LH=="LHsummer"~"Sum-0",
-                               LH%in%c("LHsmolt","age_classsmolt")~"Spr-1",
-                               TRUE~"Age-0"),
-                  LH=fct_relevel(LH,"Sum-0","Fal-0","Age-0","Spr-1"),
+) %>% mutate( LH=case_when(LH=="LHfall"~"Fal.0",
+                               LH=="LHsummer"~"Sum.0",
+                               LH%in%c("LHsmolt","age_classsmolt")~"Spr.1",
+                               TRUE~"Age.0"),
+                  LH=fct_relevel(LH,"Sum.0","Fal.0","Age.0","Spr.1"),
               var=case_when(var=="win_air"~"win.air.temp",
                             var=="win_flow"~"win.flow",
                             var=="RIS_flow_juv"~"flow",
@@ -162,11 +167,11 @@ plot_redd_effect_fun<-function(covs,
   mat_vars<-strsplit(covs,":") %>% unlist() %>% matrix(ncol=4,byrow = TRUE) %>% as_tibble() %>% `colnames<-`(c("time","LH" ,"stream","redd")) %>% 
     mutate(time=substr(time,5,5),
            LH=apply(mat_vars,1,function(x)x[which(substr(x,1,2)%in%c("LH","ag"))]),
-           LH=case_when(LH=="LHfall"~"Fal-0",
-                        LH=="LHsummer"~"Sum-0",
-                        LH%in%c("LHsmolt","age_classsmolt")~"Spr-1",
-                        TRUE~"Age-0"),
-           LH=fct_relevel(LH,"Sum-0","Fal-0","Age-0","Spr-1"),
+           LH=case_when(LH=="LHfall"~"Fal.0",
+                        LH=="LHsummer"~"Sum.0",
+                        LH%in%c("LHsmolt","age_classsmolt")~"Spr.1",
+                        TRUE~"Age.0"),
+           LH=fct_relevel(LH,"Sum.0","Fal.0","Age.0","Spr.1"),
            stream=apply(mat_vars,1,function(x)x[which(substr(x,1,2)=="st")]),
            stream= substr(stream, 7,nchar(stream)),
                    est=(ad_rep_vals[names(ad_rep_vals)=="beta_phi"][match(covs,colnames(fit_obj$Phi.design.glmmTMB$data.tmb$X))]),
@@ -341,4 +346,26 @@ make_stan_res<-function(mscjs_fit,mscjs_dat,obs_dat_long,sim_rand,post_pred=NULL
                           integerResponse = TRUE)
   
   return(dharm_sim)
+}
+
+print_param_CI<-function(par_names="time2",mod="Phi.fixed",prob=FALSE,make_neg=FALSE, include_95=FALSE,par_CI=FALSE,times2=FALSE){
+  
+  x<-param_tab[[mod]]  %>% filter(par_name==par_names) %>% select(-par_name) %>% slice(1) %>% as.numeric()
+  
+  if(times2){
+    x[1:2]<-x[1:2]*2
+    x[3:4]<-x[1]+qnorm(c(.025,.975))*x[2]
+  }
+  
+  if(prob) x<-plogis(x)
+  if(make_neg) x<--x
+x<-format(round(x,2), nsmall=2)  
+  if(include_95){paste0(x[1],"; 95% CI = ",x[3],"-- ",x[4])}else{
+    if(par_CI) {paste0(x[1]," (",x[3],"-- ",x[4])}else{
+          
+    paste0(x[1],"; ",x[3],"-- ",x[4])
+    }
+  }
+
+  
 }

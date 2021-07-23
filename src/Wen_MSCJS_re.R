@@ -27,7 +27,7 @@ if(file.exists(here("data","all_bio_data.csv"))){
 make_dat<-function(mark_file_CH=mark_file_CH,sites=c("LWe_J","McN_J","JDD_J","Bon_J","Est_J","Bon_A","McN_A","PRa_A","RIs_A","Tum_A"),start_year=2006, end_year=2017,cont_cov,length_bin=5,doy_bin=10,inc_unk=FALSE,exc_unk=FALSE){
 
   
-   # sites=c("LWe_J","McN_J","Bon_J","Bon_A","McN_A","Tum_A");start_year=2006; end_year=2017;cont_cov=c();length_bin=5;doy_bin=10;inc_unk=FALSE;inc_unk=FALSE;exc_unk=FALSE
+   # sites=c("LWe_J","McN_J","Bon_J","Bon_A","McN_A","Tum_A");start_year=2006; end_year=2017;cont_cov=c("mark_DOY_bin");length_bin=5;doy_bin=10;inc_unk=FALSE;inc_unk=FALSE;exc_unk=FALSE
   
   #drop lower trap releases if not ussing
    if(exc_unk){mark_file_CH <-mark_file_CH %>% filter(LH!="Unk") %>% droplevels()}
@@ -41,22 +41,21 @@ make_dat<-function(mark_file_CH=mark_file_CH,sites=c("LWe_J","McN_J","JDD_J","Bo
     dat_out<- mark_file_CH %>%  
       #add grouped length and release day columns
       mutate(length_bin=ceiling(Length.mm/length_bin)*length_bin-(length_bin/2),
-             rel_DOY_bin=ceiling((Release.Day.Number+ifelse(LH=="smolt",365,0))/doy_bin)*doy_bin-(doy_bin/2) ,
+             rel_DOY_bin=ceiling((Mark.Day.Number+ifelse(LH=="smolt",365,0))/doy_bin)*doy_bin-(doy_bin/2) ,
              rel_DOY_bin=ifelse(LH=="Unk",rel_DOY_bin[1],rel_DOY_bin))  %>%
       #subset some very small or large length
       filter(length_bin>=55 &length_bin<=200 & rel_DOY_bin>10) %>%
-      mutate(across(c(length_bin,rel_DOY_bin),scale)) %>% 
       #subset columns needed for analysis
       select(sea_Year_p,LH,stream, #grouping variables
              all_of(sites),all_of(cont_cov))
   }else{if(all_of(cont_cov)=="rel_DOY_bin"){
     dat_out<- mark_file_CH %>%  
       #add grouped length and release day columns
-      mutate(rel_DOY_bin=ceiling((Release.Day.Number+ifelse(LH=="smolt",365,0))/doy_bin)*doy_bin-(doy_bin/2),
+      mutate(rel_DOY_bin=ceiling((Mark.Day.Number+ifelse(LH=="smolt",365,0))/doy_bin)*doy_bin-(doy_bin/2),
              rel_DOY_bin=ifelse(LH=="Unk",rel_DOY_bin[1],rel_DOY_bin)) %>%
       #subset some very small or large length
       filter(rel_DOY_bin>10) %>%
-      mutate(across(c(rel_DOY_bin),scale)) %>% 
+
       #subset columns needed for analysis
       select(sea_Year_p,LH,stream, #grouping variables
              all_of(sites),all_of(cont_cov))
@@ -115,8 +114,9 @@ redd_dat<-read_csv(here("Data","redd_counts.csv")) %>% pivot_longer(Chiwawa:Whit
 Phi.design.dat<-
   dat_out %>% 
   #release group
-  select(sea_Year_p:stream,all_of(cont_cov)) %>% distinct() %>% 
-  expand(sea_Year_p,LH,stream) %>% #include combinations with no data
+  select(sea_Year_p:stream,all_of(cont_cov)) %>% distinct() %>%
+  # expand(sea_Year_p,LH,stream,get(cont_cov)) %>% #include combinations with no data
+  # rename("rel_DOY_bin"=4) %>% 
   #add time
   arrange(LH) %>% 
   full_join(tibble(time=1:length(sites)),by=character()) %>% mutate(Time=time-1) %>% 
@@ -153,7 +153,7 @@ cbind(.,model.matrix(~time+stream+LH+stratum-1,data=.)) %>%
   ungroup() %>% group_by(time,stream,LH) %>% mutate(redd_stan=(redds-mean(redds))/sd(redds)) %>% #standardize by time, stream, LH
   ungroup() %>% 
   #add a column of 1's to use as a goruping variable when specifying penalized cemplexity priors
-  mutate(one="1") 
+  mutate(one="1")
   # add column for first time
 #downstream time
 #ocean time
@@ -428,17 +428,18 @@ return(list(dat_out=dat_out,
 
 
 fit_wen_mscjs<-function(x,phi_formula, p_formula, psi_formula,doFit=TRUE,silent=FALSE,sd_rep=TRUE,sim_rand=1,REML=FALSE,hypersd=1,map_hypers=c(FALSE,FALSE),pen=c(1,1),start_par=NULL){
+
 #~~~~
 #glmmTMB objects to get design matrices etc. for each parameter
 ## phi
-Phi.design.glmmTMB<-glmmTMB.mod::glmmTMB(formula(phi_formula), data=x$Phi.design.dat,dispformula = ~0,doFit=FALSE,contrasts = list(LH_t1="contr.sum",stream_t1="contr.sum",LH="contr.sum",stream="contr.sum",age_class="contr.sum"))
+Phi.design.glmmTMB<-glmmTMB::glmmTMB(formula(phi_formula), data=x$Phi.design.dat,dispformula = ~0,doFit=FALSE,contrasts = list(LH="contr.sum",stream="contr.sum",age_class="contr.sum"))
 #,contrasts = list(LH="contr.sum",time="contr.sum",stream="contr.sum",age_class="contr.sum")
 #time+time:LH+time:stream+diag(0+time|stream:LH:mig_year)
 ## p
-p.design.glmmTMB<-glmmTMB.mod::glmmTMB(formula(p_formula), data=x$p.design.dat,dispformula = ~0,doFit=FALSE,contrasts = list(LH_t1="contr.sum",stream_t1="contr.sum",LH="contr.sum",stream="contr.sum",age_class="contr.sum"))
+p.design.glmmTMB<-glmmTMB::glmmTMB(formula(p_formula), data=x$p.design.dat,dispformula = ~0,doFit=FALSE,contrasts = list(LH_t1="contr.sum",stream_t1="contr.sum",LH="contr.sum",stream="contr.sum",age_class="contr.sum"))
 #par.index~time+time:LH+time:stream
 ## psi
-Psi.design.glmmTMB<-glmmTMB.mod::glmmTMB(formula(psi_formula), data=x$Psi.design.dat,dispformula = ~0,doFit=FALSE,contrasts = list(LH="contr.sum",stream="contr.sum",age_class="contr.sum"))
+Psi.design.glmmTMB<-glmmTMB::glmmTMB(formula(psi_formula), data=x$Psi.design.dat,dispformula = ~0,doFit=FALSE,contrasts = list(LH="contr.sum",stream="contr.sum",age_class="contr.sum"))
 #par.index~tostratum+tostratum:LH,
 
 #+diag(0+time|stream:LH:mig_year)
@@ -458,7 +459,7 @@ dat_TMB<-with(x,list(
   n_known_CH=n_known_CH,
   CH=select(dat_out,sites[1]:sites[length(sites)]) %>% as.matrix(),
   freq=dat_out$freq,
-  X_phi=Phi.design.glmmTMB$data.tmb$X,
+  X_phi=Phi.design.glmmTMB$data.tmb$X,#[,-c(1:3)],
   X_p=p.design.glmmTMB$data.tmb$X,
   X_psi=Psi.design.glmmTMB$data.tmb$X,
   Z_phi=Phi.design.glmmTMB$data.tmb$Z,
@@ -500,7 +501,7 @@ if(!is.null(start_par)){
 }else
 
 par_TMB<-list(
-  beta_phi_ints=Phi.design.glmmTMB$parameters$beta[1:(x$nOCC+4)], #intercept for each site and unique LH intercepts for time 1
+  beta_phi_ints=Phi.design.glmmTMB$parameters$beta[(1:(x$nOCC+4))], #intercept for each site and unique LH intercepts for time 1
   beta_phi_pen=Phi.design.glmmTMB$parameters$beta[-(1:(x$nOCC+4))],
   beta_p_ints=p.design.glmmTMB$parameters$beta[1:(x$nOCC+2)],#intercept for each site except the last and unique LH intercepts for time1
   beta_p_pen=p.design.glmmTMB$parameters$beta[-(1:(x$nOCC+2))],

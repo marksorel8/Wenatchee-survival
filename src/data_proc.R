@@ -195,7 +195,7 @@ left_join(lower_mid_col_dams %>%
   filter(!is.na(age)) %>% # drop 329 fish captured before doy 179 but without length data
   
   
-  #get rid of fish whose tag ages are consistent with observed juvenile migration year
+  #get rid of fish whose tag ages are inconsistent with observed juvenile migration year
   mutate(seaward_year_obs= select(., LWe_J:Est_J) %>% reduce(pmin,na.rm=TRUE)) %>%  # add year of seaward migration
   mutate(mark_to_seward=`seaward_year_obs`-`Mark Year YYYY`) %>% # add years between tagging and seaward migration (for those fish detected migrating downstream as juveniles)
   filter(
@@ -249,7 +249,7 @@ left_join(lower_mid_col_dams %>%
   #make detection of LWe_J 1 if that is release location (for trap dependence)
   mutate(LWe_J=if_else(stream=="LWE",1,LWe_J)) %>%
   #subset columns of interest
-  select(sea_Year_p,LH,stream,LWe_J:instr_array,`Length mm`,`Release Day Number`,LWe_J_doy:instr_array_A_doy)
+  select(sea_Year_p,LH,stream,LWe_J:instr_array,`Length mm`,`Mark Day Number`,LWe_J_doy:instr_array_A_doy)
 
 
 write.csv(mark_file_CH,file=here("Data","mark_file_CH.csv"))

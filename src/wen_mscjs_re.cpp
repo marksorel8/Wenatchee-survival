@@ -108,6 +108,7 @@ Type termwise_nll(array<Type> &U, vector<Type> theta, per_term_info<Type>& term,
   if (term.blockCode == diag_covstruct){
     // case: diag_covstruct
     vector<Type> sd = exp(theta);
+    ans -= (dexp(sd,pen,true).sum() +theta.sum()); //penalize complexity
     for(int i = 0; i < term.blockReps; i++){
       ans -= dnorm(vector<Type>(U.col(i)), Type(0), sd, true).sum();
       if (do_simulate) {
@@ -134,7 +135,7 @@ Type termwise_nll(array<Type> &U, vector<Type> theta, per_term_info<Type>& term,
     vector<Type> logsd = theta.head(n);
     vector<Type> corr_transf = theta.tail(theta.size() - n);
     vector<Type> sd = exp(logsd);
-    ans -= (dexp(sd,pen,true).sum() +logsd.sum()); //penalize complexity
+    // ans -= (dexp(sd,pen,true).sum() +logsd.sum()); //penalize complexity
     density::UNSTRUCTURED_CORR_t<Type> nldens(corr_transf);
     density::VECSCALE_t<density::UNSTRUCTURED_CORR_t<Type> > scnldens = density::VECSCALE(nldens, sd);
     for(int i = 0; i < term.blockReps; i++){
@@ -444,15 +445,15 @@ ADREPORT(beta_psi);
   vector<Type> eta_phi_fixed = X_phi*beta_phi;
   vector<Type> eta_p_fixed = X_p*beta_p;
   vector<Type> eta_psi_fixed = X_psi*beta_psi;
-  ADREPORT(eta_phi_fixed);
-  ADREPORT(eta_p_fixed);
+  // ADREPORT(eta_phi_fixed);
+  // ADREPORT(eta_p_fixed);
   //// Random component
   vector<Type> eta_phi = eta_phi_fixed + Z_phi*b_phi;
   vector<Type> eta_p = eta_p_fixed + Z_p*b_p;
   vector<Type> eta_psi = eta_psi_fixed + Z_psi*b_psi;
    ADREPORT(eta_phi);
    ADREPORT(eta_p);
-   ADREPORT(eta_psi);
+   // ADREPORT(eta_psi);
 
   // Apply link
   vector<Type> phi=invlogit(eta_phi);
