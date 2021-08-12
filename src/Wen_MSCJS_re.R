@@ -17,6 +17,9 @@ if(file.exists(here("Data","env_dat.csv"))){
   write.csv(env_dat,file=here("Data","env_dat.csv"))
 }
 
+# load("C:/Users/Mark Sorel/Downloads/envData_7302018.RData")
+# env_dat<-env_dat%>% select(Year:MC_spill_pct_juv) %>% left_join(envdata %>% rename(mig_year=year))
+
 # redds<-read_csv(here("Data","redd_counts.csv")) %>% mutate(mig_year=as.factor(Year+2)) %>% mutate(across(Chiwawa:White,scale)) %>%  pivot_longer(c("Chiwawa","Nason","White"),"stream",values_to="redds")
 
 
@@ -147,6 +150,7 @@ cbind(.,model.matrix(~time+stream+LH+stratum-1,data=.)) %>%
   #add environmental covariates
   left_join(env_dat %>% mutate(mig_year=as.factor(mig_year)),by="mig_year") %>% 
   mutate(across(sum_flow:transport.win,scale)) %>% 
+  # mutate(across(sum_flow:pdo.aut,scale)) %>% 
  replace(is.na(.), 0) %>% 
   #add redd counts
   left_join(redd_dat %>% mutate(mig_year=as.factor(mig_year)),by=c("mig_year","stream")) %>%
@@ -501,13 +505,13 @@ if(!is.null(start_par)){
 }else
 
 par_TMB<-list(
-  beta_phi_ints=Phi.design.glmmTMB$parameters$beta[(1:(x$nOCC+4))], #intercept for each site and unique LH intercepts for time 1
-  beta_phi_pen=Phi.design.glmmTMB$parameters$beta[-(1:(x$nOCC+4))],
+  beta_phi_ints=Phi.design.glmmTMB$parameters$beta[(1:(x$nOCC+7))], #intercept for each site and unique LH intercepts for time 1
+  beta_phi_pen=Phi.design.glmmTMB$parameters$beta[-(1:(x$nOCC+7))],
   beta_p_ints=p.design.glmmTMB$parameters$beta[1:(x$nOCC+2)],#intercept for each site except the last and unique LH intercepts for time1
   beta_p_pen=p.design.glmmTMB$parameters$beta[-(1:(x$nOCC+2))],
   beta_psi_ints=Psi.design.glmmTMB$parameters$beta[1:2], #intercept for each strata
   beta_psi_pen=Psi.design.glmmTMB$parameters$beta[-(1:2)],
-  log_pen_sds=rep(0,length(Phi.design.glmmTMB$parameters$beta[-(1:(x$nOCC+4))])+
+  log_pen_sds=rep(0,length(Phi.design.glmmTMB$parameters$beta[-(1:(x$nOCC+7))])+
                     length(p.design.glmmTMB$parameters$beta[-(1:(x$nOCC+2))])+
                     length(Psi.design.glmmTMB$parameters$beta[-(1:2)])), # standard deviations of penalty priors
   b_phi=Phi.design.glmmTMB$parameters$b,

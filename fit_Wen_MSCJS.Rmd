@@ -8,6 +8,9 @@ output:
 mainfont: Calibri Light
 extra_dependencies: ["bm"]
 
+bibliography: references.bib
+
+csl: journal-of-applied-ecology.csl
 ---
 
 
@@ -22,28 +25,15 @@ Life history diversity is thought to increase population productivity and stabil
  
 ## Introduction outline  {-}
 
-Life history diversity can reduce intraspecific resource competition, facilitate adaptation to changing conditions over time, and increase population stability.
-
--	This is achieved by individual animals using habitat resources in multiple ways to survive, grow, and reproduce.
-
--	Animals exhibiting different juvenile life history pathways often respond differently to environmental conditions, contributing to asynchrony in abundance trends among life history pathways and consequently stability of the population.
-
--	Understanding the range of individual responses to management or environmental change enables more accurate predictions of population responses.
 
 
-The longer-term demographic consequences of alternative life history pathways, especially alternative pathways exhibited by young animals, are rarely understood because it is difficult to track individuals throughout their life cycles.
+Life history diversity can reduce intraspecific resource competition, facilitate adaptation to changing conditions over time, and increase population stability. Organisms expressing alternative life history tactics often use habitat resources in different ways to survive, grow, and reproduce, increasing the niche space occupied by a population and enabling larger population sizes  [@Allen2008Offspring; @Day2000Competition; @Svanbäck2007Intraspecific]. Animals exhibiting different life history pathways also often exhibit asynchronous trends in abundance contributing to population stability [(]@Hilborn2003Biocomplexity; @Morozov2013Revisiting]. Understanding the range of individual responses by organisms expressing different life history tactics to management or environmental change enables more mechanistic predictions of population responses, which may help with predicting responses to conditions outside the range experienced in the past, such as those projected to occur due to anthropogenic climate change. 
+It is increasingly recognized that the condition of juvenile organisms effect demographic rates at later life stages, highlighting the importance of considering full life cycles to understand the drivers of life history and fitness [@Taborsky2006influence]. For example, the size and date of spadefoot toads (*Pelobates fuscus*) at metamorphosis is related to first-year survival and probability of reaching maturity, but toads expressing different life history tactics have similar lifetime fitness because the effects of metamorphosis date and size on survival and maturation age cancel each other out [@Schmidt2012From]. Lewin et al. [-@Lewin2017Juvenile] found that juvenile mass of female spotted hyenas (*Crocuta crocuta*) was associated with higher survival to reproduction. They further identified a positive relationship between juvenile concentrations of the growth hormone IGF-1 and age at first parturition but a negative relationship between juvenile IGF-1 and longevity in adulthood.  Understanding the interconnection of different life stages requires longitudinal data, which can be difficult to collect, which has resulted in considerable uncertainty remaining about how juvenile experiences affect lifetime fitness [@Clutton-Brock2010Individuals; @Metcalfe2001Compensation].
 
--	Above a certain age, it may become difficult to distinguish individuals that exhibited different juvenile life history pathways, yet those pathways may have lifetime effects on fitness.
 
-Anadromous  salmonids exhibit considerable life history diversity in terms of freshwater habitat use during juvenile life stages, which is associated with different responses to environmental variability and increased population stability.
+Anadromous  salmonids exhibit considerable life history diversity in terms of freshwater habitat use during juvenile life stages, which is associated with increased population stability [@Bourret2016Diversity; @Copeland2014importance; @Greene2010Improved; @Miller2010Quantifying; @Moore2012Trophic; @Phillis2018Endangered; @Schroeder2015Juvenile]. However, the degree to which juvenile life history affects demographic rates and their response to environmental variability in subsequent life stages, such as migration survival, maturation age, and lifetime reproductive success, is not well understood. Juvenile traits such as growth rate, size, and timing of ocean-entry are known to be related to survival and maturation age at subsequent life stages and to mediate relationships with environmental conditions [@Gosselin2018Conservation; @Scheuerell2005Influence; @Scheuerell2009Relating; @Wilson2021Phenological; @Zabel2004Relating]; however, considerable uncertainty remains about the role of juvenile life history diversity, specifically as it relates to rearing in alternative habitat types at different points in freshwater residency, in determining subsequent demographic rates and their relationships with environmental conditions [@Bourret2016Diversity].  This information has the potential to provide a more mechanistic understanding of the role of juvenile life history diversity in creating population stability in the face of environmental variability and to enable better prediction of responses to management actions and environmental change. 
 
--	However, the degree to which juvenile life history affects demographic rates in subsequent life stages, such as migration survival, marine survival, and lifetime reproductive success, is not well understood.
-
-To understand how lifetime demographic outcomes differ among animals with different juvenile life history pathways, we analyzed a long-term mark-recapture data set for Chinook salmon (*Oncorhynchus tshawytscha*) in the Columbia River.
-
--	Detection of fish at multiple dams allowed for estimation of survival during multiple distinct life stages, as well as maturation age.
-
--	Because fish were marked as young animals, when their juvenile life history pathways were known, we could link their early life history pathway to later survival and its relationship with environmental covariates.
+To understand how lifetime demographic outcomes differ among animals with different juvenile life history pathways, we analyzed a long-term mark-recapture data set for >150,000 Chinook salmon (*Oncorhynchus tshawytscha*) in the Columbia River over 15 years. Detection of fish at multiple dams allowed for estimation of migration survival, maturation age, and return rates from the ocean. Because fish were marked as young animals, when their juvenile life history pathways were known, we could link their early life history pathway to later survival and its relationship with environmental covariates.
 
 
 
@@ -146,7 +136,7 @@ sup_fig_nums("GOF_uncond_boot", "DHARMa bootstraped outlier test of whether the 
 
 ```
 
-The Wenatchee River Basin is locoated in central Washington State, USA (`r fig_nums("map",display="cite")`). It supports a population of spring Chinook salmon, which spawn in tributaries of the mainstem of the Wenatchee River and in the upper-most reach of the mainstem. As is common among Chinook salmon, juveniles exhibit a two-stage emigration from natal streams (Copeland and Vendetti 2009, Bourette et al. 2016); stage-one emigration is to downstream freshwater rearing areas and occurs within the first or second year of life, while stage-two emigration is to the ocean and occurs in the second spring of life (Buchanon et al. 2015). One life history pathway is characterized by fish remaining in the natal stream until their second spring of life and initiating stage-two emigration directly after stage one (natal stream-rearing). Other life history pathways are characterized by fish carrying out stage-one emigration from natal streams in spring, summer, or fall of their first year of life, and rearing and overwintering in downstream reaches prior to initiating stage-two emigration the following spring (downstream-rearing). Adults return from the ocean in spring at age three, four, or five, hold within the Wenatchee River Basin over summer, and spawn in late summer.
+The Wenatchee River Basin is locoated in central Washington State, USA (`r fig_nums("map",display="cite")`). It supports a population of spring Chinook salmon, which spawn in tributaries of the mainstem of the Wenatchee River and in the upper-most reach of the mainstem. As is common among Chinook salmon, juveniles exhibit a two-stage emigration from natal streams [@Copeland2009Contribution; @Bourret2016Diversity]; stage-one emigration is to downstream freshwater rearing areas and occurs within the first or second year of life, while stage-two emigration is to the ocean and occurs in the second spring of life [@Buchanan2015Estimating]. One life history pathway is characterized by fish remaining in the natal stream until their second spring of life and initiating stage-two emigration directly after stage one (natal stream-rearing). Other life history pathways are characterized by fish carrying out stage-one emigration from natal streams in spring, summer, or fall of their first year of life, and rearing and overwintering in downstream reaches prior to initiating stage-two emigration the following spring (downstream-rearing). Adults return from the ocean in spring at age three, four, or five, hold within the Wenatchee River Basin over summer, and spawn in late summer.
 
 
 
@@ -171,6 +161,7 @@ library(TMB)
 library(TMBhelper)
 library(glmmTMB)
 library(DHARMa)
+library(viridis)
 # library(RMark)
 ```
 
@@ -213,7 +204,7 @@ site_year_det<-mark_file_CH %>% filter(LH!="Unk") %>%  select(sea_Year_p,LH,stre
 
 ### Model {-}
 
-We used a multi-state mark-recapture model to estimate downstream survival ($\phi_{t,l,a,y}$) by interval ($t$), juvenile life history ($l$), stream ($a$), and year ($y$); upstream survival ($\phi_{t,y,s}$) by occasion, year, and age ($s$); and maturation probabilities ($\psi_{l,y,s}$) by life history, year, and age (Arnason 1973, Brownie et al. 1993 ). Because fish could not be observed after passing downstream of Bonneville Dam unless they returned to Bonneville Dam one to three years later (occasion five), annual marine survival probabilities are non-identifiable. Instead, we modeled the probability of return, at any age, for all fish entering the ocean on a given year, and conditional on return, the probabilities of fish spending one, two, or three years at sea (returning at ages three through five; Buhle et al. 2015). 
+We used a multi-state mark-recapture model to estimate downstream survival ($\phi_{t,l,a,y}$) by interval ($t$), juvenile life history ($l$), stream ($a$), and year ($y$); upstream survival ($\phi_{t,y,s}$) by occasion, year, and age ($s$); and maturation probabilities ($\psi_{l,y,s}$) by life history, year, and age [@Arnason1973estimation, @Brownie1993Capture-Recapture]. Because fish could not be observed after passing downstream of Bonneville Dam unless they returned to Bonneville Dam one to three years later (occasion five), annual marine survival probabilities are non-identifiable. Instead, we modeled the probability of return, at any age, for all fish entering the ocean on a given year, and conditional on return, the probabilities of fish spending one, two, or three years at sea [returning at ages three through five; @Buhle2018Using]. 
 
 
 
@@ -242,7 +233,7 @@ where $\alpha_t$ is an occasion-specific intercept, $\mathbf{x}_{t,l,a,y,s}$ is 
 (\#eq:survpriors)  
 \end{equation}
 
-where $\boldsymbol\lambda$ determines the strength of the penalties (Simpson et al. 2017). To select values of $\boldsymbol\lambda$ we conducted a grid search where we fit the model with several different values and evaluated model performance based on the leave-one-out information criterion (looic) calculated with the looic package (Vehtari et al. 2020) in `r version$version.string`. We fit the model with candidate values of $\boldsymbol\lambda$ = `r paste0(round(-log(0.01)/(5:2/10),2),collapse = ", ")`, or `r round(-log(0.01)/.1,2)`, testing all 25 combinations of values for the two $\lambda$ values, where one value was for used for coefficients and another for random year effects. These corresponded with a 1% probability of the standard deviation being greater than 0.5, 0.4, 0.3, 0.2, or 0.1, respectively. For the looic calculations, we sampled parameter sets from a multivariate normal distribution defined by the maximum likelihood estimates of parameters and the inverted Hessian, and calculated the log-likelihood of each capture history for each parameter set to feed into to the *looic* function.
+where $\boldsymbol\lambda$ determines the strength of the penalties [@Simpson2017Penalising]. To select values of $\boldsymbol\lambda$ we conducted a grid search where we fit the model with several different values and evaluated model performance based on the leave-one-out information criterion (looic) calculated with the looic package (Vehtari et al. 2020) in `r version$version.string`. We fit the model with candidate values of $\boldsymbol\lambda$ = `r paste0(round(-log(0.01)/(5:2/10),2),collapse = ", ")`, or `r round(-log(0.01)/.1,2)`, testing all 25 combinations of values for the two $\lambda$ values, where one value was for used for coefficients and another for random year effects. These corresponded with a 1% probability of the standard deviation being greater than 0.5, 0.4, 0.3, 0.2, or 0.1, respectively. For the looic calculations, we sampled parameter sets from a multivariate normal distribution defined by the maximum likelihood estimates of parameters and the inverted Hessian, and calculated the log-likelihood of each capture history for each parameter set to feed into to the *looic* function.
 
 
 <!-- We selected values of $\lambda$ that allowed enough flexibility in the model to capture the variability in the data but no so much flexibility such that the model was overfit, which would sacrifice statistical power and potentially predictive skill. To do so, we began with by fitting the model with $\lambda$ = `r U_0<-.5;(round(pen_1<--log(.01)/U_0,2))` such that the probability of a random effect being greater than 1 was 0.01. The distribution of scaled quantile residuals (described in *goodness of fit* below) for this model were underdispersed relative to the expected uniform distribution suggesting that the model was overfit. Thus we increased the strength of penalties until the distribution of scaled quantile residuals were approximately uniform. This was achieved when we set $\lambda$ = `r U1<-.3;(round(pen_1<--log(.01)/U1,2))` such that the Prob($\sigma_{\beta^t}$>`r U1`) = 0.01. -->
@@ -275,7 +266,7 @@ In survival intervals five and six, representing adult upstream migration, we di
 
 ##### Environmental effects on survival {-}
 
-We included effects of several environmental covariates on survival and return probabilities  (`r tab_nums("variables",display="cite")`). During the first interval, we included effects of average annual winter (November-February) air temperature and Wenatchee River discharge on survival of downstream-rearing life history pathways, allowing for different effects for summer and fall sub-yearling emigrants but assuming common effects across streams. We included effects of average water temperature and discharge at Rock Island Dam in April-May on survival during the second survival interval and at McNary dam in May-June on survival during the third interval. Similarly, we modeled the effect of average daily spill percentage across Rock Island, Wanapum, and Priest Rapids Dams in May-June on survival during the second interval, and across McNary, John Day, and The Dalles dams on survival interval three. Based on the findings of Crozier et al. (2021), we evaluated the effects of the following three covariates on return rates from the ocean  (interval 4): sea surface temperature in an arc of the northeast Pacific Ocean defined by Johnstone and Mantua (2014) during the winter prior to when fish enter the marine environment, a coastal upwelling index measured during the spring, and sea surface temperature off the coast of Washington State during the summer. Effects of all environmental covariates on survival during intervals two through four were allowed to vary for natal-stream vs downstream rearing fish  but effects were assumed to be common accross natal streams.
+We included effects of several environmental covariates on survival and return probabilities  (`r tab_nums("variables",display="cite")`). During the first interval, we included effects of average annual winter (November-February) air temperature and Wenatchee River discharge on survival of downstream-rearing life history pathways, allowing for different effects for summer and fall sub-yearling emigrants but assuming common effects across streams. We included effects of average water temperature and discharge at Rock Island Dam in April-May on survival during the second survival interval and at McNary dam in May-June on survival during the third interval. Similarly, we modeled the effect of average daily spill percentage across Rock Island, Wanapum, and Priest Rapids Dams in May-June on survival during the second interval, and across McNary, John Day, and The Dalles dams on survival interval three. Based on the findings of Crozier et al. [-@Crozier2021Climate], we evaluated the effects of the following three covariates on return rates from the ocean  (interval 4): sea surface temperature in an arc of the northeast Pacific Ocean defined by Johnstone and Mantua [-@Johnstone2014Atmospheric] during the winter prior to when fish enter the marine environment, a coastal upwelling index measured during the spring, and sea surface temperature off the coast of Washington State during the summer. Effects of all environmental covariates on survival during intervals two through four were allowed to vary for natal-stream vs downstream rearing fish  but effects were assumed to be common accross natal streams.
 
 
 We assessed carryover effects of the density of female spawners within each natal stream on subsequent survival and return nates of their offspring, as might result from density-dependent effects on within-life-history size or timing of emigration. To do so, we included effects of observed counts of redds within each natal stream one year prior to initial capture for sub-yearling emigrants and two years prior for yearling emigrants on survival during intervals one through three and return rates in interval four  (`r tab_nums("variables",display="cite")`). We allowed for life-history and natal-stream specific effects of redd density. For intervals two through four, we modeled common effects of redd density on downstream-rearing fish (combined summer and fall sub-yearling) as with other aspects of the model.
@@ -338,13 +329,13 @@ Just as in the survival model, we modeled synchronous and idiosyncratic random y
 
 ### Model fitting {-}
 
-The likelihood of the data for a given set of parameters was calculated using the forward algorithm (Zucchini et al. 2016, McClintock et al. 2020), and the Laplace approximation of the marginal log-likelihood integrated over random effects was calculated by the package TMB in R for a given set of fixed effects values (Kristensen et al 2016, R) . We fit the model by minimizing the negative marginal log-likelihood with respect to parameters, which was conducted in R using the *nlminb* function and the TMBhelper package (Gay 1990, Thorson 2020). Standard errors of fixed and random effects, as well as derived quantities, at the maximum likelihood estimate were calculated by TMB using a generalization of the delta method. The fixed effects were the intercepts  $\mathbf{\alpha}$ for $\phi$, $p$ and $\psi$ as well as the standard deviation and covariance parameters for the hyper-distributions of the Gaussian random effects. The Gaussian random effects included the penalized coefficients \mathbf{\beta} and random year effects $\mathbf{\beta}$ and random year effects $\mathbf{\delta}$ and $\mathbf{\epsilon}$. To calculate confidence intervals for certain derived quantities, we conducted a parametric bootstrap where we sampled 5,000 fixed and random effects from a multivariate normal distribution defined by the maximum likelihood estimates and variance-covariance matrix. We then calculated derived quantities for each sample.
+The likelihood of the data for a given set of parameters was calculated using the forward algorithm [@McClintock2020Uncovering; @Zucchini2016Hidden ], and the Laplace approximation of the marginal log-likelihood integrated over random effects was calculated by the package TMB in R for a given set of fixed effects values [@Kristensen2016TMB; @R2021R ]. We fit the model by minimizing the negative marginal log-likelihood with respect to parameters, which was conducted in R using the *nlminb* function and the TMBhelper package [@Gay1990Usage; @Thorson2020TMBhelper]. Standard errors of fixed and random effects, as well as derived quantities, at the maximum likelihood estimate were calculated by TMB using a generalization of the delta method. The fixed effects were the intercepts  $\mathbf{\alpha}$ for $\phi$, $p$ and $\psi$ as well as the standard deviation and covariance parameters for the hyper-distributions of the Gaussian random effects. The Gaussian random effects included the penalized coefficients \mathbf{\beta} and random year effects $\mathbf{\beta}$ and random year effects $\mathbf{\delta}$ and $\mathbf{\epsilon}$. To calculate confidence intervals for certain derived quantities, we conducted a parametric bootstrap where we sampled 5,000 fixed and random effects from a multivariate normal distribution defined by the maximum likelihood estimates and variance-covariance matrix. We then calculated derived quantities for each sample.
 <!-- To generate confidence intervals for return-age simplex probabilities, we conducted a parametric bootstrap, sampling 5,000 parameter sets from a multivariate normal distribution defined by the maximum likelihood point estimates and covariance matrix. We then calculated the probabilities for each draw and found the quantiles corresponding with the 95% confidence interval.    -->
 
 
 ### Goodness of fit {-}
 
-We assessed goodness of fit by examining scaled quantile residuals (Gelman and Hiss 2006, Dunn and Smyth 1996). We simulated 250 data sets of the same size as the observed data by sampling from binomial distributions for survival and detection, and multinomial distributions for return age. Conditional simulations were conducted using the fitted model parameters and the fitted random year effects, and unconditional simulations were conducted using the fitted model parameters (including penalized coefficients) but drawing random year effects from their hyper-distributions. We summarized the simulated and observed data by the number of recaptures from each release group (life history by stream by year) and fish age at each occasion, and used the DHARMa package (Hartig 2021) to calculate scaled quantile residuals for the observed numbers of recaptures and interrogate the residuals for outliers and departures from their expected uniform distributions. 
+We assessed goodness of fit by examining scaled quantile residuals [@Dunn1996Randomized; @Gelman2006Data]. We simulated 250 data sets of the same size as the observed data by sampling from binomial distributions for survival and detection, and multinomial distributions for return age. Conditional simulations were conducted using the fitted model parameters and the fitted random year effects, and unconditional simulations were conducted using the fitted model parameters (including penalized coefficients) but drawing random year effects from their hyper-distributions. We summarized the simulated and observed data by the number of recaptures from each release group (life history by stream by year) and fish age at each occasion, and used the DHARMa package [@Hartig2021DHARMa:] to calculate scaled quantile residuals for the observed numbers of recaptures and interrogate the residuals for outliers and departures from their expected uniform distributions. 
 
 In addition, we calculated *P* values for the model by sampling 500 parameter sets and calculating the Freeman-Tukey fit statistic,  $\sum_t{\sum_l{\sum_a{\sum_y{\sum_s{(\sqrt{d_{t,l,a,y,s}}-\sqrt{E[d_{t,l,a,y,s}]})^2}}}}}$,
 for observed and simulated data with each parameter set, where $d_{t,l,a,y,a}$ is the number of observed or simulated detections at a given occasion for fish of a given juvenile LHP, natal stream, year, and age, and $E[d_{t,l,a,y,s}]$ is the expectation of that number of detections given the model and a specific parameter set. The *P* value was then then calculated as the proportion of parameter sets in which the Freeman-Tukey fit statistic for the simulated data was greater than the statistic for the observed data. We calculated *P* values conditional on the fitted random year effects and when sampling random year effects from their hypder-distributions.
@@ -359,7 +350,7 @@ mscjs_dat<- make_dat(mark_file_CH,sites=c( "LWe_J",
    #"Est_J",
   "Bon_A","McN_A",
   #"PRa_A","RIs_A",
-  "Tum_A"),cont_cov=c(),length_bin = 5,doy_bin = 10,inc_unk = FALSE,exc_unk=TRUE,start_year = 1997,end_year = 2020) #,"mark_DOY_bin","length_bin"
+  "Tum_A"),cont_cov=c(),length_bin = 5,doy_bin = 10,inc_unk = FALSE,exc_unk=TRUE) #,"mark_DOY_bin","length_bin"
 
 # mscjs_dat$Phi.design.dat<-mscjs_dat$Phi.design.dat %>% group_by(LH) %>%
 # mutate(length_bin_scaled=scale(length_bin))
@@ -386,7 +377,6 @@ loo_mat<-matrix(NA,5,5)
 for ( i in 1:5){
 for (j in 1:5){
   
-
 combs<-expand.grid(a=1:5,b=1:5)
 
 #grod seach 
@@ -410,7 +400,7 @@ results3<-foreach(
  U_1<-combs[i,2]/10;pen_2<--log(.01)/U_1
 
 
-try(mscjs_fit2<-fit_wen_mscjs(x=mscjs_dat,
+try(mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
                            
                          #*survival*
                          phi_formula=par.index~
@@ -889,7 +879,7 @@ mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
                             us(0+tostratum|mig_year)#+diag(0+tostratum:LH|mig_year)
                            ,
     
-                            doFit = FALSE,silent=TRUE,
+                            doFit = TRUE,silent=TRUE,
                             sim_rand =0,REML=FALSE,pen=c(pen_1,pen_2), hypersd=1,map_hypers=c(FALSE,FALSE))
                          # staTt_par=mscjs_fit$mod$env$parList(par=last_best))
 # save(mscjs_fit,file=here("results","mscjs_fit.rdata"))
@@ -907,9 +897,9 @@ mscjs_fit$mod$retape()
 setwd(here())
 ```
 
-```{r organize_output, message=FALSE, warning=FALSE,eval=TRUE,echo=FALSE}  
+```{r organize_output, message=FALSE,cache=TRUE, warning=FALSE,eval=TRUE,echo=FALSE}  
 
-library(viridis)
+
 sd_rep<-mscjs_fit$fit$SD
 mod_rep<-mscjs_fit$mod$report(mscjs_fit$last_par_best)
 
@@ -1803,7 +1793,9 @@ knitr::kable(site_year_det %>% ungroup() %>%  select(LH,stream,sea_Year_p,Releas
 ```
 
 
+\newpage
 
+# References {-}
 
 
 <!-- ```{r prog_mark_mod,eval=FALSE} -->
