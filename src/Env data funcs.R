@@ -161,17 +161,11 @@ full_join(spring_mean_func(as.data.frame(Dis)%>%rename(year=Year),3,4) %>% renam
   full_join(spring_mean_func(MC_spill %>% filter(location%in%c("JDA","TDA","MCN" ), parameter=="spillpct") %>% select(-location) ,first_month = 4,last_month = 5) %>% rename(MC_spill_pct_juv=y)) %>% 
   filter(mig_year>=2006&mig_year<=2020) 
   
-# Covariates that I recieved from Brian Burke for SAR model
-envDir<-here("Data","LCM environmental data")
+# Marine covariates for SAR model from Chasco et al 2020 in Plos One
 
-envFiles<-list.files(path=envDir,pattern="*.csv")
+load(here("Data","LCM environmental data","envData_7302018.RData"))
 
-envdata<-tibble(year=2006:2020)
-
-for ( i in envFiles){y<-read.csv(paste(envDir,i,sep="/"))
-envdata<-envdata %>% left_join(y)}
-
-env_dat_out<-full_join(env_dat_out,envdata %>% rename(mig_year=year))
+env_dat_out<-left_join(env_dat_out,envdata %>% rename(mig_year=year))
 
 return(env_dat_out)
 }

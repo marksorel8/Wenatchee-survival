@@ -52,7 +52,7 @@ print_out<-function(mscjs_fit){
                             LH=="LHfall" ~ "Fal.0", 
                             LH=="LHsmolt" ~ "Spr.1",
                             LH=="age_classsmolt" ~ "Spr.1", 
-                            LH=="age_classsub" ~ "Age.0", 
+                            LH=="age_classsub" ~ "DSR", 
                             TRUE ~ LH))
   
     
@@ -136,8 +136,8 @@ tab_coef<-tibble(time=substr(mat_vars[,1],5,5),
 ) %>% mutate( LH=case_when(LH=="LHfall"~"Fal.0",
                                LH=="LHsummer"~"Sum.0",
                                LH%in%c("LHsmolt","age_classsmolt")~"Spr.1",
-                               TRUE~"Age.0"),
-                  LH=fct_relevel(LH,"Sum.0","Fal.0","Age.0","Spr.1"),
+                               TRUE~"DSR"),
+                  LH=fct_relevel(LH,"Sum.0","Fal.0","DSR","Spr.1"),
               var=case_when(var=="win_air"~"win.air.temp",
                             var=="win_flow"~"win.flow",
                             var=="RIS_flow_juv"~"flow",
@@ -152,7 +152,7 @@ tab_coef<-tibble(time=substr(mat_vars[,1],5,5),
                                         ))
 
 
-ggplot(data=tab_coef,aes(x=var,y=est,color=LH))+facet_grid(cols=vars(time),labeller =  labeller(time=c(`1`="Release to Lower Wenatchee",`2`="Lower Wenatchee to McNary", `3` = "McNary to Bonneville ",`4` = "Marine survival")),scales = "free")+geom_hline(yintercept=0,linetype=2)+geom_point(position=position_dodge(width = .75),size=5)+geom_linerange(aes(ymin=est-1.96*sd,ymax=est+1.96*sd),position=position_dodge(width = .75),lwd=1.25)+xlab("")+ylab(expression(beta))+ggthemes::scale_colour_colorblind()+labs(color = "Life\nhistory")
+ggplot(data=tab_coef,aes(x=var,y=est,color=LH))+facet_grid(cols=vars(time),labeller =  labeller(time=c(`1`="Release to Lower Wenatchee",`2`="Lower Wenatchee to McNary", `3` = "McNary to Bonneville ",`4` = "Marine survival")),scales = "free")+geom_hline(yintercept=0,linetype=2)+geom_point(position=position_dodge(width = .75),size=3)+geom_linerange(aes(ymin=est-1.96*sd,ymax=est+1.96*sd),position=position_dodge(width = .75),lwd=1.1)+xlab("")+ylab(expression(beta))+ggthemes::scale_colour_colorblind()+labs(color = "Life history pathway")+theme(legend.position="top")
 }
 
 # function to plot coefficient effects of redds
@@ -170,8 +170,8 @@ plot_redd_effect_fun<-function(covs,
            LH=case_when(LH=="LHfall"~"Fal.0",
                         LH=="LHsummer"~"Sum.0",
                         LH%in%c("LHsmolt","age_classsmolt")~"Spr.1",
-                        TRUE~"Age.0"),
-           LH=fct_relevel(LH,"Sum.0","Fal.0","Age.0","Spr.1"),
+                        TRUE~"DSR"),
+           LH=fct_relevel(LH,"Sum.0","Fal.0","DSR","Spr.1"),
            stream=apply(mat_vars,1,function(x)x[which(substr(x,1,2)=="st")]),
            stream= substr(stream, 7,nchar(stream)),
                    est=(ad_rep_vals[names(ad_rep_vals)=="beta_phi"][match(covs,colnames(fit_obj$Phi.design.glmmTMB$data.tmb$X))]),
@@ -179,7 +179,7 @@ plot_redd_effect_fun<-function(covs,
   ) 
   
   
-  ggplot(data=mat_vars,aes(x=stream,y=est,color=LH))+facet_grid(cols=vars(time),scales = "free",labeller =  labeller(time=c(`1`="Release to Lower Wenatchee",`2`="Lower Wenatchee to McNary", `3` = "McNary to Bonneville ",`4` = "Marine survival")))+geom_hline(yintercept=0,linetype=2)+geom_point(position=position_dodge(width = .75),size=5)+geom_linerange(aes(ymin=est-1.96*sd,ymax=est+1.96*sd),position=position_dodge(width = .75),lwd=1.25)+xlab("")+ylab(expression(beta))+ggthemes::scale_colour_colorblind()+labs(color = "Life\nhistory")
+  ggplot(data=mat_vars,aes(x=stream,y=est,color=LH))+facet_grid(cols=vars(time),scales = "free",labeller =  labeller(time=c(`1`="Release to Lower Wenatchee",`2`="Lower Wenatchee to McNary", `3` = "McNary to Bonneville ",`4` = "Bonneville to Bonneville")))+geom_hline(yintercept=0,linetype=2)+geom_point(position=position_dodge(width = .75),size=3)+geom_linerange(aes(ymin=est-1.96*sd,ymax=est+1.96*sd),position=position_dodge(width = .75),lwd=1.1)+xlab("")+ylab(expression(beta))+ggthemes::scale_colour_colorblind()+labs(color = "Life history pathway")+theme(legend.position="top")
 }
 
 

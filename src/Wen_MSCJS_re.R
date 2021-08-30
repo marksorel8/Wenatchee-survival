@@ -14,13 +14,8 @@ if(file.exists(here("Data","env_dat.csv"))){
 }else{
   source(here("src","Env data funcs.r"))
   env_dat<-get_dat()
-  write.csv(env_dat,file=here("Data","env_dat.csv"))
+  write.csv(env_dat,file=here("Data","env_dat.csv"),row.names = FALSE)
 }
-
-# load("C:/Users/Mark Sorel/Downloads/envData_7302018.RData")
-# env_dat<-env_dat%>% select(Year:MC_spill_pct_juv) %>% left_join(envdata %>% rename(mig_year=year))
-
-# redds<-read_csv(here("Data","redd_counts.csv")) %>% mutate(mig_year=as.factor(Year+2)) %>% mutate(across(Chiwawa:White,scale)) %>%  pivot_longer(c("Chiwawa","Nason","White"),"stream",values_to="redds")
 
 
 if(file.exists(here("data","all_bio_data.csv"))){
@@ -30,7 +25,7 @@ if(file.exists(here("data","all_bio_data.csv"))){
 make_dat<-function(mark_file_CH=mark_file_CH,sites=c("LWe_J","McN_J","JDD_J","Bon_J","Est_J","Bon_A","McN_A","PRa_A","RIs_A","Tum_A"),start_year=2006, end_year=2017,cont_cov,length_bin=5,doy_bin=10,inc_unk=FALSE,exc_unk=FALSE){
 
   
-   # sites=c("LWe_J","McN_J","Bon_J","Bon_A","McN_A","Tum_A");start_year=2006; end_year=2017;cont_cov=c("mark_DOY_bin");length_bin=5;doy_bin=10;inc_unk=FALSE;inc_unk=FALSE;exc_unk=FALSE
+   # sites=c("LWe_J","McN_J","Bon_J","Bon_A","McN_A","Tum_A");start_year=2006; end_year=2017;cont_cov=c();length_bin=5;doy_bin=10;inc_unk=FALSE;inc_unk=FALSE;exc_unk=FALSE
   
   #drop lower trap releases if not ussing
    if(exc_unk){mark_file_CH <-mark_file_CH %>% filter(LH!="Unk") %>% droplevels()}
@@ -149,7 +144,7 @@ cbind(.,model.matrix(~time+stream+LH+stratum-1,data=.)) %>%
   mutate(par.index=(1:nrow(.))-1) %>% 
   #add environmental covariates
   left_join(env_dat %>% mutate(mig_year=as.factor(mig_year)),by="mig_year") %>% 
-  mutate(across(sum_flow:transport.win,scale)) %>% 
+  mutate(across(win_flow:last_col(),scale)) %>% 
   # mutate(across(sum_flow:pdo.aut,scale)) %>% 
  replace(is.na(.), 0) %>% 
   #add redd counts
@@ -505,15 +500,15 @@ if(!is.null(start_par)){
 }else
 
 par_TMB<-list(
-  beta_phi_ints=Phi.design.glmmTMB$parameters$beta[(1:(x$nOCC+7))], #intercept for each site and unique LH intercepts for time 1
+  beta_phi_ints=Phi.design.glmmTMB$parameters$beta[(1:(x$nOCC+7))], #intercept for each site and  LH 
   beta_phi_pen=Phi.design.glmmTMB$parameters$beta[-(1:(x$nOCC+7))],
-  beta_p_ints=p.design.glmmTMB$parameters$beta[1:(x$nOCC+2)],#intercept for each site except the last and unique LH intercepts for time1
-  beta_p_pen=p.design.glmmTMB$parameters$beta[-(1:(x$nOCC+2))],
-  beta_psi_ints=Psi.design.glmmTMB$parameters$beta[1:2], #intercept for each strata
-  beta_psi_pen=Psi.design.glmmTMB$parameters$beta[-(1:2)],
+  beta_p_ints=p.design.glmmTMB$parameters$beta[1:(x$nOCC+3)],#intercept for each site except the last and unique LH 
+  beta_p_pen=p.design.glmmTMB$parameters$beta[-(1:(x$nOCC+3))],
+  beta_psi_ints=Psi.design.glmmTMB$parameters$beta[1:4], #intercept for each strata
+  beta_psi_pen=Psi.design.glmmTMB$parameters$beta[-(1:4)],
   log_pen_sds=rep(0,length(Phi.design.glmmTMB$parameters$beta[-(1:(x$nOCC+7))])+
-                    length(p.design.glmmTMB$parameters$beta[-(1:(x$nOCC+2))])+
-                    length(Psi.design.glmmTMB$parameters$beta[-(1:2)])), # standard deviations of penalty priors
+                    length(p.design.glmmTMB$parameters$beta[-(1:(x$nOCC+3))])+
+                    length(Psi.design.glmmTMB$parameters$beta[-(1:4)])), # standard deviations of penalty priors
   b_phi=Phi.design.glmmTMB$parameters$b,
   b_p=p.design.glmmTMB$parameters$b,
   b_psi=Psi.design.glmmTMB$parameters$b,
@@ -540,7 +535,7 @@ par_TMB<-list(
 #initialize model
   if(!x$inc_unk){  #model excluding unknown LH stream fish released at LWe_J
     #compile and load TMB model
-    TMB::compile("wen_mscjs_re.cpp")
+    # TMB::compile("wen_mscjs_re.cpp")
     dyn.load(dynlib("wen_mscjs_re"))
 mod<-TMB::MakeADFun(data=dat_TMB,parameters = par_TMB,random=random,DLL ="wen_mscjs_re", silent = silent)
   }else{ #model including unknown LH stream fish released at LWe_J
