@@ -23,18 +23,18 @@ $^5$US Geological Survey, Washington Cooperative Fish and Wildlife Research Unit
 
 ## Abstract  {-}
 
-Life history diversity is thought to increase population stability. However, the lifetime demographic consequences of alternative life history pathways (LHPs), especially alternative pathways exhibited by young animals, are rarely understood because it is difficult to track individuals throughout their life cycles. To understand how demographic outcomes and their relationships with environmental variables differ among animals with different LHPs, we analyzed a long-term mark-recapture dataset for spring Chinook salmon  (*Oncorhynchus tshawytscha*) from the Wenatchee River over 15 years. Different LHPs in this population either remain in the natal stream until emigrating to the ocean as one-year-olds (*natal-reach rearing*) or emigrate at age zero and rear in downstream habitats for several months before emigrating to the ocean as one-year-olds (*downstream rearing*). Downstream-rearing fish initiated emigration to the ocean 19 days earlier on average and their survival during seaward emigration was lower than natal-reach rearing fish, however, downstream-rearing fish returned as adults from the ocean at higher rates, suggesting a potential survival tradeoff between LHPs. A higher proportion of downstream-rearing fish also returned at younger ages than did natal-reach rearing fish, which should contribute to population stability by spreading each cohort’s reproductive contribution more evenly among future cohorts. Environmental variability is known to play a role in maintaining life-history variability in populations, and we identified several important sources of environmental variability influencing this population. Survival of downstream-rearing fish in downstream-rearing habitats was negatively correlated with winter air temperature, which is increasing over time. As a result, survival may be lower in the future. Return rates of downstream-rearing fish as adults from the ocean was positively correlated with coastal upwelling in spring, whereas return rates of natal-reach rearing fish was positively correlated with summer sea surface temperature. These different responses to environmental variability should lead to asynchrony in adult abundance among juvenile LHPs, contributing to population stability. Understanding differences in demographic rates of animals that exhibit different juvenile LHPs provides a more mechanistic understanding of the ways that life history diversity affects population stability and may enable more accurate predictions of the effects of management and climate change on populations.   
+Life history diversity is thought to increase population stability in variable environments. However, the lifetime demographic consequences of alternative life history pathways (LHPs), especially alternative pathways exhibited by young animals, are rarely understood because it is difficult to track individuals throughout their life cycles. To understand how demographic outcomes and their relationships with environmental variables differ among animals with different LHPs, we analyzed a long-term mark-recapture dataset for spring Chinook salmon  (*Oncorhynchus tshawytscha*) from the Wenatchee River. Different LHPs in this population either remain in the natal stream until emigrating to the ocean as one-year-olds (*natal-reach rearing*) or emigrate at age zero and rear in downstream habitats for several months before emigrating to the ocean as one-year-olds (*downstream rearing*). We found that downstream-rearing fish emigrated to the ocean 19 days earlier on average and their survival during seaward emigration was lower than natal-reach rearing fish. However, downstream-rearing fish returned as adults from the ocean at higher rates, suggesting a potential survival tradeoff handled differently by different LHPs. A higher proportion of downstream-rearing fish also returned at younger ages than did natal-reach rearing fish,  contributing to variability in age at reproduction for each cohort and therefore population stability. Environmental variability is known to play a role in maintaining life-history variability in populations, and we identified several important sources of environmental variability influencing this population. Survival of downstream-rearing fish in downstream-rearing habitats was negatively correlated with winter air temperature, which is increasing over time. As a result, survival may be lower in the future. Return rates of downstream-rearing fish as adults from the ocean was positively correlated with coastal upwelling in spring, whereas return rates of natal-reach rearing fish was positively correlated with summer sea surface temperature. These different responses to environmental variability should lead to asynchrony in adult abundance among juvenile LHPs, contributing to population stability. Understanding differences in demographic rates of animals that exhibit different juvenile LHPs provides a more mechanistic understanding of the ways that life history diversity affects population stability and may enable more accurate predictions of the effects of management and climate change on populations.   
  
 ## Introduction  {-}
 
-Life history diversity is associated with increased population stability and the sustainable provisioning of ecosystem services [@Hilborn2003Biocomplexity; @Morozov2013Revisiting]. When survival rates of animals exhibiting different life history pathways (LHPs) exhibit response diversity [*sensu* @elmqvist2003response] to environmental variability, the resulting asynchrony in LHP abundance dampens variability in total population abundance. This phenomenon is often referred to as the portfolio effect [@abbott2017portfolio; @schindler2015portfolio]. Another way that life history diversity contributes to population stability is through diversity in age at maturity and longevity, such as when one LHP reaches reproductive maturity at a younger age but another has greater longevity [e.g. @Schmidt2012From; @Lewin2017Juvenile]. In these cases, the reproductive contribution of each individual cohort is spread more evenly over future cohorts and the consequence of one large or small cohort on future cohort productivity is reduced.  
+Life history diversity is associated with increased population stability and the sustainable provisioning of ecosystem services [@Hilborn2003Biocomplexity; @Morozov2013Revisiting]. When survival rates of animals exhibiting different life history pathways (LHPs) exhibit response diversity [*sensu* @elmqvist2003response] to environmental variability, the resulting asynchrony in LHP abundance dampens variability in total population abundance. This phenomenon is often referred to as the portfolio effect [@abbott2017portfolio; @schindler2015portfolio]. Life history diversity also contributes to population stability through variability in age at maturity and longevity, such as when one LHP reaches reproductive maturity at a younger age but another has greater longevity [e.g. @Schmidt2012From; @Lewin2017Juvenile]. In these cases, the reproductive contribution of each individual cohort is spread more evenly over future cohorts and the consequence of one large or small cohort on future cohort productivity is reduced.  
 
-The longer-term demographic consequences of alternative LHPs, especially alternative pathways exhibited by young animals, are rarely understood because it is difficult to track individuals throughout their life cycles. Above a certain age, it may become difficult to distinguish individuals that exhibited different juvenile LHPs, yet those pathways may have lifetime effects on demographic rates and fitness [@Clutton-Brock2010Individuals; @Metcalfe2001Compensation]. Information about how how demographic rates differ among organisms expressing alternative LHPs is needed to better predict how populations will respond to climate change and management actions, which may differentially affect organisms expressing unique LHPs. 
+The longer-term demographic consequences of alternative LHPs, especially alternative pathways exhibited by young animals, are rarely understood because it is difficult to track individuals throughout their life cycles [@Clutton-Brock2010Individuals]. Above a certain age, it may become difficult to distinguish individuals that exhibited different juvenile LHPs, yet those pathways may have lifetime effects on demographic rates and fitness [@Metcalfe2001Compensation]. Information about how demographic rates differ among organisms expressing alternative LHPs is needed to better predict how populations will respond to climate change and management actions, which may differentially affect organisms expressing unique LHPs. 
 
 
-Anadromous salmonids exhibit considerable diversity of LHPs in terms of freshwater habitat use during juvenile life stages, which is associated with increased population stability [@Bourret2016Diversity; @Copeland2014importance; @Greene2010Improved; @Miller2010Quantifying; @Moore2012Trophic; @Phillis2018Endangered; @Schroeder2015Juvenile]. However, the degree to which juvenile LHPs are associated with different demographic rates and responses to environmental variability in subsequent life stages, such as migration survival, maturation age, and lifetime reproductive success, is not well understood [@Bourret2016Diversity; @braun2016population]. This information has the potential to provide a more mechanistic understanding of the contribution of juvenile life history diversity to population stability. Given increasing environmental variability and human impacts on habitat, this information may be critical as it will enable better prediction of population responses to management actions and environmental change that can be used to inform management decisions.  
+Anadromous salmonids exhibit considerable diversity of LHPs in terms of freshwater habitat use during juvenile life stages, which is associated with increased population stability [@Bourret2016Diversity; @Copeland2014importance; @Greene2010Improved; @Miller2010Quantifying; @Moore2012Trophic; @Phillis2018Endangered; @Schroeder2015Juvenile]. However, the degree to which average demographic rates and demographic responses to environmental variability differ among juvenile LHPs is not well understood [@Bourret2016Diversity; @braun2016population]. Understanding how demographic rates differ among LHPs could provide a more mechanistic understanding of the contribution of juvenile life history diversity to population stability. Given increasing environmental variability and human impacts on habitat, understanding demographic differences among LHPs could benefit species conservation efforts by improving prediction of population responses to management actions and environmental change.  
 
-To understand how lifetime demographic outcomes differ among animals with different juvenile LHPs, we analyzed a long-term mark-recapture data set for >150,000 Chinook salmon (*Oncorhynchus tshawytscha*) over 15 years. Detections of fish at multiple dams allowed for estimation of migration survival, maturation age, and return rates from the ocean. Because fish were marked as young animals, when their juvenile LHPs were known, we could link their early LHPs to later survival and its relationship with environmental covariates.  
+To understand how lifetime demographic outcomes differ among animals with different juvenile LHPs, we analyzed a long-term mark-recapture data set for >150,000 Chinook salmon (*Oncorhynchus tshawytscha*) who’s juvenile LHPs were known. Fish were marked as juveniles when emigrating from their natal stream, the timing of which defined their juvenile LHP. They were subsequently detected when passing dams during their downstream and upstream migrations, allowing for estimation of survival, return rates from the ocean, and maturation age proportions of returning fish that had expressed alternative juvenile LHPs.    
 
 
 ## Methods {-}
@@ -44,37 +44,37 @@ To understand how lifetime demographic outcomes differ among animals with differ
 ```{r map_cap, echo=FALSE}
 library(captioner)
 fig_nums <- captioner()
-fig_nums("map", "Maps of (a) the Wenatchee River Basin, showing spawning tributaries and (b) the Columbia River migration corridor, including dams. The numbers at dams represent the capture occasion corresponding with fish passing each location.",display=FALSE)
+fig_nums("map", "Maps of the Wenatchee River Basin (a) and the Columbia River migration corridor (b). The numbers on dams and traps represent the capture occasions corresponding with fish passing each location.",display=FALSE)
 
 ```
 
 
 ```{r timing_caption, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, include=FALSE}
 
-fig_nums("timing", "Day of year of detections of juvenile Chinook salmon at three sites (columns) by juvenile life history pathways (rows). Fish from multiple years and natal streams are represented. Vertical lines indicate median detection days. Summer (*Sum.0*) and fall (*Fal.0*) sub-yearling emigrants (downstream rearing fish) had very similar detection timing to each other. Downstream rearing fish were detected approximately 20 days earlier than yearling (*Spr.1*) emigrants (natal-reach rearing fish) in the Lower Wenatchee and approximately 10 days earlier at McNary and Bonneville Dams.")
+fig_nums("timing", "Day of year of detections at three sites (columns) by juvenile life history pathways (rows). Fish from all study years and natal streams are represented. Vertical lines indicate median detection days. Summer (*Sum.0*) and fall (*Fal.0*) sub-yearling emigrants (downstream rearing fish) had very similar detection timing to each other. Downstream rearing fish were detected approximately 20 days earlier than yearling (*Spr.1*) emigrants (natal-reach rearing fish) in the Lower Wenatchee River trap and approximately 10 days earlier at McNary and Bonneville Dams.")
 ```
 
 
 ```{r table_caption, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, include=FALSE}
 tab_nums <- captioner(prefix = "Table")
 
-tab_nums("variables", "Variables included in models of: survival probabilities ($\\phi$) following each capture occasion, conditional probabilities of age at return from the ocean given survival($\\psi$), and  detection probabilities $p$ on each occasion. *LHP* = juvenile life history pathway, *DS* = downstream rearing (only summer and fall sub-yearling LHPs), *NR.DS* = juvenile life history pathways where summer and fall sub-yearlings are grouped (natal-reach vs downstream rearing), *Ad.age* = adult age, *Stream* = natal stream, *SST.Arc.Win* = sea surface temperature in a broad area in the northeast Pacific ocean defined  by Johnstone and Mantua (2014) in winter, *SST.WA.Sum* = sea surface temperature off the coast of Washington State in summer, *CUI.Spr* = coastal upwelling index in spring, and *Redds* = observed count of redds within a fish's natal stream corresponding with its brood year. Detection probability at Tumwater Dam for adults was assumed to be 1.0.  $\\dagger$ indicates variables for which their effect was not penalized, whereas all other effects were penalized.")
+tab_nums("variables", "Variables included in models of: survival probabilities ($\\phi$) following each capture occasion, conditional probabilities of age at return from the ocean given survival($\\psi$), and  detection probabilities ($p$) on each occasion. *LHP* = juvenile life history pathway, *DS* = downstream rearing (only summer and fall sub-yearling LHPs), *NR.DS* = juvenile life history pathways where summer and fall sub-yearlings are grouped (natal-reach vs downstream rearing), *Ad.age* = adult age, *Stream* = natal stream, *SST.Arc.Win* = sea surface temperature in a broad area in the northeast Pacific ocean defined  by Johnstone and Mantua (2014) in winter, *SST.WA.Sum* = sea surface temperature off the coast of Washington State in summer, *CUI.Spr* = coastal upwelling off of the coast of Washington State in spring, and *Redds* = observed count of redds within a natal stream corresponding with each brood year. Detection probability at Tumwater Dam for adults was assumed to be 1.0.  $\\dagger$ indicates variables for which their effects were not penalized, whereas all other effects were penalized.")
 
 tab_nums("RE", "Random year effects included in models of: $\\phi$ - survival probabilities following each capture occasion, $\\psi$ - probabilities of fish returning from the ocean at different ages , and $p$ - detection probabilities on each occasion. *LH* = juvenile life history strategy, and *NR.DS* = juvenile life history pathways where summer and fall sub-yearlings are grouped (natal-reach vs downstream rearing). Detection probability at Tumwater Dam for adults was assumed to be 1.0.  ")
 ```
 
 ```{r surv_caps, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, include=FALSE}
 
-fig_nums("time_1_surv", "Annual survival estimates from release at screw traps operated near the mouths of three natal streams - Chiwawa River, Nason Creek, and White River - to the mouth of the Wenatchee River for fish expressing three different juvenile life history Pathways. The three juvenile life history pathways are fish that emigrated from their natal stream as sub-yearlings in summer (*Sum.0*) or fall (*Fal.0*), or as yearlings in spring (*Spr.1*). Points represent mean estimates and lines span 95% confidence intervals.")
+fig_nums("time_1_surv", "Annual survival estimates between release near the mouths of three natal streams - Chiwawa River, Nason Creek, and White River - and passing the mouth of the Wenatchee River en route to the ocean for fish expressing three different juvenile life history Pathways. The three juvenile life history pathways are fish that emigrated from their natal stream as sub-yearlings in summer (*Sum.0*) or fall (*Fal.0*), or as yearlings in spring (*Spr.1*). Points represent mean estimates and lines span 95% confidence intervals.")
 
-fig_nums("Env_cov", "Effects of environmental covariates on survival by occasion (column) and juvenile life history pathways (color). The three juvenile life history pathways are fish that emigrated from their natal stream as sub-yearlings in summer (*Sum.0*) or fall(*Fal.0*), or as yearlings in spring (*Spr.1*). *DSR* represents both downstream rearing life histories (summer and fall).  *CUI.spr* = coastal upwelling index during spring, *SST.sum* = sea surface temperature off the Washington coast during summer, and *SST.win* = sea surface temperature in an arc of the northeast Pacific Ocean defined by Johnstone and Mantua (2014) during the winter prior to when juveniles enter the marine environment. Points represent mean estimates and lines span 95% confidence intervals.")
+fig_nums("Env_cov", "Effects of environmental covariates on survival by occasion (column) and juvenile life history pathway (color). The three juvenile life history pathways are fish that emigrated from their natal stream as sub-yearlings in summer (*Sum.0*) or fall(*Fal.0*), or as yearlings in spring (*Spr.1*). *DSR* represents both downstream rearing life histories (summer and fall sub-yearlings).  *CUI.spr* = coastal upwelling index during spring, *SST.sum* = sea surface temperature off the Washington coast during summer, and *SST.win* = sea surface temperature in an arc of the northeast Pacific Ocean defined by Johnstone and Mantua (2014) during the winter prior to when juveniles enter the marine environment. Points represent mean estimates and lines span 95% confidence intervals.")
 
 fig_nums("Redd_cov", "Coefficients ($\\beta$) for the effects of redd density within natal streams on survival by occasion (column), juvenile life history strategy (color), and natal stream (x-axis). The three juvenile life history pathways are fish that emigrated from their natal stream as sub-yearlings in summer (*Sum.0*) or fall (*Fal.0*), or as yearlings in spring (*Spr.1*). *DSR* represents both downstream rearing life histories (summer and fall). Points represent mean estimates and lines span 95% confidence intervals.")
 
 
-fig_nums("time_2_3_surv", "Annual survival estimates betweein the mouth of the Wenatchee River and McNary Dam (top row) and between McNary Dam and Bonneville Dam (bottom row) by natal stream and juvenile life history pathway: *DSR* = downstream-rearing life histories (summer and fall sub-yearling emigrants) and *Spr.1* = natal-reach rearing life history (spring yearling emigrants). Points represent mean estimates and lines span 95% confidence intervals.")
+fig_nums("time_2_3_surv", "Annual survival estimates between the mouth of the Wenatchee River and McNary Dam (top row) and between McNary Dam and Bonneville Dam (bottom row) by natal stream (color) and juvenile life history pathway (column): *DSR* = downstream-rearing life histories (summer and fall sub-yearling emigrants) and *Spr.1* = natal-reach rearing life history (spring yearling emigrants). Points represent mean estimates and lines span 95% confidence intervals.")
 
-fig_nums("time_4_surv", "Annual adult return rates between passing downstream of Bonneville Dam as a juvenile and returning from the ocean to Bonneville Dam as an adult 1, 2 or 3 years later. Estimates are by natal stream and juvenile life history pathway: *DSR* = downstream-rearing life histories (summer and fall sub-yearling emigrants) and *Spr.1* = natal-reach rearing life history (spring yearling emigrants). Points represent mean estimates and lines span 95% confidence intervals.")
+fig_nums("time_4_surv", "Annual adult return rates between passing downstream of Bonneville Dam as a juvenile and returning from the ocean to Bonneville Dam as an adult between one and three years later. Estimates are by natal stream and juvenile life history pathway: *DSR* = downstream-rearing life histories (summer and fall sub-yearling emigrants) and *Spr.1* = natal-reach rearing life history (spring yearling emigrants). Points represent mean estimates and lines span 95% confidence intervals.")
 
 fig_nums("adult_props", "Maximum likelihood estimates of age proportions of returning adult salmon from the ocean by juvenile life history pathway: *DSR* = downstream-rearing life histories (summer and fall sub-yearling emigrants) and *Spr.1* = natal-reach rearing life history (spring yearling emigrants).")
 
@@ -87,19 +87,19 @@ fig_nums("adult_props", "Maximum likelihood estimates of age proportions of retu
 
 sup_tab_nums <- captioner(prefix = "Table S.")
 
-sup_tab_nums("phi_mean", "Mean and standard deviation of maximum likelihood point estimates of survival across years by occasion, juvenile life history, natal stream, and fish age. The three juvenile life history pathways are fish that emigrated from their natal stream as sub-yearlings in summer (*Sum.0*) or fall(*Fal.0*), or as yearlings in spring (*Spr.1*). *DSR* represents both downstream rearing life histories (summer and fall) when they were assumed to be the same. *LHP* = life history pathway, *Lcl* = lower 95% confidence limit and *ucl* = upper 95% confidence limit." )
+sup_tab_nums("phi_mean", "Estimates of survival across years by occasion, juvenile life history, natal stream, and fish age. The three juvenile life history pathways are fish that emigrated from their natal stream as sub-yearlings in summer (*Sum.0*) or fall(*Fal.0*), or as yearlings in spring (*Spr.1*). *DSR* represents both downstream rearing life histories (summer and fall sub-yearlings) on occasions when they were assumed to be the same. *LHP* = life history pathway, *Lcl* = lower 95% confidence limit and *ucl* = upper 95% confidence limit." )
 
-sup_tab_nums("p_mean", "Mean and standard deviation of maximum likelihood point estimates of detection probability across years by occasion, juvenile life history, natal stream, and life history pathway. The three juvenile life history pathways are fish that emigrated from their natal stream as sub-yearlings in summer (*Sum.0*) or fall (*Fal.0*), or as yearlings in spring (*Spr.1*). *DSR* represents both downstream rearing life histories (summer and fall). *LHP* = life history pathway, *Lcl* = lower 95% confidence limit and *ucl* = upper 95% confidence limit." )
+sup_tab_nums("p_mean", "Estimates of detection probabilities across years by occasion, juvenile life history, natal stream, and life history pathway. The three juvenile life history pathways are fish that emigrated from their natal stream as sub-yearlings in summer (*Sum.0*) or fall (*Fal.0*), or as yearlings in spring (*Spr.1*). *DSR* represents both downstream rearing life histories (summer and fall). *LHP* = life history pathway, *Lcl* = lower 95% confidence limit and *ucl* = upper 95% confidence limit." )
 
-sup_tab_nums("psi_mean", "Mean and standard deviation of maximum likelihood point estimates of proportions of fish returning at ages three through five across years by occasion, juvenile life history, natal stream, and fish age. *DSR* = downstream-rearing life histories (summer and fall sub-yearling emigrants) and *Spr.1* = natal-reach rearing life history. *LHP* = life history pathway, *Lcl* = lower 95% confidence limit and *ucl* = upper 95% confidence limit.")
+sup_tab_nums("psi_mean", "Estimates of proportions of fish returning at ages three through five across years by occasion, juvenile life history, natal stream, and fish age. *DSR* = downstream-rearing life histories (summer and fall sub-yearling emigrants) and *Spr.1* = natal-reach rearing life history. *LHP* = life history pathway, *Lcl* = lower 95% confidence limit and *ucl* = upper 95% confidence limit.")
 
 sup_tab_nums("rand_year_SD_phi", "Standard deviations of Gaussian hyper-distributions of random year effects on survival by occasion and juvenile life history pathway (LHP).  The three juvenile life history pathways are fish that emigrated from their natal stream as sub-yearlings in summer (*Sum.0*) or fall (*Fal.0*), or as yearlings in spring (*Spr.1*). *DSR* represents both downstream rearing life histories (summer and fall). *LHP* = life history pathway, *Lcl* = lower 95% confidence limit and *ucl* = upper 95% confidence limit." )
 
-sup_tab_nums("rand_year_SD_p", "Standard deviations of Gaussian hyper-distributions of random year effects on detection probability by occasion and juvenile life history strategy (LH). *SE(SD)* is the standard error of the estimated standard deviation. The three juvenile life history pathways are fish that emigrated from their natal stream as sub-yearlings in summer (*Sum.0*) or fall (*Fal.0*), or as yearlings in spring (*Spr.1*).  *DSR* represents both downstream rearing life histories (summer and fall). *LHP* = life history pathway, *Lcl* = lower 95% confidence limit and *ucl* = upper 95% confidence limit." )
+sup_tab_nums("rand_year_SD_p", "Standard deviations of Gaussian hyper-distributions of random year effects on detection probabilities by occasion and juvenile life history strategy (LH). The three juvenile life history pathways are fish that emigrated from their natal stream as sub-yearlings in summer (*Sum.0*) or fall (*Fal.0*), or as yearlings in spring (*Spr.1*).  *DSR* represents both downstream rearing life histories (summer and fall). *LHP* = life history pathway, *Lcl* = lower 95% confidence limit and *ucl* = upper 95% confidence limit." )
 
 sup_tab_nums("rand_year_SD_psi", "Marginal Standard deviations and correlation of the multivariate Gaussian hyper-distribution of random year effects on age proportions of returning adults. The proportions were modeled with a multinomial logit link, where age 4 was the reference age. *Lcl* = lower 95% confidence limit and *ucl* = upper 95% confidence limit." )
 
-sup_tab_nums("looic_tab", "Leave-one-out information criterion values for models fitted with different strengths of penalties on coefficients and random year effects, where larger values indicate stronger penalties. The first column represents the strength of the penalty on coefficients and the first row the strength of penalties on random year effects." )
+sup_tab_nums("looic_tab", "Leave-one-out information criterion values (-115,000 for readability) for models fitted with different strengths of penalties on coefficients (rows) and random year effects (columns), where larger values indicate stronger penalties. The rows represents different strength of  penalties on coefficients and columns represent different strengths of penalties on random year effects. The lowest value is bolded. The column for the strongest penalty on random year effects is ommited because it had very large values that make the color scale less readable." )
 
 sup_tab_nums("data_tab", "Number of fish released and detected at subsequent occasions by brood year, juvenile life history, and natal stream. The three juvenile life history pathways are fish that emigrated from their natal stream as sub-yearlings in summer (*Sum.0*) or fall(*Fal.0*), or as yearlings in spring (*Spr.1*).")
 
@@ -113,48 +113,50 @@ sup_tab_nums("model_params", "Mean paramater estimates, standard errors, and p-v
 
 sup_fig_nums <- captioner(prefix = "Figure S.")
 
-sup_fig_nums("time_5_6_surv", "Annual survival estimates for upstream migrating adult Chinook salmon between Bonneville Dam and McNary Dam (top row) and McNary Dam and Tumwater Dam (bottom row), where color represents the number of years spent at sea. Points represent mean estimates and lines span 95% confidence intervals.")
+sup_fig_nums("time_5_6_surv", "Annual survival estimates for upstream migrating adult Chinook salmon between Bonneville Dam and McNary Dam (top row) and McNary Dam and Tumwater Dam (bottom row), where color represents adult age. Points represent mean estimates and lines span 95% confidence intervals.")
 
 sup_fig_nums("time_2_det", "Annual recapture probability estimates for downstream-migrating juvenile Chinook salmon at the lower Wenatchee River screw trap by natal stream (colors) and juvenile life history strategy (columns). The three juvenile life history pathways are fish that emigrated from their natal stream as sub-yearlings in summer (*Sum.0*) or fall (*Fal.0*), or as yearlings in spring (*Spr.1*). Points represent mean estimates and lines span 95% confidence intervals.")
 
 
-sup_fig_nums("time_3_4_det", "Annual detection probability estimates for downstream-migrating juvenile Chinook salmon at McNary Dam (top row) and  Bonneville Dam (bottom row) by natal stream (colors) and juvenile life history pathway: *DSR* = downstream-rearing life histories (summer and fall sub-yearling emigrants) and *age-1* = natal-reach rearing life history (spring yearling emigrants). Points represent mean estimates and lines span 95% confidence intervals.")
+sup_fig_nums("time_3_4_det", "Annual detection probability estimates for downstream-migrating juvenile Chinook salmon at McNary Dam (top row) and  Bonneville Dam (bottom row) by natal stream (colors) and juvenile life history pathway: *DSR* = downstream-rearing life histories (summer and fall sub-yearling emigrants) and *Spr.1* = natal-reach rearing life history (spring yearling emigrants). Points represent mean estimates and lines span 95% confidence intervals.")
 
-sup_fig_nums("time_5_6_det", "Annual detection probability estimates for upstream-migrating adult Chinook Salmon at Bonneville Dam (top row) and  McNary Dam (bottom row), where color represents the number of years spent at sea. Points represent mean estimates and lines span 95% confidence intervals.")
+sup_fig_nums("time_5_6_det", "Annual detection probability estimates for upstream-migrating adult Chinook Salmon at Bonneville Dam (top row) and  McNary Dam (bottom row), where color represents adult age. Points represent mean estimates and lines span 95% confidence intervals.")
 
-sup_fig_nums("GOF_cond", "DHARMa residual diagnostics with simulated quantile residuals conditional on the fitted random effects. The left panel shows a Q-Q plot and the right show a plot of residuals versus rank-transformed model predictions. Red asterisks indicate outliers and the thick lines show a quantile regression fit to the residuls, which should follow the dashed horizontal lines if the residuals are uniformly distributed along the y-axis as expected.")
+sup_fig_nums("GOF_cond", "DHARMa residual diagnostics with simulated quantile residuals conditional on the fitted random effects. The left panel shows a Q-Q plot and the right show a plot of residuals versus rank-transformed model predictions. Red asterisks indicate outliers and the thick lines show a quantile regression fit to the residuals, which should follow the dashed horizontal lines if the residuals are uniformly distributed along the y-axis as expected.")
 
-sup_fig_nums("GOF_cond_disp", "DHARMa nonparametric dispersion test with simulated quanitle residuals conditional on the fitted random effect values. The plot indicates underdispersion of residuals relative to the expectation.")
+# sup_fig_nums("GOF_cond_disp", "DHARMa nonparametric dispersion test with simulated quanitle residuals conditional on the fitted random effect values. The plot indicates underdispersion of residuals relative to the expectation.")
 
-sup_fig_nums("GOF_cond_boot", "DHARMa bootstraped outlier test of whether the number of observations outside the simulation envelop is greter or less than expected for the conditional simulated quanitle residuals. The observed number of outliers is within the confidence interval, suggesting that there are not more or fewer outliers than expected.")
+# sup_fig_nums("GOF_cond_boot", "DHARMa bootstraped outlier test of whether the number of observations outside the simulation envelop is greter or less than expected for the conditional simulated quanitle residuals. The observed number of outliers is within the confidence interval, suggesting that there are not more or fewer outliers than expected.")
 
 
-sup_fig_nums("GOF_uncond", "DHARMa residual diagnostics for standardized quantile residuals *un*conditional on the fitted random effects. The left panel shows a Q-Q plot and the right show a plot of residuals versus rank-transformed model predictions. Red asterisks indicate outliers and the thick lines show a quantile regression fit to the residuls, which should follow the dashed horizontal lines  if the residuals are uniformly distributed along the y-axis as expected.")
+sup_fig_nums("GOF_uncond", "DHARMa residual diagnostics for standardized quantile residuals marginalized over random year effects. The left panel shows a Q-Q plot and the right show a plot of residuals versus rank-transformed model predictions. Red asterisks indicate outliers and the thick lines show a quantile regression fit to the residuals, which should follow the dashed horizontal lines  if the residuals are uniformly distributed along the y-axis as expected.")
 
-sup_fig_nums("GOF_uncond_disp", "DHARMa nonparametric dispersion test with simulated quantile residuals *un*conditional on the fitted random effect values.")
-
-sup_fig_nums("GOF_uncond_boot", "DHARMa bootstraped outlier test of whether the number of observations outside the simulation envelop is greter or less than expected for the *un*conditional simulated quanitle residuals. The observed number of outliers is within the confidence interval, suggesting that there are not more or fewer outliers than expected.")
+# sup_fig_nums("GOF_uncond_disp", "DHARMa nonparametric dispersion test with simulated quantile residuals *un*conditional on the fitted random effect values.")
+# 
+# sup_fig_nums("GOF_uncond_boot", "DHARMa bootstraped outlier test of whether the number of observations outside the simulation envelop is greter or less than expected for the *un*conditional simulated quanitle residuals. The observed number of outliers is within the confidence interval, suggesting that there are not more or fewer outliers than expected.")
 
 
 
 
 ```
 
-The Wenatchee River Basin is located in central Washington State, USA (`r fig_nums("map",display="cite")`). It supports a population of spring Chinook salmon, which spawn in tributaries of the mainstem of the Wenatchee River and in the upper-most reach of the mainstem. As is common among Chinook salmon, juveniles exhibit a two-stage emigration from natal streams [@Copeland2009Contribution; @Bourret2016Diversity; @Schroeder2015Juvenile]; stage-one emigration is to downstream freshwater rearing areas and occurs within the first or second year of life, while stage-two emigration is to the ocean and occurs in the second spring of life [@Buchanan2015Estimating]. One LHP is characterized by fish remaining in the natal stream until their second spring of life and initiating stage-two emigration directly after stage one (*natal-reach rearing*). Other LHPs are characterized by fish carrying out stage-one emigration from natal streams in spring, summer, or fall of their first year of life, and rearing and overwintering in downstream reaches prior to initiating stage-two emigration the following spring (*downstream rearing*). Adults return from the ocean in spring at age three, four, or five, hold within the Wenatchee River Basin over summer, and spawn in late summer.
+The Wenatchee River Basin lies in central Washington State, USA (`r fig_nums("map",display="cite")`b). It supports a population of spring Chinook salmon, which spawn in tributaries of the mainstem of the Wenatchee River and in the upper-most reach of the mainstem. As is common among Chinook salmon, juveniles exhibit a two-stage emigration from natal streams [@Copeland2009Contribution; @Bourret2016Diversity; @Schroeder2015Juvenile]; stage-one emigration is to downstream freshwater rearing areas and occurs within the first or second year of life, while stage-two emigration is to the ocean and occurs in the second spring of life [@Buchanan2015Estimating; @favrot2020fall]. One LHP is characterized by fish remaining in the natal stream until their second spring of life and initiating stage-two emigration directly after stage one (*natal-reach rearing*). Other LHPs are characterized by fish carrying out stage-one emigration from natal streams in spring, summer, or fall of their first year of life, and rearing and overwintering in downstream reaches prior to initiating stage-two emigration the following spring (*downstream rearing*). Adults return from the ocean in spring at age three, four, or five, reside within the Wenatchee River Basin over summer, and spawn in late summer.
 
 
 
 ### Data {-}
 
-From 2006 through 2017, juvenile spring Chinook salmon were sampled with rotary screw traps upon emigration from three natal streams (stage-one emigration) – the Chiwawa River, Nason Creek, and the White River (`r fig_nums("map",display="cite")`). The traps were installed in early spring and operated continuously through late fall. Captured juveniles > 60 mm were implanted with passive integrated transponder (PIT) tags within their peritoneal cavity using a syringe. Individuals <60 mm, which included most sub-yearling emigrants in spring and early summer, cannot be tagged without imposing an undue burden that would affect their survival. PIT tags transmit a unique radio-frequency identification (RFID) code when triggered by an electromagnetic interrogation pulse from an RFID reader device.  
+From 2006 through 2017, juvenile spring Chinook salmon were sampled with rotary screw traps upon emigration from three natal streams (stage-one emigration) – the Chiwawa River, Nason Creek, and the White River (`r fig_nums("map",display="cite")`a). The traps were installed in early spring and operated continuously through late fall. Captured juveniles > 60 mm were implanted with passive integrated transponder (PIT) tags within their peritoneal cavity using a syringe. Individuals <60 mm, which included most sub-yearling emigrants in spring and early summer, could not be tagged without affecting their survival. PIT tags transmitted a unique radio-frequency identification (RFID) code when triggered by an electromagnetic pulse from an RFID reader device such that encounter histories unique to each tagged individual could be constructed.  
 
-Following initial capture, the first opportunity for detection occurred at a rotary screw trap operated near the confluence of the Wenatchee River and the Columbia River (*lower Wenatchee screw trap*)  (`r fig_nums("map",display="cite")`). We assume that downstream-rearing fish remained within the Wenatchee River Basin until their second spring of life, at which point surviving individuals passed the lower Wenatchee screw trap during stage-two emigration. However, it is possible that some fish passed the lower Wenatchee screw trap as sub-yearlings when the trap was not operated, which could have biased survival estimates if these fish had different survival rates than fish that remained within the Wenatchee River Basin.  
+Following initial capture, the first opportunity for detection occurred at a rotary screw trap operated near the confluence of the Wenatchee River and the Columbia River (*lower Wenatchee screw trap*)  (`r fig_nums("map",display="cite")`a). We assumed that downstream-rearing fish remained within the Wenatchee River Basin until their second spring of life, at which point surviving individuals passed the lower Wenatchee screw trap during stage-two emigration. However, it is possible that some fish passed the lower Wenatchee screw trap as sub-yearlings when the trap was not operated, which could introduce bias into survival estimates if these fish had different survival rates than fish that remained within the Wenatchee River Basin.  
 
-Because initial capture (stage-one emigration) occurred at different times of year for fish exhibiting different LHPs, and the second capture occasion (stage-two emigration) occurred at approximately the same time of year for all fish, the length of time between the first and second capture occasions differed among LHPs. Thus, we expected heterogeneity in survival rates among LHPs during the first survival interval. We also expected potential demographic differences among LHPs during subsequent intervals owing to longer-term behavioral and physiological differences. To account for this, we categorized fish in our data set into three juvenile LHPs based on the age of fish at stage-one emigration when they were captured at the first screw trap, which were delineated based on the seasonality in average daily emigrant abundances [see @sorelInprep]. The youngest fish that were large enough to be marked with PIT tags emigrated as sub-yearlings between day of year (DOY) 141 and 262 (hereafter *summer sub-yearlings*). The subsequent group of emigrants (*fall sub-yearlings*) emigrated as sub-yearlings between DOY  263 and when the traps were removed in early winter (DOY 345). The final group of emigrants (*spring yearlings*) emigrated as yearlings in spring, between DOY 53 and 179, and were distinguished from spring or summer sub-yearlings based on a previously developed length-date cutoff rule [@sorelInprep]. We treated fish with different juvenile LHPs as different groups in subsequent modeling.  
+Because initial capture (stage-one emigration) occurred at different times of year for fish exhibiting different LHPs, and the second capture occasion (stage-two emigration) occurred at approximately the same time of year for all fish, the length of time between the first and second capture occasions differed by as much as a year for fish exhibiting different LHPs. Thus, we expected heterogeneity in survival rates among LHPs during the first survival interval. We also expected potential demographic differences among LHPs during subsequent intervals owing to longer-term behavioral (e.g. seaward migration timing) and physiological (e.g. size) differences. To account for this, we categorized fish in our data set into three juvenile LHPs based on the age of fish at stage-one emigration when they were captured at the first screw trap, which were delineated based on the seasonality in average daily emigrant abundances [see @sorelInprep]: (1) summer sub-yearlings; (2) fall sub-yearlings; and (3) spring yearlings. Summer sub-yearlings were the youngest fish that were large enough to be marked with PIT tags. They emigrated as sub-yearlings between day of year (DOY) 141 and 262. Fall sub-yearlings emigrated as sub-yearlings between DOY 263 and when the traps were removed in early winter (DOY 345). Spring yearlings emigrated as yearlings in spring, between DOY 53 and 179, and were distinguished from spring or summer sub-yearlings based on a previously developed length-date cutoff rule (Sorel et al., In Prep).  
 
-The third and fourth capture occasions occurred at juvenile bypass systems at McNary and Bonneville Dams within the seaward migration corridor (`r fig_nums("map",display="cite")`). Only juveniles that passed dams via the juvenile fish bypass systems were detected as there were no RFID readers in the spillways or the turbine penstocks. After passing Bonneville Dam as juveniles, fish entered the marine environment and could not be detected until they returned to Bonneville Dam as adults one to three years later. The fifth and sixth capture occasions occurred as returning adult fish transited fish ladders at Bonneville and McNary Dams, which are the only passage routs upstream through these dams. The seventh and final capture occasion occurred at the fish ladder at Tumwater Dam on the mainstem of the Wenatchee River, which all fish must transit to return to their natal streams. The dates and locations that marked fish were released and subsequently detected in the lower Wenathcee screw trap or at dams were downloaded from the Columbia Basin PIT Tag Information System (www.ptagis.org).  
+The third and fourth capture occasions occurred at juvenile bypass systems at McNary and Bonneville Dams within the seaward migration corridor (`r fig_nums("map",display="cite")`). Only juveniles that passed dams via the juvenile fish bypass systems were detected as there were no RFID readers in the spillways or the turbine penstocks. After passing Bonneville Dam as juveniles, fish entered the marine environment and could not be detected until they returned to Bonneville Dam as adults one to three years later. 
 
-We used data on several environmental variables as covariates in our analysis. Wenatchee River discharge was recorded at USGS gauge 12459000 and obtained using the dataRetrieval package in R version 4.0.4  [@R2021R; @Cicco2018dataRetrieval]. Air temperature was recorded at Wenatchee Pangborn Airport and obtained from the National Weather Service using the NOWData webtool (https://w2.weather.gov/climate/xmacis.php?wfo=otx).  Data on discharge, temperature, and spill percentage at mainstem Columbia River Dams was obtained using the Columbia Basin Research Data Access in Real Time webtool (http://www.cbr.washington.edu/dart/query/river_graph_text). Data on seasonal sea surface temperature and coastal upwelling anomolies were obtained from the github repository (bchasco/SAR_paper) associated with a paper by Chasco et al. [-@Chasco2021Differential] .
+The fifth and sixth capture occasions occurred as returning adult fish transited fish ladders at Bonneville and McNary Dams, which are the only passage routs upstream through these dams. The seventh and final capture occasion occurred at the fish ladder at Tumwater Dam on the mainstem of the Wenatchee River, which all fish must transit to return to their natal streams. The dates and locations that marked fish were released and subsequently detected in the lower Wenatchee screw trap or at dams were downloaded from the Columbia Basin PIT Tag Information System (www.ptagis.org).  
+
+We used data on several environmental variables as covariates in our analysis. Wenatchee River discharge was recorded at USGS gauge 12459000 and obtained using the dataRetrieval package in R version 4.0.4  [@R2021R; @Cicco2018dataRetrieval]. Air temperature was recorded at Wenatchee Pangborn Airport and obtained from the National Weather Service using the NOWData webtool (https://w2.weather.gov/climate/xmacis.php?wfo=otx).  Data on discharge, temperature, and spill percentage at mainstem Columbia River Dams were obtained using the Columbia Basin Research Data Access in Real Time webtool (http://www.cbr.washington.edu/dart/query/river_graph_text). Data on seasonal sea surface temperature and coastal upwelling anomalies were obtained from the github repository (bchasco/SAR_paper) associated with Chasco et al. [-@Chasco2021Differential].
 
 
 ```{r, cache=FALSE, echo=FALSE, warning=FALSE, message=FALSE}
@@ -167,7 +169,8 @@ library(TMBhelper)
 library(glmmTMB)
 library(DHARMa)
 library(viridis)
-# library(RMark)
+
+
 ```
 
 
@@ -185,9 +188,9 @@ site_year_det<-mark_file_CH %>% filter(LH!="Unk") %>%  select(sea_Year_p,LH,stre
 ```  
 
 
-### Model {-}
+### Model description {-}
 
-We used a multi-state mark-recapture model to estimate downstream survival and ocean return rate ($\phi_{t,l,a,y}$) by interval ($t$), juvenile life history ($l$), stream ($a$), and year ($y$); upstream adult survival ($\phi_{t,y,s}$) by occasion, year, and age ($s$); and maturation probabilities ($\psi_{l,y,s}$) by life history, year, and age [@Arnason1973estimation; @Brownie1993Capture-Recapture]. Because fish could not be observed after passing downstream of Bonneville Dam unless they returned to Bonneville Dam one to three years later (occasion five), annual marine survival probabilities were non-identifiable. Instead, we modeled the probability of return, at any age, for all fish entering the ocean on a given year, and conditional on return, the probabilities of fish spending one, two, or three years at sea  (returning at ages three through five) [@Buhle2018Using]. 
+We used a multi-state mark-recapture model to estimate downstream survival and ocean return rate ($\phi_{t,l,s,y}$) by interval ($t$), juvenile life history ($l$), stream ($s$), and year ($y$); upstream adult survival ($\phi_{t,y,a}$) by occasion, year, and age ($a$); and maturation probabilities ($\psi_{l,y,a}$) by life history, year, and age [@Arnason1973estimation; @Brownie1993Capture-Recapture]. Because fish could not be observed after passing downstream of Bonneville Dam unless they returned to Bonneville Dam one to three years later (occasion five), annual marine survival and maturation (i.e. return) probabilities were confounded and non-identifiable. Instead, we modeled the probability of return, at any age, for all fish entering the ocean on a given year, and conditional on return, the probabilities of fish spending one, two, or three years at sea  (returning at ages three through five) [@Buhle2018Using]. 
 
 
 
@@ -196,44 +199,33 @@ We used a multi-state mark-recapture model to estimate downstream survival and o
 Survival and marine-return rates ($\phi$) were modeled  as,  
 
 \begin{equation}
-logit(\phi_{t,l,a,y,s})=\alpha_{t,l} + {\mathbf{x}_{t,l,a,y,s}}' \boldsymbol \beta + \delta_{t,y}+\epsilon_{t,l,y}
+logit(\phi_{t,l,s,y,a})=\alpha_{t,l} + {\mathbf{x}_{t,l,s,y,a}}' \boldsymbol \beta + \delta_{t,y}+\epsilon_{t,l,y}
 (\#eq:logitsurv)  
 \end{equation}
 
-where $\alpha_{t,l}$ is an occasion- and LHP-specific intercept, $\mathbf{x}_{t,l,a,y,s}$ is a vector of covariates and categorical effects, $\boldsymbol \beta$ is a vector of coefficients, $\delta_{t,y}$ is a synchronous random effect of year, and $\epsilon_{t,y,l}$ is a random-year effect specific to a particular LHP. To improve parameter identifiability and model parsimony, we applied penalized-complexity priors on coefficients $\boldsymbol\beta$, and random year-effects $\delta_{t,y}$ and $\epsilon_{t,y,l}$, treating them as Gaussian random effects with an exponential prior on the standard deviations of their hypder-distributions,  
+where $\alpha_{t,l}$ is an occasion- and LHP-specific intercept, $\mathbf{x}_{t,l,s,y,a}$ is a vector of covariates and categorical effects, $\boldsymbol \beta$ is a vector of coefficients, $\delta_{t,y}$ is a synchronous random effect of year, and $\epsilon_{t,y,l}$ is a random year effect specific to a particular LHP.  
+
+To improve parameter identifiability and increase model parsimony, we applied penalized-complexity priors [@Simpson2017Penalising] on coefficients $\boldsymbol\beta$, and random year effects $\delta_{t,y}$ and $\epsilon_{t,y,l}$, treating them as Gaussian random effects with an exponential prior on the standard deviations of their hypder-distributions. Each coefficient ($\beta_n$) was assumed to be drawn from a hyper-distribution defined by a unique standard deviation ($\sigma_{\beta_n}$), $\beta_n\sim N(0,\sigma_{\beta_n})$. The same exponential prior was applied to the hyper-distributions of all coefficients, $\boldsymbol \sigma_{\beta} \sim exp(\lambda_1)$, where the rate parameter ($\lambda_1$) was a tuning parameter that determined the strength of the penalty on coefficient magnitudes. For synchronous random year effects, multiple years were assumed to be drawn from hyper-distributions defined by occasion specific standard deviations ($\sigma_{\delta_t}$), $\delta_{t,y}\sim N(0,\sigma_{\delta_t})$. Hyper-distributions for asynchronous random year effects were defined by occasion x LHP specific standard deviations ($\sigma_{\epsilon_{t,l}}$),$\epsilon_{t,y,l} \sim N(0,\sigma_{\epsilon_{t,l}})$. Exponential priors were applied to the standard deviations of all hyper-distributions for random year effects using a common rate parameter ($\lambda_2$).  
+
+To select values of the tuning parameters $\lambda_1$ and $\lambda_2$, we conducted a grid search where we fit the model with several different values of each and evaluated models based on the leave-one-out information criterion (*looic*) calculated with the looic package (Vehtari et al. 2020) in R. We fit the model with candidate values of $\lambda_1$ and $\lambda_2$ = `r paste0(round(-log(0.01)/(6:2/10),2),collapse = ", ")`, and `r round(-log(0.01)/.1,2)`, testing all 25 combinations of candidate values for $\lambda_1$ and $\lambda_2$. The candidate values corresponded with a 1% probability of a given standard deviation being greater than 0.6, 0.5, 0.4, 0.3, 0.2, or 0.1, respectively. To calculate *looic*, we sampled parameter sets from a multivariate normal distribution defined by the maximum likelihood estimates of parameters and the inverse Hessian matrix and calculated the log-likelihood of each capture history conditional on each parameter set, which were input into to the looic function.
 
 
+During the first survival interval (defined here and throughout by the occasion at the beginning of the interval), we fit intercepts for each of the three juvenile LHPs and unpenalized effects of natal stream (`r tab_nums("variables",display="cite")`). Unique intercepts were fit for LHPs during the first occasion rather than penalizing effects of LHPs relative to a mean because of the different duration that the first interval represented for each LHP. Natal stream effects were not penalized during the first interval because fish from the White River must pass through Lake Wenatchee during the first interval, which could affect survival considerably. We fit effects of the interactions between natal streams and LHPs, which were penalized with the prior defined above. In the design matrix, natal streams and LHPs were coded such that coefficients represented departures from group means (i.e. sum coding), rather than using one stream and LHP as a reference level (i.e. treatment coding), so that we were penalized all stream and LHP deviations from from the average survival.  
 
-\begin{equation}
-\begin{split}
-\boldsymbol \beta &\sim N(\mathbf 0,\boldsymbol \Sigma_{\beta})\\
-\boldsymbol \Sigma_{\beta} &= diag(\boldsymbol \sigma^2_{\beta})\\
-\boldsymbol \sigma_{\beta}&\sim exp(\lambda_1)\\
-\delta_{t,y} &\sim N(0,\sigma_{\delta_t})\\
-\epsilon_{t,y,l} &\sim N(0,\sigma_{\epsilon_{t,l}})\\
-\sigma_{\delta_t},~\sigma_{\epsilon_{t,l}} &\sim exp(\lambda_2)\\
-\end{split}
-(\#eq:survpriors)  
-\end{equation}
+During the second and third survival intervals, representing downstream-emigration survival in the mainstem of the Columbia River, we assumed that fish that emigrated from their natal stream as sub-yearlings in summer and fall (downstream rearing) had the same survival rates as one another, due to their similar detection timing on occasions two through four (`r fig_nums("timing",display="cite")`, `r tab_nums("variables",display="cite")`). This assumption was made to increase statistical power considering the relatively small sample sizes of summer sub-yearling emigrants (`r sup_tab_nums("data_tab",display = "cite")`). We fit intercepts for natal-reach and downstream rearing LHPs rather than a penalized effect because we were especially interested in identifying differences in  survival rates between LHPs and because they had different detection timing on occasions two through four. We modeled penalized effects of natal streams and their interactions with natal-reach and downstream rearing LHPs. Idiosyncratic random year effects were included for natal-reach and downstream rearing LHPs in addition to synchronous random year effects.  
 
-where $\boldsymbol\lambda$ determines the strength of the penalties [@Simpson2017Penalising]. To select values of $\boldsymbol\lambda$ we conducted a grid search where we fit the model with several different values and evaluated models based on the leave-one-out information criterion (*looic*) calculated with the looic package (Vehtari et al. 2020) in R. We fit the model with candidate values of $\boldsymbol\lambda$ = `r paste0(round(-log(0.01)/(5:2/10),2),collapse = ", ")`, or `r round(-log(0.01)/.1,2)`, testing all 25 combinations of the two $\lambda$ values, where $\lambda_1$ was used for coefficients and $\lambda_2$ for random year effects. These values of $\lambda$ corresponded with a 1% probability of a standard deviation being greater than 0.5, 0.4, 0.3, 0.2, or 0.1, respectively. For the *looic* calculations, we sampled parameter sets from a multivariate normal distribution defined by the maximum likelihood estimates of parameters and the inverted Hessian and calculated the log-likelihood of each capture history for each parameter set for input into to the *looic* function.
+We modeled adult return probabilities from the ocean at any adult age (interval four) very similarly to how we modeled survival in intervals two and three. As above, we modeled intercepts for natal-reach and downstream rearing LHPs rather than separating summer and fall sub-yearling LHPs. We included penalized effects of natal streams and their interactions with natal-reach vs downstream rearing LHPs. We included random year effects that were common among all fish and those that were unique to natal-reach or downstream rearing LHPs.  
 
-During the first survival interval, we fit intercepts for each of the three juvenile LHPs and unpenalized effects of natal stream (`r tab_nums("variables",display="cite")`). Unique intercepts were fit for LHPs during the first occasion rather than penalizing effects of LHPs relative to a mean because of the different duration that the first interval represented for each LHP. Natal stream effects were not penalized during the first interval because fish from the White River must pass through Lake Wenatchee to reach the lower Wenatchee River screw trap (occasion two), which could affect survival considerably. We fit effects of the interaction between natal streams and LHPs, which were penalized with the prior defined in Equation \@ref(eq:survpriors) for identifiability and parsimony. Natal stream and LHP were coded with a sum constraint in the design matrix so that effects represented departures from group means.   
-
-During the second and third survival intervals, representing downstream-emigration survival in the mainstem of the Columbia River, we assumed that fish that emigrated from their natal stream as sub-yearlings in summer and fall (downstream rearing) had the same survival rate as one another, due to their similar detection timing on occasions two through four (`r fig_nums("timing",display="cite")`,`r tab_nums("variables",display="cite")`). This assumption was made to increase statistical power considering the smaller sample sizes of summer sub-yearling emigrants. We fit intercepts for natal-reach and downstream rearing LHPs rather than a penalized effect relative to a mean because we were especially interested in identifying differences in  survival rates between LHPs. We modeled penalized effects of natal streams and their interactions with natal-reach and downstream rearing LHPs. Idiosyncratic random year effects were included for natal-reach and downstream rearing LHPs in addition to synchronous random year effects.  
-
-We modeled adult return probabilities from the ocean at any adult age (interval four) very similarly to how we modeled survival in intervals two and three. We again modeled intercepts for natal-reach and downstream rearing LHPs rather than separating summer and fall sub-yearling LHPs. We included penalized effects of natal streams and their interactions with natal-reach vs downstream rearing LHPs, and random year effects that were common among all fish and those that were unique to natal-reach or downstream rearing LHPs.  
-
-In survival intervals five and six, representing adult upstream migration, we did not model effects of juvenile LHPs nor natal streams on survival, assuming that carryover effects from the juvenile life stage would be diminished by adulthood and due to the smaller sample sizes of returning adults. Instead, we modeled effects of adult return age on survival, as might result from size selective harvest or age-specific migration timing differences (`r tab_nums("variables",display="cite")`). No asynchronous year effects were modeled for upstream adult survival, assuming common year effects for all adults returning each year, due to the lower power accompanying the smaller sample size.
+In survival intervals five and six, representing adult upstream migration, we did not model effects of juvenile LHPs nor natal streams on survival, assuming that carryover effects from the juvenile life stage would be diminished by adulthood and due to the smaller numbers of detections of returning adults. Instead, we modeled effects of adult return age on survival, as might result from size-selective harvest or age-specific migration timing differences (`r tab_nums("variables",display="cite")`). No asynchronous year effects were included for upstream adult survival, assuming common year effects for all adults returning each year, due to the lower statistical power accompanying the smaller number of adult detections.
 
 
 
 ##### Environmental effects on survival {-}
 
-We included effects of several environmental covariates on survival and marine-return rates  (`r tab_nums("variables",display="cite")`). During the first interval, we included effects of average annual winter (November--February) air temperature and Wenatchee River discharge on survival of downstream-rearing LHPs, allowing for different effects on summer and fall sub-yearling LHPs but assuming common effects across natal streams. We included effects of average water temperature and discharge at Rock Island Dam in April--May on survival during the second survival interval and at McNary Dam in May--June on survival during the third interval. Similarly, we modeled the effect of average daily spill percentage across Rock Island, Wanapum, and Priest Rapids Dams in May--June on survival during the second interval, and across McNary, John Day, and The Dalles Dams on survival in interval three. Based on the findings of Crozier et al. [-@Crozier2021Climate], we evaluated the effects of the following three covariates on return rates from the ocean (interval 4): sea surface temperature in an arc of the northeast Pacific Ocean defined by Johnstone and Mantua [-@Johnstone2014Atmospheric] during the winter prior to when fish enter the marine environment, spring coastal upwelling anomalies off the Washington State coast, and sea surface temperature off the coast of Washington State during the summer. Effects of all environmental covariates on survival during intervals two through four were allowed to vary between natal-reach and downstream rearing LHPs but effects were assumed to be common across natal streams. All environmental covariate values were standardized to have an across-year mean of 0.0 and standard deviation of 1.0.
+We allowed for penalized effects of several environmental covariates on survival and marine-return rates  (`r tab_nums("variables",display="cite")`). During the first interval, we included effects of average annual winter (November--February) air temperature and Wenatchee River discharge on survival of downstream-rearing LHPs, allowing for different effects on summer and fall sub-yearling LHPs but assuming common effects across natal streams. We included effects of average water temperature and discharge at Rock Island Dam in April--May on survival during the second survival interval and at McNary Dam in May--June on survival during the third interval. Similarly, we modeled the effect of average daily spill percentage across Rock Island, Wanapum, and Priest Rapids Dams in May--June on survival during the second interval, and across McNary, John Day, and The Dalles Dams on survival in interval three. Based on relationships between Chinook salmon return rates from the ocean and environmental covariates reported by Crozier et al. [-@Crozier2021Climate], we evaluated the effects of the following three covariates on return rates (interval 4): sea surface temperature in an arc of the northeast Pacific Ocean defined by Johnstone and Mantua [-@Johnstone2014Atmospheric] during the winter prior to when fish enter the marine environment, spring coastal upwelling anomalies off of the  coast of Washington State, and sea surface temperature off of the coast of Washington State during the summer. To evaluate response diversity, effects of all environmental covariates on survival during intervals two through four were allowed to vary between natal-reach and downstream rearing LHPs but were assumed to be common across natal streams to increase statistical power to detect relationships. All environmental covariate values were standardized to have an across-year mean of 0.0 and standard deviation of 1.0.
 
 
-We assessed carryover effects of the density of female spawners within each natal stream on  survival and marine-return rates of their offspring, as might result from density-dependent effects on within-LHP growth or timing of emigration. To do so, we included effects of counts of redds within each natal stream one year prior to initial capture of downstream-rearing LHPs and two years prior for natal-reach rearing LHPs on survival during intervals one through three and marine-return rates in interval four (`r tab_nums("variables",display="cite")`). We allowed for life-history and natal-reach specific effects of redd density because density-dependent effects should be a function of the capacity of a stream and its interaction with the density of fish within it.  For intervals two through four, we modeled common effects of redd density on downstream-rearing fish (combined summer and fall sub-yearling emigrants) as with other aspects of the model. Spawner densities were standardized to have a mean of 0.0 and standard deviation of 1.0 within each stream. 
+We assessed density-dependent effects on survival and marine-return rates, as might result from density-dependent effects on within-LHP growth or timing of emigration. To do so, we included penalized effects of counts of redds within each natal stream one year prior to initial capture of downstream-rearing LHPs and two years prior for natal-reach rearing LHPs on survival during intervals one through three and marine-return rates in interval four (`r tab_nums("variables",display="cite")`). Unlike with other environmental covariates, we allowed for unique effects of redd density on each LHP and natal-reach combination because density-dependent effects should be a function of the capacity of a stream and its interaction with the density of fish within it.  For intervals two through four, we modeled common effects of redd counts on downstream-rearing fish (combined summer and fall sub-yearling emigrants) as with other aspects of the model. Redd counts were also standardized to have a mean of 0.0 and standard deviation of 1.0 within each stream. 
 
   
 
@@ -251,31 +243,30 @@ mlogit(\boldsymbol \psi_{l,y}) &= \boldsymbol \alpha^\psi +  {\mathbf{x}^{\psi}_
 \end{equation}
 
 
-with age four as the reference year, where $\mathbf{\alpha}^\psi$ represents intercepts for ages three and five in multinomial logit space and $\mathbf{\beta}^\psi$ is a vector of coefficients for differences between natal-reach and downstream rearing fish. These differences were not penalized. We modeled only synchronous random year effects ($\mathbf{\delta}_y^\psi$) for adult return age probabilities due to limited power to fit idiosyncratic random year effects for different LHPs. The synchronous random year effects for each return age were bivariate normally distributed with covariance matrix $\mathrm{\Sigma}_{\delta^\psi}$ to account for the inherent correlation in the proportions of the population that returned at different ages in a given year (Buhle et al. 2018). The marginal standard deviations of the random year effects in the $\psi$ model were not penalized as they were in the $\phi$ and $p$ models, nor was their correlation.
+with age four as the reference year, where $\mathbf{\alpha}^\psi$ represented intercepts for ages three and five in multinomial logit space and $\mathbf{\beta}^\psi$ was a vector of coefficients for differences between natal-reach and downstream rearing fish. These differences were not penalized. We modeled only synchronous random year effects ($\mathbf{\delta}_y^\psi$) for adult return age probabilities due to limited power to fit idiosyncratic random year effects for different LHPs. The synchronous random year effects for each return age were bivariate normally distributed with covariance matrix $\mathrm{\Sigma}_{\delta^\psi}$ to account for the inherent correlation in the proportions of the population that returned at different ages each year (Buhle et al. 2018). Unlike in the model of survival, the marginal standard deviations of the random year effects in the return-age model were not penalized, nor was their correlation.
 
 #### Detection {-}
 
-Detection probabilities were modeled as a linear combination of intercepts, covariate effects, and synchronous and idiosyncratic random year effects in logit space in the same way as survival probabilities, see Equation \@ref(eq:logitsurv). On the first occasion we fit unpenalized intercepts for each juvenile LHP and allowed for penalized effects of natal streams and their interactions with juvenile LHPs. We applied the same penalized complexity prior as applied for $\mathbf\beta$ in the $\phi$ model, including the same value of $\lambda_1$ (`r tab_nums("variables",display="cite")`). The same penalized-complexity priors were applied for random year effects in the $p$ model as in the $\phi$ model as well, including the same value of $\lambda_2$.  
+Detection probabilities were modeled as a linear combination of intercepts, covariate effects, and synchronous and idiosyncratic random year effects in logit space in the same way as survival probabilities, see Equation \@ref(eq:logitsurv). On the first occasion we fit unpenalized intercepts for each juvenile LHP and penalized effects of natal streams and their interactions with juvenile LHPs. We applied the same penalized complexity priors as applied for $\mathbf\beta$ in the survival model, including the same value of $\lambda_1$ (`r tab_nums("variables",display="cite")`). The same penalized-complexity priors were applied for random year effects in the detection model as in the survival model as well, including the same value of $\lambda_2$.  
 
-On the third and fourth recapture occasions (juvenile detection at McNary and Bonneville Dams), we fit intercepts for natal-reach and downstream-rearing LHPs, and penalized effects of natal streams and their interactions with natal-reach and downstream-rearing LHPs.  We also included penalized effects of average daily discharge and spill percentage in May--June at McNary and Bonneville Dams respectively, as these could affect the proportion of fish going through the juvenile bypass system as opposed to spillways or penstocks. Just as for survival probabilities, we allowed for different effects of environmental covariates -- flow and spill -- on detection probabilities of natal-reach and downstream rearing LHPs during occasions three and four, because of their different emigration timing.    
+On the third and fourth recapture occasions (juvenile detection at McNary and Bonneville Dams), we fit intercepts for natal-reach and downstream-rearing LHPs, and penalized effects of natal streams and their interactions with natal-reach and downstream-rearing LHPs.  We also included penalized effects of average daily discharge and spill percentage in May--June at McNary and Bonneville Dams respectively, as these could affect the proportion of fish going through the juvenile bypass systems as opposed to spillways or penstocks. Just as for survival probabilities, we allowed for different effects of environmental covariates -- flow and spill -- on detection probabilities of natal-reach and downstream rearing LHPs during occasions three and four, because of their different emigration timing, but assumed common effects across natal streams.    
 
 
-On the fifth and sixth recapture occasions, representing detections of upstream-migrating adults at Bonneville and McNary Dams, we modeled the effect of adult age but not juvenile LHP nor natal stream, as was also the case for survival during these occasions. Adults of different ages may have different detection probabilities due to differences in their migration timing or if their body size affects tag-detection rates. Just as we did for the survival rates of adults, only synchronous random year effects were included for adult detection probabilities on occasions five and six.   
+On the fifth and sixth recapture occasions, representing detections of upstream-migrating adults at Bonneville and McNary Dams, we modeled the effect of adult age but not juvenile LHP nor natal stream, as was also the case for survival during these occasions. Adults of different ages may have different detection probabilities due to differences in their migration timing or if their body size affects tag-detection rates. Just as for the survival rates of adults, only synchronous random year effects were included for adult detection probabilities on occasions five and six.   
 
 Detection probability on the final occasion (Tumwater Dam) was fixed at 1.0 for identifiability and based on the auxiliary observation that  `r (top<-sum(mark_file_CH$instr_array!=0&mark_file_CH$Tum_A!=0,na.rm=TRUE))` out of `r (bottom<-sum(mark_file_CH$instr_array!=0,na.rm=TRUE))` fish (`r round((top/bottom)*100,2)`%) detected in adult fish ladders in main-stem Columbia River Dams and subsequently detected on in-stream arrays upstream of Tumwater Dam were also detected at Tumwater Dam.
 
 
 ### Model fitting {-}
 
-The likelihood of the data for a given set of parameters was calculated using the forward algorithm [@McClintock2020Uncovering; @Zucchini2016Hidden ], and the Laplace approximation of the marginal log-likelihood integrated over random effects was calculated by the package TMB in R for a given set of fixed effects values [@Kristensen2016TMB; @R2021R ]. We fit the model by minimizing the negative mariginal log-likelihood, which was conducted in R using the *nlminb* function and the TMBhelper package [@Gay1990Usage; @Thorson2020TMBhelper]. Fixed effects were the intercepts ($\mathbf{\alpha}$), coefficients ($\mathbf\beta$) for the return-age model only, and the standard deviation and covariance parameters for the hyper-distributions of random effects. The random effects were the penalized coefficients ($\mathbf{\beta}$) for the survival and detection probability models, and all random year effects ($\mathbf{\delta}$ and $\mathbf{\epsilon}$). To calculate confidence intervals for derived quantities, we conducted a parametric bootstrap where we sampled 5,000 fixed and random effects from a multivariate normal distribution defined by the maximum marginal likelihood estimates and inverted Hessian matrix, then calculated derived quantities with each sample parameter set.
-
+The likelihood of the data for a given set of parameters was calculated using the forward algorithm [@McClintock2020Uncovering; @Zucchini2016Hidden ], and the Laplace approximation of the marginal log-likelihood integrated over random effects was calculated by the package TMB in R for a given set of fixed effects values [@Kristensen2016TMB; @R2021R ]. We fit the model by minimizing the negative marginal log-likelihood, which was conducted in R using the *nlminb* function and the TMBhelper package [@Gay1990Usage; @Thorson2020TMBhelper]. Fixed effects were the intercepts ($\mathbf{\alpha}$), coefficients ($\mathbf\beta^\psi$) for the return-age model only, and the standard deviation and covariance parameters for the hyper-distributions of random effects. The random effects were the penalized coefficients ($\mathbf{\beta}$) for the survival and detection probability models, and all random year effects ($\mathbf{\delta}$ and $\mathbf{\epsilon}$). To calculate confidence intervals for derived quantities, we conducted a parametric bootstrap where we sampled 5,000 fixed and random effects from a multivariate normal distribution defined by the maximum marginal likelihood estimates and inverted Hessian matrix, then calculated derived quantities with each sample parameter set and found the quantiles corresponding with the confidence interval.  
 
 ### Goodness of fit {-}
 
-We assessed goodness of fit by examining scaled quantile residuals [@Dunn1996Randomized; @Gelman2006Data]. We simulated 250 data sets of the same size as the observed data by sampling from binomial distributions for survival and detection, and multinomial distributions for return age, conditional on the the maximum likelihood estimates (MLEs) of parameters. Conditional simulations were conducted using the MLEs of model parameters and random year effects, while unconditional simulations were conducted using the MLEs of model parameters (including penalized coefficients) but sampling random year effects from their hyper-distributions. We summarized simulated and observed datasets by the numbers of recaptures on each occasion from each release group (LHP by stream by year) and adult age for adult-detection occasions. We used the DHARMa package [@Hartig2021DHARMa] to calculate scaled quantile residuals for the summarized numbers of recaptures in the observed data and to interrogate the residuals for outliers and departures from uniformity. 
+We assessed goodness of fit by examining scaled quantile residuals [@Dunn1996Randomized; @Gelman2006Data]. We simulated 250 data sets of the same size as the observed data by sampling from binomial distributions for survival and detection, and multinomial distributions for return age, conditional on the maximum marginal likelihood estimates (MLEs) of parameters. Conditional simulations were conducted using the MLEs of model parameters and random year effects, while marginal simulations were conducted using the MLEs of model parameters (including penalized coefficients) but sampling random year effects from their hyper-distributions. We summarized simulated and observed datasets by the numbers of recaptures on each occasion from each release group (LHP by stream by year) and adult age for adult-detection occasions. We used the DHARMa package [@Hartig2021DHARMa] to calculate scaled quantile residuals for the summarized numbers of recaptures and to interrogate the residuals for outliers and departures from uniformity. 
 
-In addition, we calculated *P* values for the model by sampling 500 parameter sets from the multivariate normal distribution defined by the MLEs and inverted Hessian and calculating the Freeman-Tukey fit statistic,  $\sum_t{\sum_l{\sum_a{\sum_y{\sum_s{(\sqrt{d_{t,l,a,y,s}}-\sqrt{E[d_{t,l,a,y,s}]})^2}}}}}$
-for observed and simulated data generated with each parameter set, where $d_{t,l,a,y,a}$ is the summarized number of detections at a given occasion for fish of a given juvenile LHP, natal stream, year, and age, and $E[d_{t,l,a,y,s}]$ is the expectation of that number of detections given the model and a particular parameter set. The *P* value was then calculated as the proportion of parameter sets in which the Freeman-Tukey fit statistic for the simulated data was greater than the statistic for the observed data. We calculated *P* values either conditionaly given the fitted random year effects or unconditionally by sampling random year effects from their hyper-distributions, as with the simulation of scaled quantile residuals above.
+In addition, we calculated *P* values  by sampling 500 parameter sets from the multivariate normal distribution defined by the MLEs and inverted Hessian matrix and calculating the Freeman-Tukey fit statistic,  $\sum_t{\sum_l{\sum_s{\sum_y{\sum_a{(\sqrt{d_{t,l,s,y,a}}-\sqrt{E[d_{t,l,s,y,a}]})^2}}}}}$
+for observed and simulated data generated with each parameter set, where $d_{t,l,s,y,a}$ is the summarized number of detections at a given occasion for fish of a given juvenile LHP, natal stream, year, and age, and $E[d_{t,l,s,y,a}]$ is the expectation of that number of detections given the model and a particular parameter set. The *P* value was then calculated as the proportion of parameter sets in which the Freeman-Tukey fit statistic for the simulated data was greater than the statistic for the observed data. We calculated *P* values either conditionally given the fitted random year effects or marginally by sampling random year effects from their hyper-distributions.
 
 
 
@@ -312,7 +303,7 @@ Loo_pen2<-list()
 
 loo_mat<-matrix(NA,5,5)
 
-combs<-expand.grid(a=1:5,b=1:5)
+combs<-expand.grid(a=seq(from=1,to=7, by=0.5),b=seq(from=1,to=7, by=0.5))
 
 #grod seach 
 library(foreach)
@@ -330,7 +321,7 @@ results3<-foreach(
   .packages=c('TMB','tidyverse','here'),.export = c(),.inorder=TRUE) %dopar%{
   
     
-    
+    -log(.01)/(6/10)
  U_0<-combs[i,1]/10;pen_1<--log(.01)/U_0
  U_1<-combs[i,2]/10;pen_2<--log(.01)/U_1
 
@@ -491,7 +482,7 @@ try(mscjs_fit2<-fit_wen_mscjs(x=mscjs_dat,
 
 
 #calculate LOOIC for model
-try(last_best<-mscjs_fit2$last_par_best)
+try(last_best<-mscjs_fit2$last_par_best )
 try(sim_posterior<-rmvnorm_prec(mu=last_best, 
                             prec=mscjs_fit2$fit$SD$jointPrecision, 500, random_seed=1 ))
 
@@ -525,7 +516,7 @@ stopCluster(cl) #shut down parallel computing clusters
 
 
 # save list of all LOOICs
- save(results3,file=here("Loo_pen_8202021.Rdata"))
+ save(results3,file=here("Loo_pen_9242021.Rdata"))
 #Loo_pen5.Rdata = age_class interceptsa and year random effects
 #Loo_pen6.Rdata = age_class intercepts
 #Loo_pen7.Rdata = LH intercepts 
@@ -534,7 +525,7 @@ stopCluster(cl) #shut down parallel computing clusters
 #Loo_pen10.Rdata = LH intercepts year and no-pen random effects (summer and smolt) 
  
  combs<-combs %>% mutate(looic=unlist(results3))
- write.csv(combs,file=here("results","combs_loo.csv"))
+ write.csv(combs,file=here("results","combs_loo_9-24-2021.csv"))
 # dev.new()
 # plot_func()
 # print_out(mscjs_fit)
@@ -558,7 +549,7 @@ stopCluster(cl) #shut down parallel computing clusters
 
 
 ```{r plot_looic, message=FALSE, warning=FALSE,echo=FALSE,eval=FALSE}
-load(file=here("Loo_pen7.Rdata"))
+load(file=here("Loo_pen_9242021.Rdata"))
 Looic<-unlist(lapply(Loo_pen2,function(x){x$estimates[3,1]}))
 plot(which(!unlist(lapply(Loo_pen2,is.null)))+1,Looic,xlab=expression(lambda),ylab="LOOIC",pch=19)
 ```
@@ -568,7 +559,7 @@ plot(which(!unlist(lapply(Loo_pen2,is.null)))+1,Looic,xlab=expression(lambda),yl
 ```{r full_model2, message=FALSE, warning=FALSE,echo=FALSE,eval=FALSE,cache=FALSE}
 #penalized complexity
 
-i<-9
+i<-10
 
  U_0<-combs[i,1]/10;pen_1<--log(.01)/U_0
  U_1<-combs[i,2]/10;pen_2<--log(.01)/U_1
@@ -724,11 +715,11 @@ mscjs_fit<-fit_wen_mscjs(x=mscjs_dat,
                            ,
     
                             doFit = TRUE,silent=TRUE,
-                            sim_rand =0,REML=FALSE,pen=c(pen_1,pen_2), hypersd=1,map_hypers=c(FALSE,FALSE)))
+                            sim_rand =0,REML=FALSE,pen=c(pen_1,pen_2), hypersd=1,map_hypers=c(FALSE,FALSE))
 # save(mscjs_fit,file=here("results","mscjs_fit.rdata"))
 
 
-mscjs_fit$dat_TMB$X_phi %>% colnames()
+# mscjs_fit$dat_TMB$X_phi %>% colnames()
 ```
 
 ```{r full_model_load, message=FALSE, warning=FALSE,echo=FALSE,eval=TRUE,cache=FALSE, include = FALSE}
@@ -740,7 +731,7 @@ mscjs_fit$mod$retape()
 setwd(here())
 ```
 
-```{r organize_output, message=FALSE,cache=TRUE, warning=FALSE,eval=TRUE,echo=FALSE}  
+```{r organize_output, eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE}
 
 
 sd_rep<-mscjs_fit$fit$SD
@@ -823,7 +814,7 @@ psi_mean<-Psi.design.dat %>%  group_by(age_class,years) %>%  summarize(mean_psi=
 
 
 #table of paramater values
-invisible(capture.output(param_tab<-print_out(mscjs_fit)))
+invisible(capture.output(param_tab<-print_out(mscjs_fit))) 
 #%>% mutate(LH=ifelse(LH=="fall","Subyearling","Smolt")) 
 
 #----------------------------------------------------------
@@ -853,7 +844,7 @@ wow<-apply(sim_posterior,2,fun)
 psi_tab<-cbind(psi_mean[,1:2],mean=apply(wow,1,mean) %>% round(3),median=round(fun(mscjs_fit$last_par_best),3),apply(wow,1,quantile,probs=c(.025,.975)) %>% t() %>% round(3))
 
 est_ci<-function(x){
-  paste0(x[1] ,"; ",x[2] ,"-- ",x[3])
+  paste0(sprintf("%.3f",x[1]) ,"; ",sprintf("%.3f",x[2]) ," -- ",sprintf("%.3f",x[3]))
 }
 
 
@@ -1022,9 +1013,9 @@ med_params<-mscjs_fit$last_par_best[names(mscjs_fit$last_par_best)=="beta_phi_in
 which(colnames(discr_design_phi)%in%c("time1:stream1","time1:stream2" ))]
 
 
-rel_chiw_sum<-paste0("effect size = ",c(-med_params,-med_params[1]) %>% sum() %>% round(3),"; ",quantile(rel_chiw,probs = 0.025) %>% round(3),"-- ",quantile(rel_chiw,probs = 0.975) %>% round(3))
+rel_chiw_sum<-paste0("effect size = ",c(-med_params,-med_params[1]) %>% sum() %>% round(3) %>% sprintf("%.3f",.),"; ",quantile(rel_chiw,probs = 0.025) %>% round(3) %>% sprintf("%.3f",.)," -- ",quantile(rel_chiw,probs = 0.975) %>% round(3) %>% sprintf("%.3f",.))
 
-rel_nas_sum<-paste0(c(-med_params,-med_params[2]) %>% sum() %>% round(3),"; ",quantile(rel_nason,probs = 0.025) %>% round(3),"-- ",quantile(rel_nason,probs = 0.975) %>% round(3))
+rel_nas_sum<-paste0(c(-med_params,-med_params[2]) %>% sum() %>% round(3) %>% sprintf("%.3f",.),"; ",quantile(rel_nason,probs = 0.025) %>% round(3)%>% sprintf("%.3f",.)," -- ",sprintf("%.3f",quantile(rel_nason,probs = 0.975) ))
 
 
 ##---------------------------------------
@@ -1054,7 +1045,7 @@ obs_dat<-mscjs_dat$dat_out %>%
   #multiply CH by frequency
   mutate(across(LWe_J :Tum_A_3,~.*freq)) %>%
   #drop unneeded columns
-   select(!c(ch:freq ) ) %>%
+   dplyr::select(!c(ch:freq ) ) %>%
   #sum detection by stream, year, and life history
   group_by(LH,stream,sea_Year_p) %>% summarise(across(LWe_J :Tum_A_3, sum)) %>% ungroup()
 
@@ -1094,15 +1085,15 @@ dharm_sim_samp_year<-make_stan_res(mscjs_fit,mscjs_dat,obs_dat_long,sim_rand=1,n
 
 
 
-We found that the lowest *looic* occurred with $\lambda_1$ = `r round(mscjs_fit$dat_TMB$pen[2],2)` and $\lambda_2$ = `r round(mscjs_fit$dat_TMB$pen[1],2)` (`r sup_tab_nums("looic_tab",display = "cite")`), and with these values goodness of fit tests indicated  the model adequately fit the data. Scaled quantile residuals were approximately uniformly distributed based on examination of Q-Q plots and plots of simulated residuals vs. observations, and the numbers of outliers did not exceed the range of expectations (`r sup_fig_nums("GOF_cond",display = "cite")`--`r sup_fig_nums("GOF_uncond_boot",display = "n")`).  The *P* value conditional on the fitted random year effects was `r Free_Tuk_post_p$p` and when we sampled the random year effects from their hyper-distributions it was `r Free_Tuk_post_p_rand_year$p`, neither of which indicated a lack of fit.
+We found that the lowest *looic* occurred with $\lambda_1$ = `r round(mscjs_fit$dat_TMB$pen[2],2)` and $\lambda_2$ = `r round(mscjs_fit$dat_TMB$pen[1],2)` (`r sup_tab_nums("looic_tab",display = "cite")`), and with these values goodness of fit tests indicated  the model adequately fit the data. Scaled quantile residuals were approximately uniformly distributed based on examination of Q-Q plots and plots of simulated residuals vs observations, and the numbers of outliers did not exceed the range of expectations (`r sup_fig_nums("GOF_cond",display = "cite")`--`r sup_fig_nums("GOF_uncond_boot",display = "n")`).  The *P* value conditional on the fitted random year effects was `r sprintf("%.3f",Free_Tuk_post_p$p)` and when we sampled the random year effects from their hyper-distributions it was `r sprintf("%.3f",Free_Tuk_post_p_rand_year$p)`, neither of which indicated a lack of fit.
 
 #### Mainstem Wenatchee River {-}
 
 
-As expected, there were survival differences among juvenile LHPs and natal streams during the first survival interval (`r fig_nums("time_1_surv", display="cite")`, `r sup_tab_nums("mean_phi", display="cite")`). The summer sub-yearling emigrant life history, which spends the most time within the first interval, had the lowest median survival across streams (`r print_param_CI("time1:LHsummer", prob=T,include_95=T)`), followed by fall sub-yearling emigrants (`r print_param_CI("time1:LHfall", prob=T)`), and spring yearling emigrants (`r print_param_CI("time1:LHsmolt", prob=T)`).  Fish from the White River, which migrated through Lake Wenatchee on survival occasion one, had lower survival than fish from the Chiwawa River (`r rel_chiw_sum`) and Nason Creek (`r rel_nas_sum`).
+As expected, there were survival differences among juvenile LHPs and natal streams during the first survival interval (`r fig_nums("time_1_surv", display="cite")`, `r sup_tab_nums("mean_phi", display="cite")`). The summer sub-yearling emigrant life history, which spent the most time within the first interval, had the lowest median survival across streams (`r print_param_CI("time1:LHsummer", prob=T,include_95=T)`), followed by fall sub-yearling emigrants (`r print_param_CI("time1:LHfall", prob=T)`), and spring yearling emigrants (`r print_param_CI("time1:LHsmolt", prob=T)`).  Fish from the White River, which migrated through Lake Wenatchee on survival occasion one, had lower survival than fish from the Chiwawa River (`r rel_chiw_sum`) and Nason Creek (`r rel_nas_sum`).
 
 
-During the first interval, winter air temperature was negatively associated with survival of summer (`r print_param_CI("time1:win_air:LHsummer", prob=F,include_95=F)`) and fall (`r print_param_CI("time1:win_air:LHfall", prob=F,include_95=F)`) sub-yearling emigrant LHPs (`r fig_nums("Env_cov", display="cite")`). Winter discharge had a much smaller effect on summer (`r print_param_CI("time1:LHsummer:win_flow", prob=F,include_95=F)`) and fall sub-yearlings (`r print_param_CI("time1:LHfall:win_flow", prob=F,include_95=F)`), but was correlated with winter air temperature (correlation coefficient = `r mscjs_dat$Phi.design.dat %>% select(win_air,win_flow) %>% cor() %>% nth(2) %>% round(2)`).
+During the first interval, winter air temperature was negatively associated with survival of summer (`r print_param_CI("time1:win_air:LHsummer", prob=F,include_95=F)`) and fall (`r print_param_CI("time1:win_air:LHfall", prob=F,include_95=F)`) sub-yearling emigrant LHPs (`r fig_nums("Env_cov", display="cite")`). Winter discharge had a much smaller effect on summer (`r print_param_CI("time1:LHsummer:win_flow", prob=F,include_95=F)`) and fall sub-yearlings (`r print_param_CI("time1:LHfall:win_flow", prob=F,include_95=F)`) but was correlated with winter air temperature (correlation coefficient = `r mscjs_dat$Phi.design.dat %>% select(win_air,win_flow) %>% cor() %>% nth(2) %>% round(2)`).
 
 
 #### Columbia River downstream juvenile migration {-}
@@ -1111,17 +1102,17 @@ During the first interval, winter air temperature was negatively associated with
 med_doy<-mark_file_CH %>% filter(LH!="Unk") %>% mutate(LH=ifelse(LH=="smolt","NS","DS")) %>% group_by(LH) %>% summarise(median(LWe_J_doy,na.rm=T),median(McN_J_doy,na.rm=T),median(Bon_J_doy,na.rm=T))
 ```
 
-Both the timing and survival of fish during the second interval differed between natal-reach and downstream-rearing LHPs. The median detection day at the mouth of the Wenatchee River was `r diff(pull(med_doy,2))` days earlier for downstream-rearing fish than natal-reach rearing fish across natal streams, and `r diff(pull(med_doy,3))` days earlier at McNary Dam (`r fig_nums("timing", display="cite")`). Between the mouth of the Wenatchee River and McNary Dam (survival interval two), downstream-rearing fish had a lower median survival rate (`r med2_subs`) than natal-reach rearing fish (`r med2_yrlngs`).
+Both the timing and survival of fish during the second interval differed between natal-reach and downstream-rearing LHPs. The median detection day at the lower Wenatchee trap was `r diff(pull(med_doy,2))` days earlier for downstream-rearing fish than natal-reach rearing fish across natal streams, and `r diff(pull(med_doy,3))` days earlier at McNary Dam (`r fig_nums("timing", display="cite")`). Between the mouth of the Wenatchee River and McNary Dam (survival interval two), downstream-rearing fish had a lower median survival rate (`r med2_subs`) than natal-reach rearing fish (`r med2_yrlngs`).
 
 
-There was some evidence of density-dependent effects on survival in the second interval (`r fig_nums("Redd_cov", display="cite")`). Higher spawner densities in the Chiwawa River were associated with reduced survival of natal-reach rearing fish, with an effect size of `r print_param_CI("time2:age_classsmolt:streamChiwawa:redd_stan", prob=F,include_95=F,par_CI=TRUE)`). Spawner densities were negatively associated with survival of downstream-rearing fish from Nason Creek during the second interval, with an effect size of `r print_param_CI("time2:age_classsub:streamNason:redd_stan", prob=F,include_95=F,par_CI=TRUE)`). 
+There was some evidence of density-dependent effects on survival in the second interval (`r fig_nums("Redd_cov", display="cite")`). Spawner densities were negatively associated with survival of downstream-rearing fish from Nason Creek (`r print_param_CI("time2:age_classsub:streamNason:redd_stan", prob=F,include_95=F)`) and natal-reach rearing fish from the Chiwawa River (`r print_param_CI("time2:age_classsmolt:streamChiwawa:redd_stan", prob=F,include_95=F)`) during the second interval. 
 
-During the third interval (between McNary and Bonneville Dams), we did not detect that average survival rates differed appreciably among LHPs and natal streams (`r fig_nums("time_2_3_surv", display="cite")`, `r sup_tab_nums("mean_phi", display="cite")`), nor did we identify effects of environmental variables on survival rates (`r fig_nums("Env_cov", display="cite")`, `r fig_nums("Redd_cov", display="cite")`). The median annual survival rate in the third interval was `r print_param_CI("time3", prob=T,par_CI=TRUE)`). 
+During the third interval (between McNary and Bonneville Dams), we did not detect that average survival rates differed appreciably among LHPs and natal streams (`r fig_nums("time_2_3_surv", display="cite")`, `r sup_tab_nums("mean_phi", display="cite")`), nor did we identify effects of environmental variables on survival rates (`r fig_nums("Env_cov", display="cite")`, `r fig_nums("Redd_cov", display="cite")`). The median annual survival rate in the third interval was `r print_param_CI("time3", prob=T,par_CI=TRUE)`).  
 
 
 #### Ocean and upstream adult migration {-}
 
-During the fourth interval, representing adult return rates from the ocean, downstream-rearing fish returned at higher rates (`r age.0_time4`) than natal-reach rearing fish (`r age.1_time4`) (`r fig_nums("time_4_surv", display="cite")`, `r sup_tab_nums("mean_phi", display="cite")`) and differed in their response to environmental variables (`r fig_nums("Env_cov", display="cite")`). Return rates of downstream-rearing fish were positively associated with coastal upwelling in spring (`r print_param_CI("time4:age_classsub:cui.spr", prob=F,include_95=F)`), but we did not detect the same relationship for natal-reach rearing fish (`r print_param_CI("time4:age_classsmolt:cui.spr", prob=F,include_95=F)`). Instead, return rates of natal-reach rearing fish were negatively correlation with sea surface temperature off the coast of Washington State during summer (`r print_param_CI("time4:age_classsmolt:ersstWAcoast.sum", prob=F,include_95=F)`), which was true for downstream-rearing fish to a much lesser degree (`r print_param_CI("time4:age_classsub:ersstWAcoast.sum", prob=F,include_95=F)`). Spring upwelling and summer stream temperature were weakly correlated with each other (`r mscjs_dat$Phi.design.dat %>% select(ersstWAcoast.sum,cui.spr) %>% cor() %>% nth(2) %>% round(2)`). Downstream rearing fish passed Bonneville Dam `r diff(pull(med_doy,4))` days earlier as juveniles on average than natal-reach rearing fish (`r fig_nums("timing", display="cite")`).
+During the fourth interval, representing adult return rates from the ocean, downstream-rearing fish returned at about twice the rate (`r age.0_time4`) of natal-reach rearing fish (`r age.1_time4`) (`r fig_nums("time_4_surv", display="cite")`, `r sup_tab_nums("mean_phi", display="cite")`) and they differed in their responses to environmental variables (`r fig_nums("Env_cov", display="cite")`). Return rates of downstream-rearing fish were positively associated with coastal upwelling in spring (`r print_param_CI("time4:age_classsub:cui.spr", prob=F,include_95=F)`), but we did not detect the same relationship for natal-reach rearing fish (`r print_param_CI("time4:age_classsmolt:cui.spr", prob=F,include_95=F)`). Instead, return rates of natal-reach rearing fish were negatively correlation with sea surface temperature off the coast of Washington State during summer (`r print_param_CI("time4:age_classsmolt:ersstWAcoast.sum", prob=F,include_95=F)`), which was true for downstream-rearing fish to a much lesser degree (`r print_param_CI("time4:age_classsub:ersstWAcoast.sum", prob=F,include_95=F)`). Spring upwelling and summer stream temperature were weakly correlated with each other (`r mscjs_dat$Phi.design.dat %>% select(ersstWAcoast.sum,cui.spr) %>% cor() %>% nth(2) %>% round(2)`). Downstream-rearing fish passed Bonneville Dam `r diff(pull(med_doy,4))` days earlier as juveniles on average than natal-reach rearing fish (`r fig_nums("timing", display="cite")`).
 
 The most common adult return age was four years for both natal-reach (`r  psi_tab %>% filter(age_class=="Spr.1"&years==4) %>% select(4:6) %>% est_ci`) and downstream-rearing fish (`r  psi_tab %>% filter(age_class=="DSR"&years==4) %>% select(4:6) %>% est_ci`), but there were differences between LHPs in proportions returning at ages three and five (`r fig_nums("adult_props", display="cite")`, `r sup_tab_nums("psi_mean", display="cite")`). The proportion of returning fish that returned at age three was higher among downstream rearing fish (`r  psi_tab %>% filter(age_class=="DSR"&years==3) %>% select(4:6) %>% est_ci`) than natal-reach rearing fish (`r psi_tab %>% filter(age_class=="Spr.1"&years==3) %>% select(4:6) %>% est_ci`). The proportion of returning adults that returned at age five  was lower among downstream rearing fish (`r psi_tab %>% filter(age_class=="DSR"&years==5) %>% select(4:6) %>% est_ci`) than natal-reach rearing fish (`r psi_tab %>% filter(age_class=="Spr.1"&years==5) %>% select(4:6) %>% est_ci`). 
 
@@ -1130,61 +1121,52 @@ The model identified little variability in upstream survival rates (`r sup_fig_n
 
 ## Discussion {-}
 
-We identified a potential driver of asynchronous productivity between juvenile LHPs in their different relationships between return rates from the ocean and environmental variables. Specifically, return rates of downstream-rearing LHPs were positively correlated with spring upwelling whereas return rates of natal-reach rearing LHPs were negatively correlated with summer sea surface temperature. Furthermore, these variables were only weakly correlated with one another. This suggests that differing relationships with these variables contribute to asynchrony in return rates between LHPs that could reduce interannual variability in total population abundance. One reason for the different relationships between LHPs’ marine return rates and environmental variables might be the earlier ocean-entry timing of downstream rearing LHPs as well as any differences in their behavior upon ocean entry. 
 
-Braun et al. [-@braun2016population] found that marine return rates in populations of Chinook salmon that exhibited different juvenile LHPs responded differently to marine covariates. They found that abundance trends were asynchronous among these populations as well. Freshwater et al. [-@Freshwater2017Coherent] found that productivity was asynchronous among sockeye salmon (*Onchorhynchus nerka*) populations that exhibited different juvenile LHPs and were know to behave differently upon ocean entry. Our results show that juvenile life history diversity within populations contributes to response diversity as has previously been observed for life history diversity among populations.  
+Differences between LHPs in average downstream migration survival and marine-return rates suggest a potential survival tradeoff between life stages that each LHP handles differently. Downstream-rearing LHPs initiated seaward migration earlier and had lower downstream-migration survival than natal-reach rearing emigrants. However, downstream-rearing LHPs entered the marine environment earlier and returned from the ocean at around twice the rate of natal-reach rearing fish. This tradeoff between downstream migration survival and marine return rates may be directly related to migration and ocean-entry timing. Earlier passage dates at Bonneville Dam have been associated with increased return rates from the ocean in multiple populations and species of salmon  [@Chasco2021Differential; @Scheuerell2009Relating; @Wilson2021Phenological], suggesting that earlier downstream emigration may contribute to the higher marine return rates of downstream-rearing LHPs. The different ocean-entry timing between LHPs may also have facilitated the different relationships between marine-return rates and environmental variables that we identified.  
 
-Differences between LHPs in average migration survival and marine-return rates suggest a potential survival tradeoff that each LHP navigates differently. Downstream-rearing LHPs initiated seaward migration earlier and had lower downstream-migration survival than natal-reach rearing emigrants. However, downstream-rearing LHPs entered the marine environment earlier and returned from the ocean at higher rates. This tradeoff between downstream migration survival and marine return rates may be directly related to migration and ocean-entry timing. Earlier passage dates at Bonneville Dam have been associated with increased return rates from the ocean in multiple populations and species of salmon  [@Chasco2021Differential; @Scheuerell2009Relating; @Wilson2021Phenological], suggesting that earlier downstream emigration may contribute to the higher marine return rates of downstream-rearing LHPs. The different ocean-entry timing between LHPs may also have facilitate the different relationships between marine-return rates and environmental variables that we identified. 
+Return rates of downstream-rearing LHPs were positively correlated with spring upwelling whereas return rates of natal-reach rearing LHPs were negatively correlated with summer sea surface temperature. Furthermore, these variables were only weakly correlated with one another. These results suggest that juvenile life history diversity within populations contributes to response diversity and population stability as has previously been observed for life history diversity among populations. Braun et al. [-@braun2016population] found that marine return rates in populations of Chinook salmon that exhibited different juvenile LHPs responded differently to marine covariates. They found that abundance trends were asynchronous among these populations as well. Freshwater et al. [-@Freshwater2017Coherent] found that productivity was asynchronous among sockeye salmon (*Onchorhynchus nerka*) populations that exhibited different juvenile LHPs and were known to behave differently upon ocean entry. 
 
-The younger adult-return ages of downstream-rearing than natal-reach rearing LHPs likely contributed to their higher return rates from the ocean as well because spending less time in the ocean exposes fish to less mortality. However, fish that return at younger ages are also smaller and have lower fecundity on average, representing a potential tradeoff between survival and fecundity, which the alternative LHPs navigate differently. Because fish were only recaptured when entering and returning from the ocean, we could not estimate annual survival and maturation rates in the ocean, which would enable a more robust assessment of the survival-fecundity tradeoff [@stearns1976life].  
-
-The differences in return ages between LHPs should contribute to population stability by spreading the reproductive effort of each individual cohort more uniformly across future cohorts. This should reduce the effect of a single good or bad cohort on future cohort productivity, providing another mechanism by which juvenile life history diversity stabalizes populations.  
-
-Scheuerell [-@Scheuerell2005Influence] found that larger juvenile Chinook salmon tended to return at younger ages and Tréhin et al. [-@trehin2021growth] found that marine growth rate during the first year at sea was positively associated with the probability of maturing after one year at sea for Atlantic salmon (*Salmo salar*). This suggests that downstream-rearing LHPs might attain larger body sizes than natal-reach rearing LHPs prior to ocean entry or grow faster during their first year at sea.  
+The younger adult-return ages of downstream-rearing than natal-reach rearing LHPs likely contributed to their higher return rates from the ocean as well because spending less time in the ocean exposes fish to less mortality. However, fish that return at age three are mostly small males that may have lower reproductive success than older fish [@berejikian2010mating], representing a tradeoff between survival and reproductive success, which the alternative LHPs navigate differently. Because fish were only recaptured when entering and returning from the ocean, we could not estimate annual survival and maturation rates in the ocean, which would enable a more robust assessment of the tradeoff between survival and reproductive success. The differences in return ages between LHPs should contribute to population stability by spreading the reproductive effort of each individual cohort more uniformly across future cohorts. This should reduce the effect of a single good or bad cohort on future cohort productivity. Scheuerell [-@Scheuerell2005Influence] and Tottam et al. [-@tattam2015length] found that larger juvenile Chinook salmon smolts tended to return at younger ages and Tréhin et al. [-@trehin2021growth] found that marine growth rates during the first year at sea were positively associated with the probability of maturation after one year at sea in Atlantic salmon (*Salmo salar*). This suggests that downstream-rearing LHPs might have attained larger body sizes than natal-reach rearing LHPs prior to ocean entry or have grown faster during their first year at sea, leading to their younger return ages.  
 
 
-For downstream-rearing LHPs, survival while rearing in downstream habitats (interval 1) was negatively associated with winter air temperature, indicating the potential for reduced future survival given climate trends. Winters are warming in this region and are projected to continue to do so [@Mantua2010Climate; @Masson-Delmotte2021Summary], suggesting that survival rates of fish overwintering in downstream habitats may decline. Warmer air temperature is associated with warmer water temperature, which may increase metabolic demand during winter when food is scarce leading to starvation or increased time spent foraging and associated predation risk.   
-
-Information on survival rates of resident juveniles within the natal stream during the same period when downstream-rearing LHPs were rearing in downstream habitats (their interval 1) would allow for an assessment of tradeoffs and response diversity among LHPs at this point in their ontogeny. This information could further elucidate ways in which juvenile life history diversity contributes to asynchrony and population stability.  
+For downstream-rearing LHPs, survival while rearing in downstream habitats (interval 1) was negatively associated with winter air temperature, indicating the potential for reduced future survival given climate trends. Winters are warming in this region and are projected to continue to do so [@Mantua2010Climate; @Masson-Delmotte2021Summary], suggesting that survival rates of fish overwintering in downstream habitats may decline. Warmer air temperature is associated with warmer water temperature, which may increase metabolic demand during winter when food is scarce. This may lead to starvation or increased time spent foraging and associated predation risk [@favrot2020fall]. Information on survival rates of resident juveniles within the natal stream during their first summer and second winter when downstream-rearing LHPs were rearing in downstream habitats (their interval 1) would allow for an assessment of tradeoffs and response diversity among LHPs at this point in their ontogeny. Understanding response diversity during a brood year’s first summer and winter could further elucidate ways in which juvenile life history diversity contributes to asynchrony and population stability.  
 
 Fish that originated in the White River had lower survival than fish from the other two streams during the first interval, indicating that rearing within and migrating through Lake Wenatchee was a net source of mortality for all LHPs. Lakes and reservoirs sometimes serve as productive rearing habitat for juvenile salmonids, which provide growth advantages over stream rearing and can lead to higher survival rates in subsequent life stages [@Bourret2014Using]. However, the relatively small sample size of downstream-rearing fish from the White River made it unlikely that we would be able to detect survival benefits of lake rearing in subsequent life stages.  
 
-Within our model, recapture probabilities were particularly low during the second capture occasion, which contributed to uncertainty in estimates of survival, especially during the first and second intervals. Certain model specifications produced unrealistic estimates of survival during the first and second intervals, which indicated that the model had difficulty partitioning mortality between them.
 
 
-Our model of survival, maturation age, and return rates over 15 years allowed us to evaluate LHP-specific effects of environmental covariates and characterize additional interannual variability with random effects. This enabled us to identify potential sources of asynchrony and tradeoffs navigated by fish throughout their ontogeny. Our computationally efficient model that uses Template Model Builder to evaluate the Laplace approximation of the marginal likelihood and fits by expectation maximization enabled fast mod fitting and can accommodate additional data from future years as well as other populations including hatchery-origin fish. Adding data would increase statistical power to identify year-varying survival rates and covariate relationships during intervals where we did not have enough power to do so. Additional data should also increase the precision of estimates.  
+Our model of survival, maturation age, and return rates over 15 years allowed us to evaluate LHP-specific effects of environmental covariates and characterize additional interannual variability with random effects. This enabled us to identify potential sources of asynchrony and tradeoffs navigated by fish throughout their ontogeny. However, the dataset that we analyzed contained limited information to assess some parameters of interest. It only included fish that were >60 mm upon emigration from the natal stream and therefore excludes a portion of the population that emigrate in spring as sub-yearlings at lengths < 60 mm. The survival and maturation age of these smallest emigrants might be better assessed by back-calculation of the juvenile LHPs of returning adults using a technique such as otolith microchemistry, as opposed to mark-recapture data [e.g. @phillis2018endangered]. Additionally, recapture probabilities were particularly low during the second capture occasion, which contributed to uncertainty in estimates of survival, especially during the first and second intervals. Certain model specifications produced unrealistic estimates of survival during the first and second intervals, which indicated that the model had difficulty partitioning mortality between them. 
 
-Our approach to feature selection using penalized complexity priors allowed us to evaluate relationships between demographic rates and several continuous and categorical covariates, while adhering to the principal of Occam’s razor [@Hooten2015guide; @Simpson2017Penalising ]. Other approaches to regularization and feature selection, such as LASSO, neural networks, and random forest models also hold promise for us in mark-recapture modeling  [@Hutchinson2011Incorporating; @Joseph2020Neural].  
 
-Combining our model with models of the remainder of the salmon life cycle – spawning and production of juveniles expressing alternative LHPs – within an integrated population model will allow for population projection and assessment of the contribution of alternative LHPs to population productivity. Because our multi-state model includes both synchronous and asynchronous variability in demographic rates as functions of ecological variables and other sources of stochasticity, it can be used to simulate population trajectories that reflect this variability. Furthermore, the relationships that we identified between environmental variables and demographic rates can be used to simulate the effects of projected changes to environmental conditions, and changes in population density, on demographic rates [@Crozier2021Climate]. Our estimation of survival rates within distinct habitats can be varied to reflect the anticipated effects of management actions such as freshwater habitat restoration and to simulate their effects on population productivity [@honea2009evaluating]. These features will make such an integrated population model valuable for population viability analyses and assessing the outcomes of different management actions while considering the effects of climate change.  
+Our computationally efficient model was computationally efficient to fit by expectation maximization that usinge TMB to evaluate the Laplace approximation of the marginal log likelihood,  and could therefore accommodate additional data from future years as well as other populations including hatchery-origin fish, were they to become available. Adding dataModels fit to larger data sets might  would increase have the statistical power to identify year-varying survival rates and covariate relationships during intervals where we did not have enough power to do so. Additional data should also increase the precision of estimates. Our approach to feature selection using PC priors allowed us to evaluate relationships between demographic rates and several continuous and categorical covariates, while adhering to the principal of Occam’s razor [@Hooten2015guide; @Simpson2017Penalising ]. The approach of treating coefficients as Gaussian random effects with hypder-distribution standard deviations informed by $\lambda$ is equivalent to Ridge Regression [@james2013introduction]. One reason that we selected our approach was because of its ease of implementation, but other approaches to regularization and feature selection, including neural networks and random forest models also hold promise for use in mark-recapture modeling (Hutchinson et al., 2011; Joseph, 2020).   
 
-The dataset that we analyzed only included fish that were >60 mm upon emigration from the natal stream and therefore excludes a portion of the population that emigrate in spring as sub-yearlings at lengths < 60 mm. The survival and maturation age of these smallest emigrants might be better assessed by back-calculation of the juvenile LHPs of returning adults using a technique such as otolith microchemistry, as opposed to mark-recapture data [e.g. @phillis2018endangered].  
+Future work combining our model with models of the remainder of the salmon life cycle – spawning and production of juveniles expressing alternative LHPs – within an integrated population model [e.g. @defilippo2021improving] will allow for population projection and assessment of the contribution of alternative LHPs to population productivity. Because our multi-state model includes both synchronous and asynchronous variability in demographic rates as functions of ecological variables and other sources of stochasticity, it can be used to simulate population trajectories that reflect this variability. Furthermore, the relationships that we identified between environmental variables and demographic rates can be used to simulate the effects of projected changes to environmental conditions on demographic rates [@Crozier2021Climate]. These features will make such an integrated population model valuable for population viability analyses and assessing the outcomes of different management actions while considering the effects of climate change.  
 
-Our example of how life history diversity contributes to population stability has implications for natural resource management. Differing responses of animals expressing alternative LHPs to environmental variables might be especially important for maintaining population stability as environmental conditions continue to change and become more variable in the future [@Mantua2010Climate; @Masson-Delmotte2021Summary]. This highlights the value of maintaining life history diversity for conservation and the sustainable provisioning of ecosystem services.  
+Our findings about how maturation ages and demographic responses to environmental variability differ among LHPs have implications for natural resource management. Because these features should contribute to the stability of population dynamics in variable environmentals, they might be especially important for maintaining population stability as environmental conditions continue to change and become more variable in the future [@Mantua2010Climate; @Masson-Delmotte2021Summary]. This highlights the value of maintaining life history diversity for conservation and the sustainable provisioning of ecosystem services.  
 
 \newpage
 ## Tables {-}
 
 `r tab_nums("variables")`
 
-Occasion|Variables|
+Occasion/interval|Variables|
 |--|---------|
 |$\boldsymbol\phi$|
-|Natal emigration|LHP$^\dagger$ + Stream$^\dagger$ + LHP\*Stream + DS\*Win.flow + DS\*Win.air + LHP\*Stream\*Redds|
-|Lower Wenatchee|NR.DS$^\dagger$  + Stream + NR.DS\*Stream + NR.DS\*Temp  + NR.DS\*Flow + NR.DS\*Spill + NR.DS\*Stream\*Redds|
-|McNary.juv|NR.DS$^\dagger$ + Stream + NR.DS\*Stream + NR.DS\*Temp + NR.DS\*Flow + NR.DS\*Spill + NR.DS\*Stream\*Redds|
-|Bonneville.juv|NR.DS$^\dagger$ + Stream + NR.DS\*Stream +  NR.DS\*SST.Arc.Win + NR.DS\*CUI.Spr + NR.DS\*SST.WA.Sum + NR.DS\*Stream\*Redds|
-|Bonneville.ad|Ad.age |
-|McNary.ad|Ad.age |
+|1-Natal emigration|LHP$^\dagger$ + Stream$^\dagger$ + LHP\*Stream + DS\*Win.flow + DS\*Win.air + LHP\*Stream\*Redds|
+|2-Lower Wenatchee|NR.DS$^\dagger$  + Stream + NR.DS\*Stream + NR.DS\*Temp  + NR.DS\*Flow + NR.DS\*Spill + NR.DS\*Stream\*Redds|
+|3-McNary.juv|NR.DS$^\dagger$ + Stream + NR.DS\*Stream + NR.DS\*Temp + NR.DS\*Flow + NR.DS\*Spill + NR.DS\*Stream\*Redds|
+|4-Bonneville.juv|NR.DS$^\dagger$ + Stream + NR.DS\*Stream +  NR.DS\*SST.Arc.Win + NR.DS\*CUI.Spr + NR.DS\*SST.WA.Sum + NR.DS\*Stream\*Redds|
+|5-Bonneville.ad|Ad.age |
+|6-McNary.ad|Ad.age |
 |$\boldsymbol{\psi}$|
-|Bonneville| NR.DS$^\dagger$ |
+|4-Bonneville| NR.DS$^\dagger$ |
 |$\boldsymbol{p}$|
-|Lower Wenatchee| LHP$^\dagger$ + Stream + LHP\*Stream |
-|McNary.juv|NR.DS$^\dagger$ + Stream + NR.DS\*Stream + NR.DS\*Flow + NR.DS\*Spill|
-|Bonneville.juv|NR.DS$^\dagger$ + Stream + NR.DS\*Stream + NR.DS\*Flow + NR.DS\*Spill|
-|Bonneville.ad|Ad.age |
-|McNary.ad|Ad.age |
-|Tumwater.ad|- |
+|2-Lower Wenatchee| LHP$^\dagger$ + Stream + LHP\*Stream |
+|3-McNary.juv|NR.DS$^\dagger$ + Stream + NR.DS\*Stream + NR.DS\*Flow + NR.DS\*Spill|
+|4-Bonneville.juv|NR.DS$^\dagger$ + Stream + NR.DS\*Stream + NR.DS\*Flow + NR.DS\*Spill|
+|5-Bonneville.ad|Ad.age |
+|6-McNary.ad|Ad.age |
+|7-Tumwater.ad|- |
 
 <!-- \newpage  -->
 
@@ -1214,7 +1196,7 @@ Occasion|Variables|
 ## Figures {-}
 
 ```{r map, echo=FALSE, out.width = '100%'}
-knitr::include_graphics("2_panel_map_elev_8122021.png")
+knitr::include_graphics("2_panel_map_elev_9242021.png")
 ```
 
 `r fig_nums("map")`
@@ -1368,7 +1350,7 @@ ggplot(data= as_tibble(Psi.design.dat) %>% mutate(age_class=ifelse(age_class=="S
 ```{r phi_means, echo=FALSE,eval=TRUE, message=FALSE, warning=FALSE}
 # knitr::kable(phi_mean , col.names = c("Occasion", "Life history","Stream",  "Age", "$Mean(\\phi_y)$","$SD(\\phi_y)$"),escape = FALSE)
 
-knitr::kable(phi_tab  , col.names = c("Interval", "LHP","Stream",  "Age" , "Median","lcl","ucl"),escape = FALSE)
+knitr::kable(phi_tab  , col.names = c("Interval", "LHP","Stream",  "Age" , "Median","lcl","ucl"),escape = FALSE, digits =3)
 
 
 ```
@@ -1441,7 +1423,7 @@ knitr::kable(param_tab[[3]] %>% rename("Age"="Occasion") %>% select(1) %>%  muta
 
 `r sup_tab_nums("looic_tab")`
 
-```{r looic_tab}
+```{r looic_tab, message=FALSE, warning=FALSE}
 format_cells <- function(df, rows ,cols, value = c("italics", "bold", "strikethrough")){
 
   # select the correct markup
@@ -1462,8 +1444,15 @@ format_cells <- function(df, rows ,cols, value = c("italics", "bold", "strikethr
 
   return(df)
 }
-looic_tab<-read.csv(here("results","combs_loo.csv"))[,-1] %>% mutate(looic=round(looic,2),looic=format(looic,digits=7),a=round(-log(.01)/(a/10),2) ,b=round(-log(.01)/(b/10),2)) %>% arrange(a,b) %>% format_cells(which.min(.[,3]), 3, "bold") %>%   pivot_wider(names_from =c("a"),values_from="looic") %>% rename(" "="b")
-knitr::kable(looic_tab)
+
+looic_tab<-read.csv(here("results","combs_loo_9-24-2021.csv"))[,-1] %>% mutate(looic=looic-115000,a=-log(.01)/(a/10) ,b=-log(.01)/(b/10)) %>% 
+  # mutate(across(everything(),format,digits=3)) %>%
+ arrange(a,b)  %>%   pivot_wider(names_from =c("a"),values_from="looic") %>% rename(" "="b")
+min<-min(looic_tab[-1,-1])
+#%>% format_cells(which.min(.[,3]), 3, "bold")
+library(huxtable)
+library(flextable)
+as_hux(looic_tab[,-ncol(looic_tab)]) %>% set_right_border(col=1,row=everywhere) %>% set_font_size(6) %>% set_width(1) %>% map_background_color(-1,-1,by_colorspace(rev(viridis(10)))) %>% map_bold(-1,-1,by_ranges(min+.0001,c(TRUE,FALSE))) %>% set_number_format(c("%.1f"))
 
 ```
 
@@ -1499,7 +1488,7 @@ ggplot(data= as_tibble(p.design.dat) %>% filter(Time==0),aes(x=mig_year ,y=p_fit
 `r sup_fig_nums("time_2_det")`
 
 ```{r plot_detection2, fig.height=6, fig.width=7, paged.print=TRUE,eval=TRUE}
-ggplot(data= as_tibble(p.design.dat) %>% filter(Time==1|Time==2),aes(x=mig_year ,y=p_fit,color=stream)) + geom_point(position=position_dodge(width = .5))+geom_linerange(aes(ymin=lcl_p,ymax=ucl_p),position=position_dodge(width = .5))+facet_grid(time~age_class,scales="free",labeller =  labeller(LWe_J=c(`0`="NOT Detected at Lower Wen.",`1`="Detected at Lower Wen."),time=c(`2`="Lower Wenatchee",`3`="McNary Juvenile",`4`="Bonneville Juvenile")))+xlab("Year")+ylab("Detection")+ylim(0,1)+
+ggplot(data= as_tibble(p.design.dat) %>% filter(Time==1|Time==2),aes(x=mig_year ,y=p_fit,color=stream)) + geom_point(position=position_dodge(width = .75))+geom_linerange(aes(ymin=lcl_p,ymax=ucl_p),position=position_dodge(width = .75))+facet_grid(time~age_class,scales="free",labeller =  labeller(LWe_J=c(`0`="NOT Detected at Lower Wen.",`1`="Detected at Lower Wen."),time=c(`2`="Lower Wenatchee",`3`="McNary Juvenile",`4`="Bonneville Juvenile")))+xlab("Year")+ylab("Detection")+ylim(0,1)+
   scale_x_discrete(guide = guide_axis(check.overlap = TRUE))+
   scale_color_viridis(option="B",discrete=T,end=.7)+labs(color = "Natal stream")+theme(legend.position="top")
 ```
@@ -1508,7 +1497,7 @@ ggplot(data= as_tibble(p.design.dat) %>% filter(Time==1|Time==2),aes(x=mig_year 
 
 ```{r plot_detection3, fig.height=5, fig.width=6, paged.print=TRUE,eval=TRUE}
 
-ggplot(data= as_tibble(p.design.dat)%>% filter(Time>2),aes(x=mig_year ,y=p_fit,color=stratum)) + geom_point(position=position_dodge(width = .5))+geom_linerange(aes(ymin=lcl_p,ymax=ucl_p),position=position_dodge(width = .5))+facet_grid(~time,scales="free",labeller =  labeller(time=c(`5`="Bonneville Adult",`6`=" McNary Adult")))+ylim(0,1)+xlab("Year")+ylab("Detection")+
+ggplot(data= as_tibble(p.design.dat)%>% filter(Time>2),aes(x=mig_year ,y=p_fit,color=stratum)) + geom_point(position=position_dodge(width = .75))+geom_linerange(aes(ymin=lcl_p,ymax=ucl_p),position=position_dodge(width = .75))+facet_grid(~time,scales="free",labeller =  labeller(time=c(`5`="Bonneville Adult",`6`=" McNary Adult")))+ylim(0,1)+xlab("Year")+ylab("Detection")+
   scale_x_discrete(guide = guide_axis(check.overlap = TRUE))+
   scale_color_viridis(option="D",discrete=T,end=.7)+labs(color = "Adult age")+theme(legend.position="top")
 
@@ -1530,23 +1519,26 @@ plot(dharm_sim,quantreg=TRUE)
 
 `r sup_fig_nums("GOF_cond")`
 
-```{r DHARMa_GOF_cond2, echo=FALSE,eval=TRUE, message=TRUE, warning=FALSE,fig.height=7, fig.width=8}
-testDispersion(dharm_sim)
 
-# testOutliers(dharm_sim,type = "bootstrap")
 
-#When data were simulated based on the fitted values for random effects, the standardized residuals were underdispersed, suggesting that we are are sacrificing some power in the data to make inference.
-```
 
-`r sup_fig_nums("GOF_cond_disp")`
+<!-- ```{r DHARMa_GOF_cond2, echo=FALSE,eval=TRUE, message=TRUE, warning=FALSE,fig.height=7, fig.width=8} -->
+<!-- testDispersion(dharm_sim) -->
 
-```{r DHARMa_GOF_cond3, echo=FALSE,eval=TRUE, message=TRUE, warning=FALSE,fig.height=7, fig.width=8}
+<!-- # testOutliers(dharm_sim,type = "bootstrap") -->
 
- testOutliers(dharm_sim,type = "bootstrap")
+<!-- #When data were simulated based on the fitted values for random effects, the standardized residuals were underdispersed, suggesting that we are are sacrificing some power in the data to make inference. -->
+<!-- ``` -->
 
-```
+<!-- `r sup_fig_nums("GOF_cond_disp")` -->
 
-`r sup_fig_nums("GOF_cond_boot")`
+<!-- ```{r DHARMa_GOF_cond3, echo=FALSE,eval=TRUE, message=TRUE, warning=FALSE,fig.height=7, fig.width=8} -->
+
+<!--  testOutliers(dharm_sim,type = "bootstrap") -->
+
+<!-- ``` -->
+
+<!-- `r sup_fig_nums("GOF_cond_boot")` -->
 
 
 
@@ -1559,43 +1551,52 @@ plot(dharm_sim_samp_year,quantreg=TRUE)
 
 `r sup_fig_nums("GOF_uncond")`
 
-```{r DHARMa_GOF_uncond2, echo=FALSE,eval=TRUE, message=FALSE, warning=FALSE,fig.height=7, fig.width=8}
-
-testDispersion(dharm_sim_samp_year)
-# testOutliers(dharm_sim_samp_year,type = "bootstrap")
-
-#When random effects were simulated, the standardized residuals looked good. This suggests that this model could be used to simulate unobserved years, such as we might want to do in a population viability analysis.
-```
-
-`r sup_fig_nums("GOF_uncond_disp")`
-
-```{r DHARMa_GOF_uncond3, echo=FALSE,eval=TRUE, message=FALSE, warning=FALSE,fig.height=7, fig.width=8}
 
 
-testOutliers(dharm_sim_samp_year,type = "bootstrap")
 
-#look for autocorrelation in scaled residuals
-# obs_dat_long<-obs_dat_long %>% mutate(SR_cond=dharm_sim$scaledResiduals,SR_uncond=dharm_sim_samp_year$scaledResiduals)
-# 
-# #acf(1) for each group
-# test<-obs_dat_long %>% group_by(LH,stream,name) %>% 
-#   summarise(acf(SR_cond,plot=FALSE)[[1]][2])
-#   
-# #print
-# test %>% ungroup %>% arrange(name) %>% print(n=200)
-# 
-# #acf(1) unconditional for each group
-# test<-obs_dat_long %>% group_by(LH,stream,name) %>% 
-#   summarise(acf(SR_uncond,plot=FALSE)[[1]][2])
-#   
-# #print
-# test %>% ungroup %>% arrange(name) %>% print(n=200)
+<!-- ```{r DHARMa_GOF_uncond2, echo=FALSE,eval=TRUE, message=FALSE, warning=FALSE,fig.height=7, fig.width=8} -->
 
-#no real evidence of autocorrelation
+<!-- testDispersion(dharm_sim_samp_year) -->
+<!-- # testOutliers(dharm_sim_samp_year,type = "bootstrap") -->
 
-```
+<!-- #When random effects were simulated, the standardized residuals looked good. This suggests that this model could be used to simulate unobserved years, such as we might want to do in a population viability analysis. -->
+<!-- ``` -->
 
-`r sup_fig_nums("GOF_uncond_boot")`
+<!-- `r sup_fig_nums("GOF_uncond_disp")` -->
+
+
+
+
+
+<!-- ```{r DHARMa_GOF_uncond3, echo=FALSE,eval=TRUE, message=FALSE, warning=FALSE,fig.height=7, fig.width=8} -->
+
+
+<!-- testOutliers(dharm_sim_samp_year,type = "bootstrap") -->
+
+<!-- #look for autocorrelation in scaled residuals -->
+<!-- # obs_dat_long<-obs_dat_long %>% mutate(SR_cond=dharm_sim$scaledResiduals,SR_uncond=dharm_sim_samp_year$scaledResiduals) -->
+<!-- #  -->
+<!-- # #acf(1) for each group -->
+<!-- # test<-obs_dat_long %>% group_by(LH,stream,name) %>%  -->
+<!-- #   summarise(acf(SR_cond,plot=FALSE)[[1]][2]) -->
+<!-- #    -->
+<!-- # #print -->
+<!-- # test %>% ungroup %>% arrange(name) %>% print(n=200) -->
+<!-- #  -->
+<!-- # #acf(1) unconditional for each group -->
+<!-- # test<-obs_dat_long %>% group_by(LH,stream,name) %>%  -->
+<!-- #   summarise(acf(SR_uncond,plot=FALSE)[[1]][2]) -->
+<!-- #    -->
+<!-- # #print -->
+<!-- # test %>% ungroup %>% arrange(name) %>% print(n=200) -->
+
+<!-- #no real evidence of autocorrelation -->
+
+<!-- ``` -->
+
+<!-- `r sup_fig_nums("GOF_uncond_boot")` -->
+
+
 
 ```{r DHARMa_extra,eval=FALSE}
 plotResiduals(dharm_sim, paste(obs_dat_long$stream,obs_dat_long$LH))

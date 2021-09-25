@@ -1,6 +1,5 @@
 
 
-
 #function that prints fixed and random effects and their standard deviations and correlations in a nice table
 print_out<-function(mscjs_fit){
   
@@ -84,7 +83,7 @@ print_out<-function(mscjs_fit){
   print("fixed")
   Phi.fixed<-tibble(par_name=colnames(mscjs_fit$dat_TMB$X_phi),estimate=ad_rep_vals[names(ad_rep_vals)=="beta_phi"],sd=ad_rep_sds[names(ad_rep_vals)=="beta_phi"]) %>% mutate(lcl=estimate+qnorm(.025)*sd,ucl=estimate+qnorm(.975)*sd)
   
-  Phi.fixed %>%  mutate(p_value= round(2*pnorm(abs(estimate/sd), lower.tail = FALSE),3)) %>% print(n=100)
+  Phi.fixed %>%  mutate(p_value= round(2*pnorm(abs(estimate/sd), lower.tail = FALSE),4)) %>% print(n=100)
  print("Random covariance")
   try(phi_rand_cov<- print_cov("Phi"))
   
@@ -93,7 +92,7 @@ print_out<-function(mscjs_fit){
   print("p")
   print("fixed")
   p.fixed<-tibble(par_name=colnames(mscjs_fit$p.design.glmmTMB$data.tmb$X),estimate=ad_rep_vals[names(ad_rep_vals)=="beta_p"],sd=ad_rep_sds[names(ad_rep_vals)=="beta_p"]) %>% mutate(lcl=estimate+qnorm(.025)*sd,ucl=estimate+qnorm(.975)*sd)
-  p.fixed %>%  mutate(p_value= round(2*pnorm(abs(estimate/sd), lower.tail = FALSE),3)) %>% print(n=100)
+  p.fixed %>%  mutate(p_value= round(2*pnorm(abs(estimate/sd), lower.tail = FALSE),4)) %>% print(n=100)
   print("Random covariance")
   try(p_rand_cov<-print_cov("p"))
   
@@ -102,7 +101,7 @@ print_out<-function(mscjs_fit){
   print("fixed")
   Psi.fixed<-tibble(par_name=colnames(mscjs_fit$Psi.design.glmmTMB$data.tmb$X),estimate=ad_rep_vals[names(ad_rep_vals)=="beta_psi"],sd=ad_rep_sds[names(ad_rep_vals)=="beta_psi"]) %>% mutate(lcl=estimate+qnorm(.025)*sd,ucl=estimate+qnorm(.975)*sd)
   
-  Psi.fixed%>%  mutate(p_value= round(2*pnorm(abs(estimate/sd), lower.tail = FALSE),3)) %>% print(n=100)
+  Psi.fixed%>%  mutate(p_value= round(2*pnorm(abs(estimate/sd), lower.tail = FALSE),4)) %>% print(n=100)
   try(psi_rand_cov<-print_cov("Psi"))
   
   return(list(phi_rand_cov=phi_rand_cov,p_rand_cov=p_rand_cov,psi_rand_cov=psi_rand_cov,Phi.fixed=Phi.fixed,p.fixed=p.fixed,Psi.fixed=Psi.fixed))
@@ -270,14 +269,14 @@ Freem_Tuk_P<-function(obs_dat_long,  # observed data
     sim<-mscjs_fit$mod$simulate(par=sim_posterior[,i])
     
     # sumarize expected observations based on paramater set
-    exp_det<-cbind(mscjs_dat$releases %>% ungroup() %>% select(LH,stream,sea_Year_p) , sim$det_1,sim$det_2,sim$det_3) %>% `colnames<-`(colnames(obs_dat %>% select(LH  :Tum_A_3))) %>% 
+    exp_det<-cbind(mscjs_dat$releases %>% ungroup() %>% dplyr::select(LH,stream,sea_Year_p) , sim$det_1,sim$det_2,sim$det_3) %>% `colnames<-`(colnames(obs_dat %>% dplyr::select(LH  :Tum_A_3))) %>% 
       #sum detection by stream, year, and life history
       group_by(LH,stream,sea_Year_p,) %>% summarise(across(LWe_J :Tum_A_3, sum)) %>% ungroup() %>% pivot_longer(LWe_J :Tum_A_3) %>% 
       filter(!(LH=="Unk" & name==("LWe_J")))
     # filter(!(LH=="Unk" & !name%in%c("Bon_J","McN_J")))
     
     # summarize simulated data based on parameter set
-    sim_obs<-cbind(mscjs_dat$releases %>% ungroup() %>% select(LH,stream,sea_Year_p) , sim$sim_det_1,sim$sim_det_2,sim$sim_det_3) %>% `colnames<-`(colnames(obs_dat %>% select(LH  :Tum_A_3))) %>% 
+    sim_obs<-cbind(mscjs_dat$releases %>% ungroup() %>% dplyr::select(LH,stream,sea_Year_p) , sim$sim_det_1,sim$sim_det_2,sim$sim_det_3) %>% `colnames<-`(colnames(obs_dat %>% dplyr::select(LH  :Tum_A_3))) %>% 
       #sum detection by stream, year, and life history
       group_by(LH,stream,sea_Year_p) %>% summarise(across(LWe_J :Tum_A_3, sum)) %>% ungroup() %>% pivot_longer(LWe_J :Tum_A_3) %>% 
       filter(!(LH=="Unk" & name==("LWe_J")))
@@ -349,7 +348,7 @@ make_stan_res<-function(mscjs_fit,mscjs_dat,obs_dat_long,sim_rand,post_pred=NULL
 }
 
 print_param_CI<-function(par_names="time2",mod="Phi.fixed",prob=FALSE,make_neg=FALSE, include_95=FALSE,par_CI=FALSE,times2=FALSE){
-  
+
   x<-param_tab[[mod]]  %>% filter(par_name==par_names) %>% select(-par_name) %>% slice(1) %>% as.numeric()
   
   if(times2){
@@ -359,13 +358,12 @@ print_param_CI<-function(par_names="time2",mod="Phi.fixed",prob=FALSE,make_neg=F
   
   if(prob) x<-plogis(x)
   if(make_neg) x<--x
-x<-format(round(x,2), nsmall=2)  
-  if(include_95){paste0(x[1],"; 95% CI = ",x[3],"-- ",x[4])}else{
-    if(par_CI) {paste0(x[1]," (",x[3],"-- ",x[4])}else{
+x<-format(round(x,3), nsmall=2)  
+  if(include_95){paste0( sprintf("%.6s",x[1]),"; 95% CI = ", sprintf("%.5s",x[3])," -- ", sprintf("%.6s",x[4]))}else{
+    if(par_CI) {paste0(sprintf("%.6s",x[1])," (", sprintf("%.6s",x[3])," -- ", sprintf("%.6s",x[4]))}else{
           
-    paste0(x[1],"; ",x[3],"-- ",x[4])
+    paste0(sprintf("%.6s",x[1]),"; ",sprintf("%.6s",x[3])," -- ",sprintf("%.6s",x[4]))
     }
   }
 
-  
 }

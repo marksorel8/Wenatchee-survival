@@ -393,8 +393,6 @@ DATA_IVECTOR(n_released);   // number of fish released in each cohort (LH x stre
 DATA_IMATRIX(phi_pim_sim);  // index of phi parameters for the simulation 
 DATA_IMATRIX(p_pim_sim);    // index of p parameters for the simulation 
 DATA_IVECTOR(psi_pim_sim);  // index of psi parameters for the simulation 
-DATA_IVECTOR(TD_occ);       // occasions with trap dependent detection (effect of detection/non-detection at previous occasion)
-DATA_IVECTOR(TD_i);         // p_pim_sim index for detection parameters for fish that were detected at the previous occasion
 DATA_INTEGER(sim_rand);     //flag indicating whether to simulate the random effects in simulations
 DATA_IVECTOR(f_rel);        // occasion of release for each cohort
 //penality parameter for PC prior
@@ -713,20 +711,10 @@ for(int n=0; n<n_cohorts; n++){ // loop over release cohorts
     pS(1) *= Type(phi_hat(phi_pim_sim(n,t))); //prob stay alive
     
     //observation process
-    if(t==TD_occ(0)){ //if occasion that has trap dependency with detection at Lower Wenatchee (most likely McNary)
-      if(f_rel(n)==1){
-        det_1(n,t) =  Type(p_hat(p_pim_sim(n,TD_i(0)))*pS(1)*n_released(n));
-      }else{
-        det_1(n,t) = Type(p_hat(p_pim_sim(n,t))*pS(1)*n_released(n)*(Type(1)-p_hat(p_pim_sim(n,t-1)))); //not detected at previous
-        det_1(n,t) += Type(p_hat(p_pim_sim(n,TD_i(0)))*pS(1)*n_released(n))*p_hat(p_pim_sim(n,t-1));}     // detected at previous
-    }else{if(t==TD_occ(1)){//if occasion that has trap dependency with detection at McNary (most likely JDD or Bonneville)
-      det_1(n,t) = Type(p_hat(p_pim_sim(n,t))*pS(1)*n_released(n)*(Type(1)-p_hat(p_pim_sim(n,t-1)))); //not detected at previous
-      det_1(n,t) += Type(p_hat(p_pim_sim(n,TD_i(1)))*pS(1)*n_released(n)*p_hat(p_pim_sim(n,t-1)));     // detected at previous
-    }else{
       det_1(n,t) = Type(p_hat(p_pim_sim(n,t))*pS(1)*n_released(n)); //expected obs
-    }
+
     
-    }}
+    }
   
 
     //ocean occasion
@@ -780,34 +768,13 @@ for(int n=0; n<n_released.size(); n++){ // loop over individual release cohorts
   
   //downstream migration
   for(int t=f_rel(n); t<nDS_OCC; t++){       //loop over downstream occasions (excluding capture occasion)
-    if(t==TD_occ(0)){ //if occasion that has trap dependency with detection at Lower Wenatchee (most likely McNary)
-      //survival process
-      if(f_rel(n)==1){
-        sim_state_1(n,t+1)=rbinom(Type( sim_state_1(n,t)),phi(phi_pim_sim(n,t)));
-        sim_det_1(n,t)= rbinom(Type(sim_state_1(n,t+1)),  Type(p(p_pim_sim(n,TD_i(0)))));
-      }else{
-        not_det_surv= rbinom(Type( sim_state_1(n,t)-sim_det_1(n,t-1)),phi(phi_pim_sim(n,t))); //simulated stay alive not detected previously
-        det_surv = rbinom(Type( sim_det_1(n,t-1)),phi(phi_pim_sim(n,t))); //simulated stay alive detected previously
-        sim_state_1(n,t+1) = det_surv + not_det_surv; //simulated stay alive
-        //observation process
-        sim_det_1(n,t) = rbinom(Type( not_det_surv), Type(p(p_pim_sim(n,t)) ));  //not detected at previous
-        sim_det_1(n,t) += rbinom(Type(det_surv),  Type(p(p_pim_sim(n,TD_i(0)))));}     // detected at previous
-    }else{if(t==TD_occ(1)){//if occasion that has trap dependency with detection at McNary (most likely JDD or Bonneville)
-      //survival process
-      not_det_surv= rbinom(Type( sim_state_1(n,t)-sim_det_1(n,t-1)),phi(phi_pim_sim(n,t))); //simulated stay alive not detected previously
-      det_surv = rbinom(Type( sim_det_1(n,t-1)),phi(phi_pim_sim(n,t))); //simulated stay alive detected previously
-      sim_state_1(n,t+1) = det_surv + not_det_surv; //simulated stay alive
-      //observation process
-      sim_det_1(n,t) = rbinom(Type( not_det_surv), Type(p(p_pim_sim(n,t)) ));  //not detected at previous
-      sim_det_1(n,t) += rbinom(Type(det_surv),  Type(p(p_pim_sim(n,TD_i(1)))));     // detected at previous
-    }else{
       //survival process
       sim_state_1(n,t+1) = rbinom(Type( sim_state_1(n,t)),phi(phi_pim_sim(n,t))); //simulated stay alive
       //observation process
       sim_det_1(n,t) = rbinom(Type( sim_state_1(n,t+1)),  Type(p(p_pim_sim(n,t)))); //simulated obs
-    }
+
     
-    }}
+    }
  
     //ocean occasion
     int t = nDS_OCC;  //set occasion to be ocean occasion
