@@ -154,6 +154,13 @@ tab_coef<-tibble(time=substr(mat_vars[,1],5,5),
 ggplot(data=tab_coef,aes(x=var,y=est,color=LH))+facet_grid(cols=vars(time),labeller =  labeller(time=c(`1`="Release to Lower Wenatchee",`2`="Lower Wenatchee to McNary", `3` = "McNary to Bonneville ",`4` = "Marine survival")),scales = "free")+geom_hline(yintercept=0,linetype=2)+geom_point(position=position_dodge(width = .75),size=3)+geom_linerange(aes(ymin=est-1.96*sd,ymax=est+1.96*sd),position=position_dodge(width = .75),lwd=1.1)+xlab("")+ylab(expression(beta))+ggthemes::scale_colour_colorblind()+labs(color = "Life history pathway")+theme(legend.position="top")
 }
 
+# 
+# tab_coef<-tab_coef %>% mutate(LH=ifelse(LH=="Spr.1","Natal-reach rearing","Downstream rearing"))
+# ggplot(data=tab_coef,aes(y=var,x=est,color=LH))+facet_grid(cols=vars(time),labeller =  labeller(time=c(`1`="Release to Lower Wenatchee",`2`="Lower Wenatchee to McNary", `3` = "McNary to Bonneville ",`4` = "Bonneville to Boneville")),scales = "free")+geom_vline(xintercept=0,linetype=2)+geom_point(position=position_dodge(width = .75),size=3)+geom_linerange(aes(xmin=est-1.96*sd,xmax=est+1.96*sd),position=position_dodge(width = .75),lwd=1.1)+xlab("")+ylab("")+xlab(expression(beta))+ggthemes::scale_colour_colorblind()+labs(color = "Life history pathway")+theme(legend.position="top",axis.text=element_text(size=12),axis.title=element_text(size=14),legend.text = element_text(size=12))
+# }
+
+
+
 # function to plot coefficient effects of redds
 plot_redd_effect_fun<-function(covs, 
       fit_obj=mscjs_fit){
