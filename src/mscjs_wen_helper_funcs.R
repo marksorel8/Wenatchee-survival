@@ -366,7 +366,7 @@ print_param_CI<-function(par_names="time2",mod="Phi.fixed",prob=FALSE,make_neg=F
   if(prob) x<-plogis(x)
   if(make_neg) x<--x
 x<-format(round(x,3), nsmall=2)  
-  if(include_95){paste0( sprintf("%.6s",x[1]),"; 95% CI = ", sprintf("%.5s",x[3])," -- ", sprintf("%.6s",x[4]))}else{
+  if(include_95){paste0( sprintf("%.6s",x[1]),"; 95% confidence interval = ", sprintf("%.5s",x[3])," -- ", sprintf("%.6s",x[4]))}else{
     if(par_CI) {paste0(sprintf("%.6s",x[1])," (", sprintf("%.6s",x[3])," -- ", sprintf("%.6s",x[4]))}else{
           
     paste0(sprintf("%.6s",x[1]),"; ",sprintf("%.6s",x[3])," -- ",sprintf("%.6s",x[4]))
