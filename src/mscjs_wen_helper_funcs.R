@@ -364,13 +364,91 @@ print_param_CI<-function(par_names="time2",mod="Phi.fixed",prob=FALSE,make_neg=F
   }
   
   if(prob) x<-plogis(x)
-  if(make_neg) x<--x
+  
+  if(make_neg){ 
+    x<--x
+    x[3:4]<-x[4:3]
+  }
+  
+  
 x<-format(round(x,3), nsmall=2)  
-  if(include_95){paste0( sprintf("%.6s",x[1]),"; 95% confidence interval = ", sprintf("%.5s",x[3])," -- ", sprintf("%.6s",x[4]))}else{
-    if(par_CI) {paste0(sprintf("%.6s",x[1])," (", sprintf("%.6s",x[3])," -- ", sprintf("%.6s",x[4]))}else{
+
+  if(include_95){paste0( sprintf("%.6s",x[1]),"; CI = ", sprintf("%.5s",x[3]),", ", sprintf("%.6s",x[4]))}else{
+    if(par_CI) {paste0(sprintf("%.6s",x[1])," (CI = ", sprintf("%.6s",x[3]),", ", sprintf("%.6s",x[4]))}else{
           
-    paste0(sprintf("%.6s",x[1]),"; ",sprintf("%.6s",x[3])," -- ",sprintf("%.6s",x[4]))
+    paste0(sprintf("%.6s",x[1]),"; CI = ",sprintf("%.6s",x[3]),", ",sprintf("%.6s",x[4]))
     }
   }
 
+}
+
+
+
+#--------------------------------------
+#function to calculate derived quantity of effect of being a downstream rearing juvenile LHP *RELATIVE TO NRR LHP* on time 2 survival for fish from a given stream
+
+#takes a stream name, and (fromt he global environment): design matrices, posterior parameter samples.
+#returns the mean and 95% CI for the effect of being a DSR relative to a NRR for time 2 survial for a given stream
+
+calc_rel_DSR<-function(stream="Chiwawa"){
+  
+  
+  ## build posterior of effect of being DSR
+  time2_DSR<-
+    
+    ###design matrix for  DSR time 2
+    (as.matrix(design_phi[Phi.design.dat2$stream ==stream &Phi.design.dat2$time==2 & Phi.design.dat2$LH =="Sum.0" ,
+                          which(colnames(design_phi)%in%c("time2:age_class1","time2:age_class1:stream1","time2:age_class1:stream2"))] %>% distinct)) %>% 
+    ###  multiply by posterior samples for effects 
+    `%*%` (sim_posterior_phi[
+      which(colnames(design_phi)%in%c("time2:age_class1","time2:age_class1:stream1","time2:age_class1:stream2")),])
+  
+  
+  ## build posterior of effect of bein NRR
+  time2_NRR<-
+    
+    ###design matrix for Chiwawa DSR time 2
+    (as.matrix(design_phi[Phi.design.dat2$stream ==stream &Phi.design.dat2$time==2 & Phi.design.dat2$LH =="Spr.1" ,
+                          which(colnames(design_phi)%in%c("time2:age_class1","time2:stream1:age_class1","time2:stream2:age_class1"))] %>% distinct)) %>% 
+    ###  multiply by posterior samples for effects 
+    `%*%` (sim_posterior_phi[
+      which(colnames(design_phi)%in%c("time2:age_class1","time2:stream1:age_class1","time2:stream2:age_class1")),])
+  
+  ## build posterior for effect of DSR *relative to NRR*
+  rel_DSR<-time2_DSR-time2_NRR
+  
+  
+  ##calculate expected value of derived quantity based on posterior mean
+  med_params_DSR<-
+    ###design matrix for DSR Chiwawa effects time 2
+    (as.matrix(design_phi[Phi.design.dat2$stream ==stream &Phi.design.dat2$time==2 & Phi.design.dat2$LH =="Sum.0"   ,
+                          which(colnames(design_phi)%in%c("time2:age_class1","time2:stream1:age_class1","time2:stream2:age_class1"))] %>% distinct)) %>% 
+    ###  multiply by posterior mean for effects
+    `%*%` (mscjs_fit$last_par_best[names(mscjs_fit$last_par_best)%in%c("beta_phi_ints","beta_phi_pen")][
+      which(colnames(design_phi)%in%c("time2:age_class1","time2:stream1:age_class1","time2:stream2:age_class1"))])
+  
+  med_params_NRR<-
+    ###design matrix for DSR  effects time 2
+    (as.matrix(design_phi[Phi.design.dat2$stream ==stream &Phi.design.dat2$time==2 & Phi.design.dat2$LH =="Spr.1"   ,
+                          which(colnames(design_phi)%in%c("time2:age_class1","time2:stream1:age_class1","time2:stream2:age_class1"))] %>% distinct)) %>% 
+    ###  multiply by posterior mean for effects of stream at time 1
+    `%*%` (mscjs_fit$last_par_best[names(mscjs_fit$last_par_best)%in%c("beta_phi_ints","beta_phi_pen")][
+      which(colnames(design_phi)%in%c("time2:age_class1","time2:stream1:age_class1","time2:stream2:age_class1"))])
+  
+  #expected value of relative effect of DSR compared to NRR time 2 chiwawa 
+  med_param_rel_DSR<-med_params_DSR-med_params_NRR
+  
+  
+  ## format confidence interval for results
+  time2_DSR_effect<-paste0(c(med_param_rel_DSR) %>% sum() %>% round(3) %>% sprintf("%.3f",.),"; CI = ",quantile(rel_DSR,probs = 0.025) %>% round(3) %>% sprintf("%.3f",.),", ",quantile(rel_DSR,probs = 0.975) %>% round(3) %>% sprintf("%.3f",.))
+  
+  time2_DSR_effect
+}
+
+
+
+#--------------------------------------
+#function to format confidence intervals for pritning in results
+est_ci<-function(x){
+  paste0(sprintf("%.3f",x[1]) ,"; CI = ",sprintf("%.3f",x[2]) ,", ",sprintf("%.3f",x[3]))
 }
