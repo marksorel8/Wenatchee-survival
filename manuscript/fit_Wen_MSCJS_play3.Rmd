@@ -1,4 +1,3 @@
-
 ---
 title: Juvenile life history diversity is associated with lifetime demographic heterogeneity in a migratory fish
 
@@ -12,7 +11,7 @@ extra_dependencies: ["bm"]
 
 bibliography: references.bib
 
-csl: journal-of-applied-ecology.csl
+csl: chicago-author-date.csl
 
 header-includes:
     - \usepackage{setspace}
