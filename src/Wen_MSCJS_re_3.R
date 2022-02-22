@@ -115,7 +115,6 @@ n_states<-3
 #occasions corresponding to lower wenatchee and mcnary juveniles (for trap dependence)
 # trap_dep<-which(sites%in%c("LWe_J", "McN_J"))
 
-redd_dat<-read_csv(here("Data","redd_counts.csv")) %>% pivot_longer(Chiwawa:White,"stream",values_to = "redds") %>% mutate(mig_year=Year+2) %>% select(!Year)
 
 #~~~~
 #extract the individual design data for each parameter
@@ -158,8 +157,7 @@ cbind(.,model.matrix(~time+stream+LH+stratum-1,data=.)) %>%
   mutate(across(win_flow:last_col(),scale)) %>% 
   # mutate(across(sum_flow:pdo.aut,scale)) %>% 
  replace(is.na(.), 0) %>% # note these do not affect the likelihood. The only missing values are for marine covariates in recent years when adults returned but no juveniles went to sea (i.e. years when those covariates are used). Still, they end up in design matrix so cause things to crash if na.
-  #add redd counts
-  left_join(redd_dat %>% mutate(mig_year=as.factor(mig_year)),by=c("mig_year","stream")) %>%
+ 
   ungroup() %>% group_by(time,stream,LH) %>% mutate(redd_stan=(redds-mean(redds))/sd(redds)) %>% #standardize by time, stream, LH
   ungroup() %>% 
   #add a column of 1's to use as a goruping variable when specifying penalized cemplexity priors
@@ -214,8 +212,7 @@ p.design.dat<-
   left_join(env_dat %>% mutate(mig_year=as.factor(mig_year)),by="mig_year") %>% 
   mutate(across(sum_flow:last_col(),scale)) %>% 
   replace(is.na(.), 0) %>% # note these do not affect the likelihood. The only missing values are for marine covariates in recent years when adults returned but no juveniles went to sea (i.e. years when those covariates are used). Still, they end up in design matrix so cause things to crash if na.
-  #add redd counts
-  left_join(redd_dat %>% mutate(mig_year=as.factor(mig_year)),by=c("mig_year","stream")) %>%
+
   ungroup() %>% group_by(time,stream,LH) %>% mutate(redd_stan=(redds-mean(redds))/sd(redds)) %>% #standardize by time, stream, LH
   ungroup() %>% 
   #add a column of 1's to use as a goruping variable when specifying penalized cemplexity priors
