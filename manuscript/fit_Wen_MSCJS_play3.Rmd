@@ -268,7 +268,7 @@ for observed and simulated data generated with each parameter set [@conn2018guid
 
 
 
-```{r data_load, message=FALSE, warning=FALSE, process_dat,echo=FALSE,cache=FALSE}
+```{r , message=FALSE, warning=FALSE, process_dat,echo=FALSE,cache=FALSE}
 mscjs_dat<- make_dat(mark_file_CH,sites=c( "LWe_J",
   "McN_J",
 
