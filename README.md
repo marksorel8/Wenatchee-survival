@@ -1,6 +1,7 @@
 # Wenatchee-survival
-Modeling the survival of fish tagged at screw traps in natal streams through their return as spawning adults.
+This is the repository associated with the *in prep* manuscript: Juvenile life history diversity is associated with life-long demographic heterogeneity in a migratory fish by
+Mark H. Sorel, Andrew R. Murdoch, Richard W. Zabel, Jeffrey C. Jorgensen, Corey M. Kamphaus,and Sarah J. Converse.
 
-Some wild juvenile spring Chinook salmon are captured when emigrating fromtheir natal stream, and are implanted with passive integrated trasponder (PIT) tags. Those fish may then be detected within facilties for passing fish upstream or downstream at dams.
+The purpose of the repository is to estimate survival, smolt-to-adult return rates, and return age probabilities for spring Chinook salmon marked as juveniles when emigrating from their natal stream. 
 
-
+Please direct any questions or comments to me, Mark Sorel, at marks6@uw.edu.
