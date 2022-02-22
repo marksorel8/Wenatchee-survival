@@ -122,7 +122,6 @@ sup_fig_nums("Env_cov", "Effects of environmental covariates on survival by occa
 sup_fig_nums("timing", "Day of year of detections at three sites (columns) by juvenile life history pathways (rows). Fish from all study years and natal streams are represented. Vertical lines indicate median detection days. Summer (*Sum.0*) and fall (*Fal.0*) subyearling emigrants (downstream-rearing fish) had very similar detection timing to each other. downstream-rearing fish were detected 19 days earlier than yearling (*Spr.1*) emigrants (natal-reach-rearing fish) in the Lower Wenatchee River trap,9 days earlier at McNary Dam, and 10 days earlier at Bonneville Dam on average.")
 
 
-# sup_fig_nums("Redd_cov", "Coefficients ($\\beta$) for the effects of redd density within natal streams on survival by occasion (column), juvenile life history strategy (color), and natal stream (x-axis). The three juvenile life history pathways are fish that emigrated from their natal stream as subyearlings in summer (*Sum.0*) or fall (*Fal.0*), or as yearlings in spring (*Spr.1*). *DSR* represents both downstream-rearing life histories (summer and fall). Points represent mean estimates and lines span 95% confidence intervals.")
 
 sup_fig_nums("time_3_surv", "Annual survival estimates between McNary Dam and Bonneville Dam  by natal stream (color) and juvenile life history pathway (column): Points represent mean estimates and lines span 95% confidence intervals.")
 

@@ -158,8 +158,7 @@ cbind(.,model.matrix(~time+stream+LH+stratum-1,data=.)) %>%
   # mutate(across(sum_flow:pdo.aut,scale)) %>% 
  replace(is.na(.), 0) %>% # note these do not affect the likelihood. The only missing values are for marine covariates in recent years when adults returned but no juveniles went to sea (i.e. years when those covariates are used). Still, they end up in design matrix so cause things to crash if na.
  
-  ungroup() %>% group_by(time,stream,LH) %>% mutate(redd_stan=(redds-mean(redds))/sd(redds)) %>% #standardize by time, stream, LH
-  ungroup() %>% 
+  ungroup() %>%
   #add a column of 1's to use as a goruping variable when specifying penalized cemplexity priors
   mutate(one="1")
   # add column for first time
@@ -213,7 +212,6 @@ p.design.dat<-
   mutate(across(sum_flow:last_col(),scale)) %>% 
   replace(is.na(.), 0) %>% # note these do not affect the likelihood. The only missing values are for marine covariates in recent years when adults returned but no juveniles went to sea (i.e. years when those covariates are used). Still, they end up in design matrix so cause things to crash if na.
 
-  ungroup() %>% group_by(time,stream,LH) %>% mutate(redd_stan=(redds-mean(redds))/sd(redds)) %>% #standardize by time, stream, LH
   ungroup() %>% 
   #add a column of 1's to use as a goruping variable when specifying penalized cemplexity priors
   mutate(one="1")
