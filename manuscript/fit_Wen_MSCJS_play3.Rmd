@@ -29,7 +29,7 @@ $^4$Yakama Nation Fisheries, Mid-Columbia Field Station, Peshastin, WA 98847, US
 $^5$US Geological Survey, Washington Cooperative Fish and Wildlife Research Unit, School of Environmental and Forest Sciences & School of Aquatic and Fishery Sciences, University of Washington, Box 355020, Seattle, Washington 98195, USA  
 
 
-*Data availability statement*: All data were downloaded from public repositories cited within the manuscript. All data and code used in the analysis analysis are available at  https://github.com/marksorel8/Wenatchee-survival
+*Data availability statement*: All data were downloaded from public repositories cited within the manuscript. All data and code used in the analysis analysis are available at  https://github.com/Quantitative-Conservation-Lab/Wenatchee-survival
 
 *Key words*: Individual heterogeneity; multi-state model; synchrony, survival, maturation age, Chinook salmon; Columbia River; mark recapture; marine survival; migration; endangered species
 
