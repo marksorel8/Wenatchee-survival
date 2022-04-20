@@ -38,6 +38,8 @@ rm(LWe_mark_file)
 #recaptures in lower Wenatchee dams
 lower_wen_traps_recaps<-read_csv(here("Data","ptagis","ptagis_recap_data_wen_trib_screwt.csv")) %>% mutate(recap_date=lubridate::mdy_hms(recap_date),"First Year YYYY"=lubridate::year(recap_date),"First Day Num"=lubridate::yday(recap_date)) %>% rename("Tag Code" = tag_id ) %>% arrange(recap_date)
 
+
+
 #Lower and mid Columbia mainstem dam detections
 lower_mid_col_dams<-read_csv(here("Data","ptagis","mid_lower_Col_Interrogation_Summary.csv"))
 
@@ -67,6 +69,7 @@ upper_col_dams_tum<-bind_rows(upper_col_dams_tum,obs_dat_LWe_releases %>% filter
 
 #load length cutoffs for subyearling/yearling delineation for all days <=179
 load(here("Data","cutoffs_and_props.Rdata"))
+
 
 
 #add capture histories to mark file
@@ -253,4 +256,43 @@ left_join(lower_mid_col_dams %>%
 
 
 write.csv(mark_file_CH,file=here("Data","mark_file_CH.csv"))
+
+
+
+
+# 
+# ## look at size at recapture by LHP
+# lenght_recap<-mark_file %>% 
+#   
+#   #Lower Wenatchee Juvenile recapture
+#   left_join(lower_wen_traps_recaps %>%
+#               filter(`recap_site` %in% c("WENA4T","WENATT"))) %>% 
+#   mutate(mark_date=lubridate::mdy_hms(mark_date),
+#          mark_doy=lubridate::yday(mark_date)) %>% 
+#   
+#   
+#   #add age
+#   mutate( age = case_when((mark_doy>179)~   "sub", #if DOY > 179 then subyearling
+#                           is.na(mark_length )~       NA_character_,
+#                           (mark_length >=cutoffs_and_props[[1]]$y[ifelse((mark_doy-49)>0,
+#                                                                          (mark_doy-49),1)]) ~     "YCW",#assign age based on cutoff rule
+#                           TRUE~                                 "sub"
+#   )
+#   ) %>% 
+#   filter(!is.na(age)) %>% # drop 329 fish captured before doy 179 but without length data
+# 
+# 
+#   
+#   #assign life history (LH)
+#   mutate(LH= case_when(
+#     age=="Unk" ~ "Unk",
+#     age=="YCW" ~ "smolt",
+#     mark_doy<= 139 ~"fry",
+#     mark_doy<=262 ~"summer",
+#     TRUE ~"fall",
+#     
+#   )) 
+# 
+# 
+# lenght_recap %>% filter(!is.na(recap_length)) %>% group_by(LH) %>% summarize(mean(recap_length),n(),sd(recap_length))
 
